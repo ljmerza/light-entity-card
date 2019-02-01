@@ -3,8 +3,8 @@ var html = LitElement.prototype.html;
 
 class LightEntityCard extends LitElement {
 
-	static get properties() {
-   	return {
+  static get properties() {
+    return {
     	hass: Object,
       config: Object
     };
