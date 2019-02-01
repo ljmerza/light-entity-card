@@ -1,4 +1,4 @@
-<h1 align="center">Light Entity Card for Home Assistant</h1>
+<h1 align="center">Light Entity Card</h1>
 <h4 align="center">Control any light entity through lovelace</h4>
 
 <p align="center">
@@ -36,7 +36,7 @@ custom_updater:
 
 | Name | Type | Requirement | `Default value` Description
 | ---- | ---- | ------- | -----------
-| type | string | **Required** | `custom:light-entity-cardd`
+| type | string | **Required** | `custom:light-entity-card`
 | entity | string | **Required** | The entity name of the light entity to control
 
 <h2>Configuration</h2>
