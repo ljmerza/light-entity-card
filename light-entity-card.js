@@ -344,8 +344,6 @@ class LightEntityCard extends LitElement {
    * @param {String} state
    */
   callEntityService(payload, state){
-    console.log({ payload });
-    
     this.hass.callService("light", state, {
       entity_id: this.state.entity_id,
       ...payload
