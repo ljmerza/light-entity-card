@@ -12,7 +12,7 @@
 * HS Color wheel
 * Color temperature and white value support
 * Support for configured language
-* compact card support for grouped entities
+* Compact card support for grouped entities
 
 <h2>Track Updates</h2>
 
