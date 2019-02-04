@@ -363,8 +363,6 @@ class LightEntityCard extends LitElement {
    * @param {LightEntity} entity
    */
   setBrightness(event, entity){
-    console.log('test');
-    
     const brightness = parseInt(event.target.value, 10);
     if (isNaN(brightness)) return;
 
@@ -421,9 +419,7 @@ class LightEntityCard extends LitElement {
    * @param {String} state
    */
   callEntityService(payload, entity, state){
-    console.log({ payload, entity, state, _isUpdating:this._isUpdating});
     if(this._isUpdating) return;
-    
     const entityType = entity.entity_id.split('.')[0];
 
     this.hass.callService(entityType, state || LightEntityCard.cmdToggle.on, {
