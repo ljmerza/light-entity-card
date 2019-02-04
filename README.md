@@ -1,5 +1,5 @@
 <h1 align="center">Light Entity Card</h1>
-<h4 align="center">Control any light entity through lovelace</h4>
+<h4 align="center">Control any light/switch entity through lovelace</h4>
 
 <p align="center">
   <img src='https://i.imgur.com/5An8qQD.png' />
@@ -7,11 +7,12 @@
 
 <h2>Features</h2>
 
-* Works on any light based entity
+* Works on any light and switch based entity
 * Toggle on/off
 * HS Color wheel
 * Color temperature and white value support
 * Support for configured language
+* compact card support for grouped entities
 
 <h2>Track Updates</h2>
 
@@ -29,7 +30,7 @@ custom_updater:
 
 ```yaml
 - type: custom:light-entity-card
-  entity: light.led_strip
+  entity: light.downstairs
 ```
 
 <h2>Options</h2>
@@ -38,6 +39,7 @@ custom_updater:
 | ---- | ---- | ------- | -----------
 | type | string | **Required** | `custom:light-entity-card`
 | entity | string | **Required** | The entity name of the light entity to control
+| group | boolean | **Optional** | `false` Compacts card
 
 <h2>Configuration</h2>
 Go to your config directory and create a www folder. Inside the www run
@@ -50,7 +52,7 @@ In your ui-lovelace.yaml
 
 ```yaml
 resources:
-  - url: /local/light-entity-card/light-entity-card.js?v=1.0.0
+  - url: /local/light-entity-card/light-entity-card.js?v=1.1.0
     type: js
 ```
 
@@ -59,5 +61,5 @@ Add the custom card to views:
 ```yaml
 views:
   - type: custom:light-entity-card
-    entity: light.led_strip
+    entity: light.downstairs
 ```
