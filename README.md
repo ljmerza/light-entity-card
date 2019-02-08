@@ -13,6 +13,7 @@
 * Color temperature and white value support
 * Support for configured language
 * Compact card support for grouped entities
+* use `persist_features: true` to always show entity features
 
 <h2>Track Updates</h2>
 
@@ -40,6 +41,7 @@ custom_updater:
 | type | string | **Required** | `custom:light-entity-card`
 | entity | string | **Required** | The entity name of the light entity to control
 | group | boolean | **Optional** | `false` Compacts card
+| persist_features | boolean | **Optional** | `false` always show entity features
 
 <h2>Configuration</h2>
 Go to your config directory and create a www folder. Inside the www run
@@ -52,7 +54,7 @@ In your ui-lovelace.yaml
 
 ```yaml
 resources:
-  - url: /local/light-entity-card/light-entity-card.js?v=1.1.0
+  - url: /local/light-entity-card/light-entity-card.js?v=1.2.0
     type: js
 ```
 
