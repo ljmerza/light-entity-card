@@ -43,7 +43,7 @@ custom_updater:
 | entity | string | **Required** | The entity name of the light entity to control
 | group | boolean | **Optional** | `false` Compacts card
 | persist_features | boolean | **Optional** | `false` always show entity features
-| effects_list | list | string | **Optional** | `` custom list of effects or an input_select entity
+| effects_list | list or string | **Optional** | custom list of effects or an input_select entity
 
 <h2>Configuration</h2>
 Go to your config directory and create a www folder. Inside the www run
