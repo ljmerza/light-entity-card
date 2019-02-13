@@ -14,6 +14,7 @@
 * Support for configured language
 * Compact card support for grouped entities
 * use `persist_features: true` to always show entity features
+* use `effects_list` to add custom effects list or use `input_select` entity
 
 <h2>Track Updates</h2>
 
@@ -42,6 +43,7 @@ custom_updater:
 | entity | string | **Required** | The entity name of the light entity to control
 | group | boolean | **Optional** | `false` Compacts card
 | persist_features | boolean | **Optional** | `false` always show entity features
+| effects_list | list | string | **Optional** | `` custom list of effects or an input_select entity
 
 <h2>Configuration</h2>
 Go to your config directory and create a www folder. Inside the www run
@@ -54,14 +56,38 @@ In your ui-lovelace.yaml
 
 ```yaml
 resources:
-  - url: /local/light-entity-card/light-entity-card.js?v=1.2.0
+  - url: /local/light-entity-card/light-entity-card.js?v=1.3.0
     type: js
 ```
 
-Add the custom card to views:
+Example lovelace configurations:
 
 ```yaml
 views:
   - type: custom:light-entity-card
     entity: light.downstairs
+```
+
+```yaml
+views:
+  - type: custom:light-entity-card
+    entity: light.downstairs
+    effects_list:
+      - effect1
+      - effect2
+```
+
+```yaml
+views:
+  - type: custom:light-entity-card
+    entity: light.downstairs
+    effects_list: input_select.custom_effect_list
+```
+
+```yaml
+views:
+  - type: custom:light-entity-card
+    entity: light.downstairs
+    group: true
+    persist_features: true
 ```
