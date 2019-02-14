@@ -56,7 +56,7 @@ In your ui-lovelace.yaml
 
 ```yaml
 resources:
-  - url: /local/light-entity-card/light-entity-card.js?v=1.3.0
+  - url: /local/light-entity-card/light-entity-card.js?v=1.3.1
     type: js
 ```
 
