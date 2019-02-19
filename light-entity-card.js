@@ -1,5 +1,5 @@
 ; (function () {
-  const LitElement = Object.getPrototypeOf(customElements.get("hui-error-entity-row"));
+  const LitElement = Object.getPrototypeOf(customElements.get("home-assistant-main"));
   const html = LitElement.prototype.html;
 
   class LightEntityCard extends LitElement {
