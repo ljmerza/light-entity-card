@@ -131,6 +131,7 @@ class LightEntityCard extends LitElement {
 
     this.config = {
       group: false,
+      colorWheel: true,
       persist_features: false,
       ...config,
     };
@@ -179,7 +180,7 @@ class LightEntityCard extends LitElement {
           ${this.createColorTemperature(stateObj)}
           ${this.createWhiteValue(stateObj)}
         </div>
-        ${this.createColorPicker(stateObj)}
+        ${this.config.colorWheel ? this.createColorPicker(stateObj) : html``}
         ${this.createEffectList(stateObj)}
       </ha-card>
     `;

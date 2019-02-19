@@ -1,6 +1,6 @@
 {
     "name": "light-entity-card",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "A light-entity card for Home Assistant Lovelace UI",
     "keywords": [
         "home-assistant",

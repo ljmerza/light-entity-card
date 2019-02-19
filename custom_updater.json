@@ -1,7 +1,7 @@
 {
   "light-entity-card": {
     "updated_at": "2019-02-19",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "remote_location": "https://raw.githubusercontent.com/ljmerza/light-entity-card/master/light-entity-card.js",
     "visit_repo": "https://github.com/ljmerza/light-entity-card",
     "changelog": "https://github.com/ljmerza/light-entity-card/releases/latest"
