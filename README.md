@@ -46,17 +46,14 @@ custom_updater:
 | effects_list | list or string | **Optional** | custom list of effects or an input_select entity
 
 <h2>Configuration</h2>
-Go to your config directory and create a www folder. Inside the www run
 
-```bash
-git clone https://github.com/ljmerza/light-entity-card.git
-```
+Download `light-entity-card.js` from the [latest release](https://github.com/ljmerza/light-entity-card/releases/latest/) and upload it your /www folder of your Home Assistant config directory.
 
 In your ui-lovelace.yaml
 
 ```yaml
 resources:
-  - url: /local/light-entity-card/light-entity-card.js?v=1.3.1
+  - url: /local/light-entity-card.js?v=2.0.0
     type: js
 ```
 

@@ -1,0 +1,38 @@
+{
+    "name": "light-entity-card",
+    "version": "2.0.0",
+    "description": "A light-entity card for Home Assistant Lovelace UI",
+    "keywords": [
+        "home-assistant",
+        "homeassistant",
+        "hass",
+        "automation",
+        "lovelace",
+        "custom-cards",
+        "light-entity"
+    ],
+    "main": "main.js",
+    "module": "main.js",
+    "repository": "git@github.com:ljmerza/light-entity-card.git",
+    "author": "Leonardo Merza <ljmerza@gmail.com>",
+    "license": "MIT",
+    "dependencies": {
+        "lit-element": "^2.0.1"
+    },
+    "devDependencies": {
+        "eslint": "^5.13.0",
+        "eslint-config-airbnb-base": "^13.1.0",
+        "eslint-plugin-import": "^2.16.0",
+        "rollup": "^0.66.6",
+        "rollup-plugin-commonjs": "^9.2.0",
+        "rollup-plugin-node-resolve": "^3.4.0",
+        "rollup-plugin-replace": "^2.1.0",
+        "rollup-plugin-terser": "^3.0.0"
+    },
+    "scripts": {
+        "build": "npm run lint && npm run rollup",
+        "rollup": "rollup -c",
+        "lint": "eslint main.js style.js",
+        "watch": "rollup -c --watch"
+    }
+}
