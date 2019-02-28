@@ -44,7 +44,7 @@ custom_updater:
 | group | boolean | **Optional** | `false` Compacts card
 | colorWheel | boolean | **Optional** | `true` Show color-picker if entity has support
 | persist_features | boolean | **Optional** | `false` always show entity features
-| effects_list | list or string | **Optional** | custom list of effects or an input_select entity
+| effects_list | list|string|boolean | **Optional** | custom list of effects, an input_select entity, or set false to always hide
 
 <h2>Configuration</h2>
 
@@ -54,7 +54,7 @@ In your ui-lovelace.yaml
 
 ```yaml
 resources:
-  - url: /local/light-entity-card.js?v=2.1.0
+  - url: /local/light-entity-card.js?track=true
     type: js
 ```
 

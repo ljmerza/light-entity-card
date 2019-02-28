@@ -35,6 +35,10 @@ class LightEntityCard extends LitElement {
     };
   }
 
+  constructor() {
+    super();
+  }
+
   /**
    * get the current size of the card
    * @return {Number}
@@ -85,10 +89,6 @@ class LightEntityCard extends LitElement {
     return style;
   }
 
-  constructor() {
-    super();
-  }
-
   get language() {
     return this.__hass.resources[this.__hass.language];
   }
@@ -132,6 +132,7 @@ class LightEntityCard extends LitElement {
     this.config = {
       group: false,
       colorWheel: true,
+
       persist_features: false,
       ...config,
     };
@@ -274,6 +275,9 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createEffectList(stateObj) {
+    // do we disable effect list always?
+    if (this.config.effects_list === false) return html``; 
+
     // need to check state and persist_features here because if given custom effect list we may
     // want to sho that even if the feature doesn't exist so dont check that part to move forward just persist_features/state
     if (!this.config.persist_features && !this.isEntityOn(stateObj)) return html``;
