@@ -133,7 +133,6 @@ class LightEntityCard extends LitElement {
       group: false,
       persist_features: false,
       
-      header: true,
       brightness: true,
       color_temp: true,
       white_value: true,
