@@ -131,9 +131,13 @@ class LightEntityCard extends LitElement {
 
     this.config = {
       group: false,
-      colorWheel: true,
-
       persist_features: false,
+      
+      header: true,
+      brightness: true,
+      color_temp: true,
+      white_value: true,
+      color_picker: true,
       ...config,
     };
   }
@@ -181,7 +185,7 @@ class LightEntityCard extends LitElement {
           ${this.createColorTemperature(stateObj)}
           ${this.createWhiteValue(stateObj)}
         </div>
-        ${this.config.colorWheel ? this.createColorPicker(stateObj) : html``}
+        ${this.createColorPicker(stateObj)}
         ${this.createEffectList(stateObj)}
       </ha-card>
     `;
@@ -193,6 +197,7 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createHeader(stateObj) {
+    if (this.config.header === false) return html``; 
     const title = this.config.header || stateObj.attributes.friendly_name || stateObj.entity_id;
 
     return html`
@@ -212,14 +217,15 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createBrightnessSlider(stateObj) {
+    if (this.config.brightness === false) return html``; 
     if (this.dontShowFeature('brightness', stateObj)) return html``;
 
     return html`
-      <div class='control brightness light-entity-card-center'>
-        <ha-labeled-slider 
+      <div class='control light-entity-card-center'>
+        <ha-icon icon="hass:weather-sunny"></ha-icon>
+        <ha-slider 
           .value='${stateObj.attributes.brightness}'
           @value-changed="${e => this.setBrightness(e, stateObj)}"
-          icon="hass:weather-sunny"
           min="1"
           max="255"
         >
@@ -233,13 +239,14 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createColorTemperature(stateObj) {
+    if (this.config.color_temp === false) return html``; 
     if (this.dontShowFeature('colorTemp', stateObj)) return html``;
 
     return html`
-      <div class="control color_temp light-entity-card-center">
-        <ha-labeled-slider
+      <div class="control light-entity-card-center">
+        <ha-icon icon="hass:thermometer"></ha-icon>
+        <ha-slider
           class='light-entity-card-color_temp'
-          icon="hass:thermometer"
           min="${stateObj.attributes.min_mireds}"
           max="${stateObj.attributes.max_mireds}"
           .value=${stateObj.attributes.color_temp}
@@ -255,12 +262,13 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createWhiteValue(stateObj) {
+    if (this.config.white_value === false) return html``; 
     if (this.dontShowFeature('whiteValue', stateObj)) return html``;
 
     return html`
-      <div class="control white_value light-entity-card-center">
-        <ha-labeled-slider
-          icon="hass:file-word-box"
+      <div class="control light-entity-card-center">
+        <ha-icon icon="hass:file-word-box"></ha-icon>
+        <ha-slider
           max="255"
           .value="${stateObj.attributes.white_value}"
           @value-changed="${e => this.setWhiteValue(e, stateObj)}"
@@ -301,7 +309,7 @@ class LightEntityCard extends LitElement {
     const caption = this.language['ui.card.light.effect'];
 
     return html`
-      <div class="control effect_list light-entity-card-center light-entity-card-effectlist">
+      <div class="control light-entity-card-center light-entity-card-effectlist">
         <paper-dropdown-menu @value-changed=${e => this.setEffect(e, stateObj)} label="${caption}">
           <paper-listbox selected="${selectedIndex}" slot="dropdown-content" placeholder="${caption}">
             ${listItems}
@@ -317,6 +325,7 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createColorPicker(stateObj) {
+    if (this.config.color_picker === false) return html``; 
     if (this.dontShowFeature('color', stateObj)) return html``;
 
     return html`

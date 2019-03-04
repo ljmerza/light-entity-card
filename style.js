@@ -23,8 +23,12 @@ const style = css`
         font-size: 16px;
     }
 
-    .group .light-entity-card-sliders {
-        display: flex;
+    .light-entity-card-sliders > div {
+        margin-top: 10px;
+    }
+
+    .group .light-entity-card-sliders > div {
+        margin-top: 0px;
     }
 
     .light-entity-card__toggle {

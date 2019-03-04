@@ -15,6 +15,7 @@
 * Compact card support for grouped entities
 * use `persist_features: true` to always show entity features
 * use `effects_list` to add custom effects list or use `input_select` entity
+* always show or hide header and each input 
 
 <h2>Track Updates</h2>
 
@@ -28,7 +29,7 @@ custom_updater:
     - https://raw.githubusercontent.com/ljmerza/light-entity-card/master/custom_updater.json
 ```
 
-<h1>Usage</h1>
+<h1>Minimal Usage</h1>
 
 ```yaml
 - type: custom:light-entity-card
@@ -45,6 +46,12 @@ custom_updater:
 | colorWheel | boolean | **Optional** | `true` Show color-picker if entity has support
 | persist_features | boolean | **Optional** | `false` always show entity features
 | effects_list | list|string|boolean | **Optional** | custom list of effects, an input_select entity, or set false to always hide
+| header | boolean | string | **Optional** | custom header name or `false` to hide header
+| brightness | boolean | **Optional** | `true` show brightness slider if available 
+| color_temp | boolean | **Optional** | `true` show color temp slider if available 
+| white_value | boolean | **Optional** | `true` show white value slider if available 
+| color_picker | boolean | **Optional** | `true` show color picker wheel if available 
+
 
 <h2>Configuration</h2>
 
