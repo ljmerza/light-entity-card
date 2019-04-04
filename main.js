@@ -132,7 +132,6 @@ class LightEntityCard extends LitElement {
     this.config = {
       group: false,
       persist_features: false,
-      
       brightness: true,
       color_temp: true,
       white_value: true,
@@ -165,7 +164,7 @@ class LightEntityCard extends LitElement {
    */
   getEntitiesToShow(entities) {
     if (entities.attributes.entity_id && Array.isArray(entities.attributes.entity_id))
-      return entities.attributes.entity_id.map(entity_id => this.__hass.states[entity_id]);
+      return entities.attributes.entity_id.map(entity_id => this.__hass.states[entity_id]).filter(Boolean);
 
     return [entities];
   }
@@ -196,7 +195,7 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createHeader(stateObj) {
-    if (this.config.header === false) return html``; 
+    if (this.config.header === false) return html``;
     const title = this.config.header || stateObj.attributes.friendly_name || stateObj.entity_id;
 
     return html`
@@ -216,7 +215,7 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createBrightnessSlider(stateObj) {
-    if (this.config.brightness === false) return html``; 
+    if (this.config.brightness === false) return html``;
     if (this.dontShowFeature('brightness', stateObj)) return html``;
 
     return html`
@@ -238,7 +237,7 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createColorTemperature(stateObj) {
-    if (this.config.color_temp === false) return html``; 
+    if (this.config.color_temp === false) return html``;
     if (this.dontShowFeature('colorTemp', stateObj)) return html``;
 
     return html`
@@ -261,7 +260,7 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createWhiteValue(stateObj) {
-    if (this.config.white_value === false) return html``; 
+    if (this.config.white_value === false) return html``;
     if (this.dontShowFeature('whiteValue', stateObj)) return html``;
 
     return html`
@@ -283,7 +282,7 @@ class LightEntityCard extends LitElement {
    */
   createEffectList(stateObj) {
     // do we disable effect list always?
-    if (this.config.effects_list === false) return html``; 
+    if (this.config.effects_list === false) return html``;
 
     // need to check state and persist_features here because if given custom effect list we may
     // want to sho that even if the feature doesn't exist so dont check that part to move forward just persist_features/state
@@ -324,7 +323,7 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createColorPicker(stateObj) {
-    if (this.config.color_picker === false) return html``; 
+    if (this.config.color_picker === false) return html``;
     if (this.dontShowFeature('color', stateObj)) return html``;
 
     return html`
