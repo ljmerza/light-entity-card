@@ -1,11 +1,15 @@
-<h1 align="center">Light Entity Card</h1>
-<h4 align="center">Control any light/switch entity through lovelace</h4>
+# Light Entity Card</h1>
+#### Control any light/switch entity through lovelace</h4>
 
-<p align="center">
-  <img src='https://i.imgur.com/5An8qQD.png' />
-</p>
+<img src='https://i.imgur.com/5An8qQD.png' />
 
-<h2>Features</h2>
+[![GitHub Release][releases-shield]][releases]
+[![License][license-shield]](LICENSE.md)
+
+![Project Maintenance][maintenance-shield]
+[![GitHub Activity][commits-shield]][commits]
+
+## Features
 
 * Works on any light and switch based entity
 * Toggle on/off
@@ -17,7 +21,7 @@
 * use `effects_list` to add custom effects list or use `input_select` entity
 * always show or hide header and each input 
 
-<h2>Track Updates</h2>
+## Track Updates
 
 This custom card can be tracked with the help of [custom-updater](https://github.com/custom-components/custom_updater).
 
@@ -36,14 +40,14 @@ custom_updater:
   entity: light.downstairs
 ```
 
-<h2>Options</h2>
+## Options
 
 | Name | Type | Requirement | `Default value` Description
 | ---- | ---- | ------- | -----------
 | type | string | **Required** | `custom:light-entity-card`
 | entity | string | **Required** | The entity name of the light entity to control
 | group | boolean | **Optional** | `false` Compacts card
-| colorWheel | boolean | **Optional** | `true` Show color-picker if entity has support
+| color_wheel | boolean | **Optional** | `true` Show color-picker if entity has support
 | persist_features | boolean | **Optional** | `false` always show entity features
 | effects_list | list|string|boolean | **Optional** | custom list of effects, an input_select entity, or set false to always hide
 | header | boolean | string | **Optional** | custom header name or `false` to hide header
@@ -53,7 +57,7 @@ custom_updater:
 | color_picker | boolean | **Optional** | `true` show color picker wheel if available 
 
 
-<h2>Configuration</h2>
+## Configuration
 
 Download `light-entity-card.js` from the [latest release](https://github.com/ljmerza/light-entity-card/releases/latest/) and upload it your /www folder of your Home Assistant config directory.
 
@@ -96,3 +100,15 @@ views:
     group: true
     persist_features: true
 ```
+
+Enjoy my card? Help me out for a couple of :beers: or a :coffee:!
+
+[![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/JMISm06AD)
+
+
+[commits-shield]: https://img.shields.io/github/commit-activity/y/ljmerza/light-entity-card.svg?style=for-the-badge
+[commits]: https://github.com/ljmerza/light-entity-card/commits/master
+[license-shield]: https://img.shields.io/github/license/ljmerza/light-entity-card.svg?style=for-the-badge
+[maintenance-shield]: https://img.shields.io/badge/maintainer-Leonardo%20Merza%20%40ljmerza-blue.svg?style=for-the-badge
+[releases-shield]: https://img.shields.io/github/release/ljmerza/light-entity-card.svg?style=for-the-badge
+[releases]: https://github.com/ljmerza/light-entity-card/releases

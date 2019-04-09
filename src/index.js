@@ -1,6 +1,14 @@
+import '@babel/polyfill';
 
 import { LitElement, html } from 'lit-element';
 import style from './style';
+
+import defaultConfig from './defaults';
+import LightEntityCardEditor from './index-editor';
+
+
+const editorName = 'light-entity-card-editor';
+customElements.define(editorName, LightEntityCardEditor);
 
 
 class LightEntityCard extends LitElement {
@@ -9,6 +17,23 @@ class LightEntityCard extends LitElement {
       hass: Object,
       config: Object,
     };
+  }
+
+  /**
+   * checks and saves config of entity
+   * @param {*} config
+   */
+  setConfig(config) {
+    if (!config.entity) throw Error('entity required.');
+
+    this.config = {
+      ...defaultConfig,
+      ...config,
+    };
+  }
+
+  static async getConfigElement() {
+    return document.createElement(editorName);
   }
 
   static get featureNames() {
@@ -33,10 +58,6 @@ class LightEntityCard extends LitElement {
       light: 10,
       switch: 1,
     };
-  }
-
-  constructor() {
-    super();
   }
 
   /**
@@ -123,24 +144,6 @@ class LightEntityCard extends LitElement {
   }
 
   /**
-   * checks and saves config of entity
-   * @param {*} config
-   */
-  setConfig(config) {
-    if (!config.entity) throw Error('entity required.');
-
-    this.config = {
-      group: false,
-      persist_features: false,
-      brightness: true,
-      color_temp: true,
-      white_value: true,
-      color_picker: true,
-      ...config,
-    };
-  }
-
-  /**
    * generates a card for each given entiy in the config
    * @return {TemplateResult}
    */
@@ -176,7 +179,7 @@ class LightEntityCard extends LitElement {
    */
   createCard(stateObj) {
     return html`
-      <ha-card class='light-entity-card ${this.config.group ? 'group' : ''}'>
+      <ha-card class='light-entity-card ${this.config.group ? ' group' : '' }'>
         ${this.createHeader(stateObj)}
         <div class='light-entity-card-sliders'>
           ${this.createBrightnessSlider(stateObj)}
@@ -202,7 +205,7 @@ class LightEntityCard extends LitElement {
       <div class="light-entity-card__header">
         <div class='light-entity-card__title'>${title}</div>
         <div class='light-entity-card-center'>
-          <paper-toggle-button ?checked=${this.isEntityOn(stateObj)} @change=${e => this.setToggle(e, stateObj)}>
+          <paper-toggle-button ?checked=${this.isEntityOn(stateObj)} @change=${e=> this.setToggle(e, stateObj)}>
           </paper-toggle-button>
         </div>
       </div>
@@ -221,12 +224,8 @@ class LightEntityCard extends LitElement {
     return html`
       <div class='control light-entity-card-center'>
         <ha-icon icon="hass:weather-sunny"></ha-icon>
-        <ha-slider 
-          .value='${stateObj.attributes.brightness}'
-          @value-changed="${e => this.setBrightness(e, stateObj)}"
-          min="1"
-          max="255"
-        >
+        <ha-slider .value='${stateObj.attributes.brightness}' @value-changed="${e => this.setBrightness(e, stateObj)}" min="1"
+          max="255">
       </div>
     `;
   }
@@ -243,13 +242,9 @@ class LightEntityCard extends LitElement {
     return html`
       <div class="control light-entity-card-center">
         <ha-icon icon="hass:thermometer"></ha-icon>
-        <ha-slider
-          class='light-entity-card-color_temp'
-          min="${stateObj.attributes.min_mireds}"
-          max="${stateObj.attributes.max_mireds}"
-          .value=${stateObj.attributes.color_temp}
-          @value-changed="${e => this.setColorTemp(e, stateObj)}"
-        ></ha-labeled-slider>
+        <ha-slider class='light-entity-card-color_temp' min="${stateObj.attributes.min_mireds}" max="${stateObj.attributes.max_mireds}"
+          .value=${stateObj.attributes.color_temp} @value-changed="${e => this.setColorTemp(e, stateObj)}">
+          </ha-labeled-slider>
       </div>
     `;
   }
@@ -266,11 +261,8 @@ class LightEntityCard extends LitElement {
     return html`
       <div class="control light-entity-card-center">
         <ha-icon icon="hass:file-word-box"></ha-icon>
-        <ha-slider
-          max="255"
-          .value="${stateObj.attributes.white_value}"
-          @value-changed="${e => this.setWhiteValue(e, stateObj)}"
-        ></ha-labeled-slider>
+        <ha-slider max="255" .value="${stateObj.attributes.white_value}" @value-changed="${e => this.setWhiteValue(e, stateObj)}">
+          </ha-labeled-slider>
       </div>
     `;
   }
@@ -308,7 +300,7 @@ class LightEntityCard extends LitElement {
 
     return html`
       <div class="control light-entity-card-center light-entity-card-effectlist">
-        <paper-dropdown-menu @value-changed=${e => this.setEffect(e, stateObj)} label="${caption}">
+        <paper-dropdown-menu @value-changed=${e=> this.setEffect(e, stateObj)} label="${caption}">
           <paper-listbox selected="${selectedIndex}" slot="dropdown-content" placeholder="${caption}">
             ${listItems}
           </paper-listbox>
@@ -328,14 +320,9 @@ class LightEntityCard extends LitElement {
 
     return html`
       <div class='light-entity-card__color-picker'>
-        <ha-color-picker 
-        id="${this.generateColorPickerId(stateObj)}"
-        class='control color' 
-        saturation-segments=8 
-        hue-segments=24 
-        throttle=500
-        @colorselected=${e => this.setColorPicker(e, stateObj)}
-      >
+        <ha-color-picker id="${this.generateColorPickerId(stateObj)}" class='control color' saturation-segments=8
+          hue-segments=24 throttle=500 @colorselected=${e=> this.setColorPicker(e, stateObj)}
+          >
         </ha-color-picker>
       </div>
     `;
