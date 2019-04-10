@@ -14,15 +14,15 @@ const style = css`
 
     .checkbox-options {
         display: flex;
-        justify-content: space-between;
     }
 
     .checkbox-options paper-checkbox {
         margin-top: 10px;
+        width: 50%;
     }
 
     .overall-config {
-        margin-bottom: 10px;
+        margin-bottom: 20px;
     }
 `;
 

@@ -79,7 +79,7 @@ export default class LightEntityCardEditor extends LitElement {
           </paper-dropdown-menu>
         </div>
 
-        <div class=overall-config'>
+        <div class='overall-config'>
           <div class='checkbox-options'>
               <paper-checkbox
                 @checked-changed="${this._valueChanged}" 
