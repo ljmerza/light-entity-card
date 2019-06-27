@@ -1,5 +1,5 @@
 # Light Entity Card
-Control any light/switch entity
+Control any light/switch entity through lovelace
 
 <img src='https://raw.githubusercontent.com/ljmerza/light-entity-card/master/card.png' />
 
@@ -31,32 +31,28 @@ resources:
 ## Configurations:
 ---
 ```yaml
-views:
-  - type: custom:light-entity-card
-    entity: light.downstairs
+type: custom:light-entity-card
+entity: light.downstairs
 ```
 
 ```yaml
-views:
-  - type: custom:light-entity-card
-    entity: light.downstairs
-    effects_list:
-      - effect1
-      - effect2
+type: custom:light-entity-card
+entity: light.downstairs
+effects_list:
+  - effect1
+  - effect2
 ```
 
 ```yaml
-views:
-  - type: custom:light-entity-card
-    entity: light.downstairs
-    effects_list: input_select.custom_effect_list
+type: custom:light-entity-card
+entity: light.downstairs
+effects_list: input_select.custom_effect_list
 ```
 
 ```yaml
-views:
-  - type: custom:light-entity-card
-    entity: light.downstairs
-    group: true
+type: custom:light-entity-card
+entity: light.downstairs
+group: true
 ```
 
 ## Options:
