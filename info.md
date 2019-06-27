@@ -36,7 +36,7 @@ Control any light/switch entity through lovelace
 | white_value | boolean | **Optional** | `true` show white value slider if available 
 | color_picker | boolean | **Optional** | `true` show color picker wheel if available 
 
-### Example lovelace configurations:
+## Example lovelace configurations:
 ```yaml
 views:
   - type: custom:light-entity-card
