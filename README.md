@@ -1,5 +1,5 @@
 # Light Entity Card
-Control any light/switch entity through lovelace
+Control any light/switch entity
 
 <img src='https://raw.githubusercontent.com/ljmerza/light-entity-card/master/card.png' />
 
