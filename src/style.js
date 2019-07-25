@@ -14,6 +14,11 @@ const style = css`
         width: 100%;
     }
 
+    .percent-slider {
+        color: var(--primary-text-color);
+        margin-top: 5px;
+    }
+
     .light-entity-card__header {
         display: flex;
         justify-content: space-between;

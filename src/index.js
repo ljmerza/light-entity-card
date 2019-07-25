@@ -226,9 +226,26 @@ class LightEntityCard extends LitElement {
     return html`
       <div class='control light-entity-card-center'>
         <ha-icon icon="hass:${this.config.brightness_icon}"></ha-icon>
-        <ha-slider .value='${stateObj.attributes.brightness}' @value-changed="${e => this.setBrightness(e, stateObj)}" min="1"
-          max="255">
+        <ha-slider .value='${stateObj.attributes.brightness}' @value-changed="${e => this.setBrightness(e, stateObj)}" min="1" max="255"></ha-slider>
+        ${this.showPercent(stateObj.attributes.brightness, 0, 254)}
       </div>
+    `;
+  }
+
+  /**
+   * shows slider percent if config is set
+   * @param {number} value 
+   * @param {number} min 
+   * @param {number} max 
+   * @return {TemplateResult}
+   */
+  showPercent(value, min, max){
+    if (!this.config.show_slider_percent) return html``;
+    let percent = parseInt(((value - min) * 100) / (max - min), 0);
+    if (isNaN(percent)) percent = 0;
+
+    return html`
+      <div class='percent-slider'>${percent}%</div>
     `;
   }
 
@@ -246,7 +263,8 @@ class LightEntityCard extends LitElement {
         <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
         <ha-slider class='light-entity-card-color_temp' min="${stateObj.attributes.min_mireds}" max="${stateObj.attributes.max_mireds}"
           .value=${stateObj.attributes.color_temp} @value-changed="${e => this.setColorTemp(e, stateObj)}">
-          </ha-labeled-slider>
+        </ha-slider>
+        ${this.showPercent(stateObj.attributes.color_temp, stateObj.attributes.min_mireds-1, stateObj.attributes.max_mireds-1)}
       </div>
     `;
   }
@@ -264,7 +282,8 @@ class LightEntityCard extends LitElement {
       <div class="control light-entity-card-center">
         <ha-icon icon="hass:${this.config.white_icon}"></ha-icon>
         <ha-slider max="255" .value="${stateObj.attributes.white_value}" @value-changed="${e => this.setWhiteValue(e, stateObj)}">
-          </ha-labeled-slider>
+        </ha-slider>
+        ${this.showPercent(stateObj.attributes.white_value, 0, 254)}
       </div>
     `;
   }

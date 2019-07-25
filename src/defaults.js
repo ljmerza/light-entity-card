@@ -7,6 +7,8 @@ export default {
     white_value: true,
     color_picker: true,
 
+    show_slider_percent: false,
+
     full_width_sliders: false,
 
     brightness_icon: 'weather-sunny',

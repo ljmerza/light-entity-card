@@ -168,6 +168,11 @@ export default class LightEntityCardEditor extends LitElement {
                 .checked=${this._config.full_width_sliders}
                 .configValue="${"full_width_sliders"}"
               >Full Width Sliders</paper-checkbox>
+              <paper-checkbox
+                @checked-changed="${this._valueChanged}" 
+                .checked=${this._config.show_slider_percent}
+                .configValue="${"show_slider_percent"}"
+              >Show Slider Percent</paper-checkbox>
             </div>
           </div>
       </div>
