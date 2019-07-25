@@ -75,6 +75,7 @@ group: true
 | brightness_icon | string | **Optional** | `weather-sunny` change the brightness slider icon
 | white_icon | string | **Optional** | `file-word-box` change the white slider icon
 | temperature_icon | string | **Optional** | `thermometer` change the temperature slider icon
+| show_slider_percent | boolean | **Optional** | `false` show percent next to sliders
 
 ---
 
