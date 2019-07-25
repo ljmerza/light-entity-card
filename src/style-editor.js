@@ -4,6 +4,7 @@ const style = css`
     .entities {
         padding-top: 10px;
         padding-bottom: 10px;
+        display: flex;
     }
 
     .entities paper-checkbox {
@@ -16,9 +17,15 @@ const style = css`
         display: flex;
     }
 
+    .checkbox-options paper-checkbox,
+    .entities paper-dropdown-menu, 
+    .entities paper-input {
+        padding-right: 2%;
+        width: 48%;
+    }
+
     .checkbox-options paper-checkbox {
         margin-top: 10px;
-        width: 50%;
     }
 
     .overall-config {

@@ -47,13 +47,23 @@ export default class LightEntityCardEditor extends LitElement {
       return html``;
     }
 
+    // get header name
+    let header = this._config.header;
+    if (!header && this._config.entity){
+      let name = this._config.entity.split('.')[1] || '';
+      if (name){
+        name = name.charAt(0).toUpperCase() + name.slice(1);
+        header = name;
+      }
+    }
+
     return html`
       <div class="card-config">
 
         <div class=overall-config'>
           <paper-input
-            label="Header (Optional)"
-            .value="${this._config.header}"
+            label="Header"
+            .value="${header}"
             .configValue="${"header"}"
             @value-changed="${this._valueChanged}"
           ></paper-input>
@@ -75,8 +85,28 @@ export default class LightEntityCardEditor extends LitElement {
                 })
               }
             </paper-listbox>
-          
           </paper-dropdown-menu>
+          <paper-input
+            label="Brightness Icon"
+            .value="${this._config.brightness_icon}"
+            .configValue="${"brightness_icon"}"
+            @value-changed="${this._valueChanged}"
+          ></paper-input>
+        </div>
+
+        <div class='entities'>
+         <paper-input
+            label="White Icon"
+            .value="${this._config.white_icon}"
+            .configValue="${"white_icon"}"
+            @value-changed="${this._valueChanged}"
+          ></paper-input>
+          <paper-input
+            label="Temperature Icon"
+            .value="${this._config.temperature_icon}"
+            .configValue="${"temperature_icon"}"
+            @value-changed="${this._valueChanged}"
+          ></paper-input>
         </div>
 
         <div class='overall-config'>
@@ -126,21 +156,25 @@ export default class LightEntityCardEditor extends LitElement {
                 .configValue="${"color_picker"}"
               >Show Color Picker</paper-checkbox>
               <paper-checkbox
-                  @checked-changed="${this._valueChanged}" 
-                  .checked=${this._config.effects_list}
-                  .configValue="${"effects_list"}"
-                >Show Effects List</paper-checkbox>
-              </div>
+                @checked-changed="${this._valueChanged}" 
+                .checked=${this._config.effects_list}
+                .configValue="${"effects_list"}"
+              >Show Effects List</paper-checkbox>
             </div>
 
+            <div class='checkbox-options'>
+              <paper-checkbox
+                @checked-changed="${this._valueChanged}" 
+                .checked=${this._config.full_width_sliders}
+                .configValue="${"full_width_sliders"}"
+              >Full Width Sliders</paper-checkbox>
+            </div>
           </div>
       </div>
     `;
   }
 
   _valueChanged(ev) {
-    console.log({ ev });
-    
     if (!this._config || !this.hass || !this._firstRendered) return;
     const { target: { configValue, value }, detail: { value: checkedValue} } = ev;
 
@@ -150,7 +184,6 @@ export default class LightEntityCardEditor extends LitElement {
       this._config = { ...this._config, [configValue]: value };
     }
 
-    console.log(this._config);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 }

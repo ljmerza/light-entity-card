@@ -10,6 +10,10 @@ const style = css`
         padding-top: 0;
     }
 
+    .ha-slider-full-width ha-slider {
+        width: 100%;
+    }
+
     .light-entity-card__header {
         display: flex;
         justify-content: space-between;

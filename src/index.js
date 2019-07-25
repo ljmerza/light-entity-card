@@ -178,10 +178,12 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createCard(stateObj) {
+    const sliderClass = this.config.full_width_sliders ? 'ha-slider-full-width' : '';
+
     return html`
       <ha-card class='light-entity-card ${this.config.group ? ' group' : '' }'>
         ${this.createHeader(stateObj)}
-        <div class='light-entity-card-sliders'>
+        <div class='light-entity-card-sliders ${sliderClass}'>
           ${this.createBrightnessSlider(stateObj)}
           ${this.createColorTemperature(stateObj)}
           ${this.createWhiteValue(stateObj)}
@@ -223,7 +225,7 @@ class LightEntityCard extends LitElement {
 
     return html`
       <div class='control light-entity-card-center'>
-        <ha-icon icon="hass:weather-sunny"></ha-icon>
+        <ha-icon icon="hass:${this.config.brightness_icon}"></ha-icon>
         <ha-slider .value='${stateObj.attributes.brightness}' @value-changed="${e => this.setBrightness(e, stateObj)}" min="1"
           max="255">
       </div>
@@ -241,7 +243,7 @@ class LightEntityCard extends LitElement {
 
     return html`
       <div class="control light-entity-card-center">
-        <ha-icon icon="hass:thermometer"></ha-icon>
+        <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
         <ha-slider class='light-entity-card-color_temp' min="${stateObj.attributes.min_mireds}" max="${stateObj.attributes.max_mireds}"
           .value=${stateObj.attributes.color_temp} @value-changed="${e => this.setColorTemp(e, stateObj)}">
           </ha-labeled-slider>
@@ -260,7 +262,7 @@ class LightEntityCard extends LitElement {
 
     return html`
       <div class="control light-entity-card-center">
-        <ha-icon icon="hass:file-word-box"></ha-icon>
+        <ha-icon icon="hass:${this.config.white_icon}"></ha-icon>
         <ha-slider max="255" .value="${stateObj.attributes.white_value}" @value-changed="${e => this.setWhiteValue(e, stateObj)}">
           </ha-labeled-slider>
       </div>
