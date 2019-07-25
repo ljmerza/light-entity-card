@@ -71,6 +71,10 @@ group: true
 | color_temp | boolean | **Optional** | `true` show color temp slider if available 
 | white_value | boolean | **Optional** | `true` show white value slider if available 
 | color_picker | boolean | **Optional** | `true` show color picker wheel if available 
+| full_width_sliders | boolean | **Optional** | `false` makes slider the full width of card
+| brightness_icon | string | **Optional** | `weather-sunny` change the brightness slider icon
+| white_icon | string | **Optional** | `file-word-box` change the white slider icon
+| temperature_icon | string | **Optional** | `thermometer` change the temperature slider icon
 
 ---
 

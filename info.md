@@ -3,10 +3,6 @@ Control any light/switch entity through lovelace
 
 <img src='https://raw.githubusercontent.com/ljmerza/light-entity-card/master/card.png' />
 
-[![GitHub Release][releases-shield]][releases]
-[![License][license-shield]](LICENSE.md)
-![Project Maintenance][maintenance-shield]
-
 ## Features
 ---
 * Works on any light and switch based entity
@@ -71,6 +67,10 @@ group: true
 | color_temp | boolean | **Optional** | `true` show color temp slider if available 
 | white_value | boolean | **Optional** | `true` show white value slider if available 
 | color_picker | boolean | **Optional** | `true` show color picker wheel if available 
+| full_width_sliders | boolean | **Optional** | `false` makes slider the full width of card
+| brightness_icon | string | **Optional** | `weather-sunny` change the brightness slider icon
+| white_icon | string | **Optional** | `file-word-box` change the white slider icon
+| temperature_icon | string | **Optional** | `thermometer` change the temperature slider icon
 
 ---
 
@@ -78,10 +78,3 @@ Enjoy my card? Help me out for a couple of :beers: or a :coffee:!
 
 [![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/JMISm06AD)
 
-
-[commits-shield]: https://img.shields.io/github/commit-activity/y/ljmerza/light-entity-card.svg?style=for-the-badge
-[commits]: https://github.com/ljmerza/light-entity-card/commits/master
-[license-shield]: https://img.shields.io/github/license/ljmerza/light-entity-card.svg?style=for-the-badge
-[maintenance-shield]: https://img.shields.io/badge/maintainer-Leonardo%20Merza%20%40ljmerza-blue.svg?style=for-the-badge
-[releases-shield]: https://img.shields.io/github/release/ljmerza/light-entity-card.svg?style=for-the-badge
-[releases]: https://github.com/ljmerza/light-entity-card/releases
