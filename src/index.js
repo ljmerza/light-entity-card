@@ -207,8 +207,8 @@ class LightEntityCard extends LitElement {
       <div class="light-entity-card__header">
         <div class='light-entity-card__title'>${title}</div>
         <div class='light-entity-card-center'>
-          <paper-toggle-button ?checked=${this.isEntityOn(stateObj)} @change=${e=> this.setToggle(e, stateObj)}>
-          </paper-toggle-button>
+          <ha-switch ?checked=${this.isEntityOn(stateObj)} @change=${e=> this.setToggle(e, stateObj)}>
+          </ha-switch>
         </div>
       </div>
     `;

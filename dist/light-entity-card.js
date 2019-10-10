@@ -410,8 +410,8 @@ var xt="adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prot
       <div class="light-entity-card__header">
         <div class='light-entity-card__title'>${e}</div>
         <div class='light-entity-card-center'>
-          <paper-toggle-button ?checked=${this.isEntityOn(t)} @change=${e=>this.setToggle(e,t)}>
-          </paper-toggle-button>
+          <ha-switch ?checked=${this.isEntityOn(t)} @change=${e=>this.setToggle(e,t)}>
+          </ha-switch>
         </div>
       </div>
     `}createBrightnessSlider(t){return!1===this.config.brightness?K``:this.dontShowFeature("brightness",t)?K``:K`
