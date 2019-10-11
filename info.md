@@ -15,6 +15,10 @@ Control any light/switch entity through lovelace
 * use `effects_list` to add custom effects list or use `input_select` entity
 * always show or hide header and each input 
 
+## Releases
+---
+* 3.0.0 - switched toggle button element - required min hass version 0.100
+
 ## Installation through [HACS](https://github.com/custom-components/hacs)
 ---
 Add the following to resources in your lovelace config:
