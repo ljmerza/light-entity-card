@@ -174,6 +174,13 @@ export default class LightEntityCardEditor extends LitElement {
                 .configValue="${"show_slider_percent"}"
               >Show Slider Percent</paper-checkbox>
             </div>
+
+            <div class='checkbox-options'>
+              <paper-checkbox
+                @checked-changed="${this._valueChanged}" 
+                .checked=${this._config.smooth_color_wheel}
+                .configValue="${"smooth_color_wheel"}"
+              >Smooth Color Wheel</paper-checkbox>
           </div>
       </div>
     `;

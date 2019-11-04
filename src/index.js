@@ -30,6 +30,9 @@ class LightEntityCard extends LitElement {
       ...defaultConfig,
       ...config,
     };
+
+    this._hueSegments = this.config.smooth_color_wheel ? 0 : 24;
+    this._saturationSegments = this.config.smooth_color_wheel ? 0 : 8;
   }
 
   static async getConfigElement() {
@@ -345,9 +348,14 @@ class LightEntityCard extends LitElement {
 
     return html`
       <div class='light-entity-card__color-picker'>
-        <ha-color-picker id="${this.generateColorPickerId(stateObj)}" class='control color' saturation-segments=8
-          hue-segments=24 throttle=500 @colorselected=${e=> this.setColorPicker(e, stateObj)}
-          >
+        <ha-color-picker 
+          id="${this.generateColorPickerId(stateObj)}" 
+          class='control color' 
+          saturation-segments=${this._saturationSegments}
+          hue-segments=${this._hueSegments}
+          throttle=500 
+          @colorselected=${e=> this.setColorPicker(e, stateObj)}
+        >
         </ha-color-picker>
       </div>
     `;

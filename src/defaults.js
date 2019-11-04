@@ -6,6 +6,7 @@ export default {
     color_temp: true,
     white_value: true,
     color_picker: true,
+    smooth_color_wheel: false,
 
     show_slider_percent: false,
 

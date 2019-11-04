@@ -76,6 +76,7 @@ group: true
 | white_icon | string | **Optional** | `file-word-box` change the white slider icon
 | temperature_icon | string | **Optional** | `thermometer` change the temperature slider icon
 | show_slider_percent | boolean | **Optional** | `false` show percent next to sliders
+| smooth_color_wheel | boolean | **Optional** | `false` smooth out color wheel for more colors
 
 ---
 
