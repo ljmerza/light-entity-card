@@ -65,7 +65,7 @@ group: true
 | group | boolean | **Optional** | `false` Compacts card
 | color_wheel | boolean | **Optional** | `true` Show color-picker if entity has support
 | persist_features | boolean | **Optional** | `false` always show entity features
-| effects_list | list|string|boolean | **Optional** | custom list of effects, an input_select entity, or set false to always hide
+| effects_list | list/string/boolean | **Optional** | custom list of effects, an input_select entity, or set false to always hide
 | header | boolean | string | **Optional** | custom header name or `false` to hide header
 | brightness | boolean | **Optional** | `true` show brightness slider if available 
 | color_temp | boolean | **Optional** | `true` show color temp slider if available 
