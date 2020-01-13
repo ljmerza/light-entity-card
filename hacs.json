@@ -1,4 +1,5 @@
 {
     "name": "Light Entity Card",
-    "render_readme": true
+    "render_readme": true,
+    "filename": "dist/light-entity-card.js"
 }
