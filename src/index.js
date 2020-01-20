@@ -157,10 +157,16 @@ class LightEntityCard extends LitElement {
     this._isUpdating = true;
     this._shownStateObjects = this.getEntitiesToShow(entity);
 
-    return this._shownStateObjects.reduce((htmlTemplate, stateObj) => html`
-        ${htmlTemplate}
-        ${this.createCard(stateObj)}
-      `, html`<style>${this.styles}</style>`);
+    const templates = this._shownStateObjects.reduce((htmlTemplate, stateObj) => {
+      return html`${htmlTemplate}${this.createEntityTemplate(stateObj)}`;
+    }, ``);
+
+    return html`
+      <style>${this.styles}</style>
+      <ha-card class='light-entity-card ${this.config.group ? ' group' : ''}'>
+        ${templates}
+      </ha-card>
+    `;
   }
 
   /**
@@ -176,24 +182,22 @@ class LightEntityCard extends LitElement {
   }
 
   /**
-   * creates a lignt entiy card for a given entity
+   * creates an entity's template
    * @param {LightEntity} stateObj
    * @return {TemplateResult}
    */
-  createCard(stateObj) {
+  createEntityTemplate(stateObj) {
     const sliderClass = this.config.full_width_sliders ? 'ha-slider-full-width' : '';
 
     return html`
-      <ha-card class='light-entity-card ${this.config.group ? ' group' : '' }'>
-        ${this.createHeader(stateObj)}
-        <div class='light-entity-card-sliders ${sliderClass}'>
-          ${this.createBrightnessSlider(stateObj)}
-          ${this.createColorTemperature(stateObj)}
-          ${this.createWhiteValue(stateObj)}
-        </div>
-        ${this.createColorPicker(stateObj)}
-        ${this.createEffectList(stateObj)}
-      </ha-card>
+      ${this.createHeader(stateObj)}
+      <div class='light-entity-card-sliders ${sliderClass}'>
+        ${this.createBrightnessSlider(stateObj)}
+        ${this.createColorTemperature(stateObj)}
+        ${this.createWhiteValue(stateObj)}
+      </div>
+      ${this.createColorPicker(stateObj)}
+      ${this.createEffectList(stateObj)}
     `;
   }
 
