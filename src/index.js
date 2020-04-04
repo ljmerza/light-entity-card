@@ -5,10 +5,14 @@ import style from './style';
 
 import defaultConfig from './defaults';
 import LightEntityCardEditor from './index-editor';
+import packageJson from '../package.json';
 
 
 const editorName = 'light-entity-card-editor';
 customElements.define(editorName, LightEntityCardEditor);
+
+/* eslint no-console: 0 */
+console.info(`%c  LIGHT-ENTITY-CARD   \n%c  Version ${packageJson.version}       `, "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
 
 
 class LightEntityCard extends LitElement {
@@ -460,7 +464,8 @@ class LightEntityCard extends LitElement {
    */
   callEntityService(payload, stateObj, state) {
     if (this._isUpdating) return;
-    const entityType = stateObj.entity_id.split('.')[0];
+    let entityType = stateObj.entity_id.split('.')[0];
+    if (entityType === 'group') entityType= 'homeassistant';
 
     this.hass.callService(entityType, state || LightEntityCard.cmdToggle.on, {
       entity_id: stateObj.entity_id,
