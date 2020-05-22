@@ -75,6 +75,11 @@ const style = css`
         justify-content:center;
         cursor: pointer;
     }
+
+    .light-entity-card-toggle {
+        margin-top: 15px;
+        margin-right: 5px;
+    }
 `;
 
 export default style;
