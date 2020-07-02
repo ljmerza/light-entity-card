@@ -79,6 +79,10 @@ const style = css`
     .light-entity-card-toggle {
         margin-right: 5px;
     }
+
+    .hidden {
+        display: none;
+    }
 `;
 
 export default style;

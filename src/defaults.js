@@ -8,6 +8,7 @@ export default {
     white_value: true,
     color_picker: true,
     smooth_color_wheel: false,
+    hide_header: false,
 
     show_slider_percent: false,
 

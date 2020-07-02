@@ -186,6 +186,15 @@ export default class LightEntityCardEditor extends LitElement {
                 .checked=${this._config.consolidate_entites}
                 .configValue="${"consolidate_entites"}"
               >Consolidate Entities</paper-checkbox>
+            </div>
+
+            <div class='checkbox-options'>
+              <paper-checkbox
+                @checked-changed="${this._valueChanged}" 
+                .checked=${this._config.hide_header}
+                .configValue="${"hide_header"}"
+              >Hide Header</paper-checkbox>
+            </div>
           </div>
       </div>
     `;

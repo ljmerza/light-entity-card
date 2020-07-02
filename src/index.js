@@ -167,8 +167,6 @@ class LightEntityCard extends LitElement {
       this._shownStateObjects = [...this._stateObjects];
     }
 
-    console.log({ test: this._shownStateObjects, entity, t2: this._stateObjects })
-
     const templates = this._shownStateObjects.reduce((htmlTemplate, stateObj) => {
       return html`${htmlTemplate}${this.createEntityTemplate(stateObj)}`;
     }, ``);
@@ -219,7 +217,7 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createHeader(stateObj) {
-    if (this.config.header === false) return html``;
+    if (this.config.hide_header) return html``;
     const title = this.config.header || stateObj.attributes.friendly_name || stateObj.entity_id;
 
     return html`
