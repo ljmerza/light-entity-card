@@ -20,9 +20,18 @@ Control any light/switch entity through lovelace
 * use `effects_list` to add custom effects list or use `input_select` entity
 * always show or hide header and each input 
 
-## Installation through [HACS](https://github.com/custom-components/hacs)
+## Installation
 ---
 
+Add through  [HACS](https://github.com/custom-components/hacs)
+
+Or you can add this card manually by adding the following to resources in your lovelace config:
+
+```yaml
+resources:
+  - url: /www/light-entity-card/light-entity-card.js
+    type: js
+```
 
 ## Configurations:
 ---
@@ -58,6 +67,7 @@ group: true
 | type                | string              | **Required** | `custom:light-entity-card`                                                  |
 | entity              | string              | **Required** | The entity name of the light entity to control                              |
 | shorten_cards       | boolean             | **Optional** | `false` show a compact version of the card                                  |
+| consolidate_entites | boolean             | **Optional** | `false` if entity is a group you can consolidate all entities into one      |
 | persist_features    | boolean             | **Optional** | `false` always show entity features                                         |
 | effects_list        | list/string/boolean | **Optional** | custom list of effects, an input_select entity, or set false to always hide |
 | header              | boolean/string      | **Optional** | custom header name or `false` to hide header                                |
