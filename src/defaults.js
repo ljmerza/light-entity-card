@@ -1,6 +1,6 @@
 export default {
     shorten_cards: false,
-    consolidate_entites: false,
+    consolidate_entities: false,
     color_wheel: true,
     persist_features: false,
     brightness: true,

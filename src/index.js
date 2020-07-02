@@ -161,7 +161,7 @@ class LightEntityCard extends LitElement {
     this._isUpdating = true;
     this._stateObjects = this.getEntitiesToShow(entity);
     // need to find what state objects are actually gonig to be shown
-    if (this.config.consolidate_entites) {
+    if (this.config.consolidate_entities) {
       this._shownStateObjects = [entity];
     } else {
       this._shownStateObjects = [...this._stateObjects];
