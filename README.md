@@ -71,7 +71,7 @@ group: true
 | persist_features     | boolean             | **Optional** | `false` always show entity features                                         |
 | effects_list         | list/string/boolean | **Optional** | custom list of effects, an input_select entity, or set false to always hide |
 | header               | string              | **Optional** | custom header name                                                          |
-| hide_header          | boolean             | **Optional** | `false` hides the entires header of the card including toggle               |
+| hide_header          | boolean             | **Optional** | `false` hides the entity header of the card including toggle                |
 | brightness           | boolean             | **Optional** | `true` show brightness slider if available                                  |
 | color_temp           | boolean             | **Optional** | `true` show color temp slider if available                                  |
 | white_value          | boolean             | **Optional** | `true` show white value slider if available                                 |
