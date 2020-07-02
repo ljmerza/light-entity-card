@@ -159,7 +159,15 @@ class LightEntityCard extends LitElement {
     if (!entity) throw Error(`Invalid entity: ${this.config.entity}`);
 
     this._isUpdating = true;
-    this._shownStateObjects = this.getEntitiesToShow(entity);
+    this._stateObjects = this.getEntitiesToShow(entity);
+    // need to find what state objects are actually gonig to be shown
+    if (this.config.consolidate_entites) {
+      this._shownStateObjects = [entity];
+    } else {
+      this._shownStateObjects = [...this._stateObjects];
+    }
+
+    console.log({ test: this._shownStateObjects, entity, t2: this._stateObjects })
 
     const templates = this._shownStateObjects.reduce((htmlTemplate, stateObj) => {
       return html`${htmlTemplate}${this.createEntityTemplate(stateObj)}`;
@@ -167,7 +175,7 @@ class LightEntityCard extends LitElement {
 
     return html`
       <style>${this.styles}</style>
-      <ha-card class='light-entity-card ${this.config.group ? ' group' : ''}'>
+      <ha-card class='light-entity-card ${this.config.shorten_cards ? ' group' : ''}'>
         ${templates}
       </ha-card>
     `;
@@ -218,7 +226,7 @@ class LightEntityCard extends LitElement {
       <div class="light-entity-card__header">
         <div class='light-entity-card__title'>${title}</div>
         <div class='light-entity-card-toggle'>
-          <ha-switch .checked=${this.isEntityOn(stateObj)} @change=${e=> this.setToggle(e, stateObj)}></ha-switch>
+          <ha-switch .checked=${this.isEntityOn(stateObj)} @change=${e => this.setToggle(e, stateObj)}></ha-switch>
         </div>
       </div>
     `;
@@ -249,7 +257,7 @@ class LightEntityCard extends LitElement {
    * @param {number} max 
    * @return {TemplateResult}
    */
-  showPercent(value, min, max){
+  showPercent(value, min, max) {
     if (!this.config.show_slider_percent) return html``;
     let percent = parseInt(((value - min) * 100) / (max - min), 0);
     if (isNaN(percent)) percent = 0;
@@ -274,7 +282,7 @@ class LightEntityCard extends LitElement {
         <ha-slider class='light-entity-card-color_temp' min="${stateObj.attributes.min_mireds}" max="${stateObj.attributes.max_mireds}"
           .value=${stateObj.attributes.color_temp} @value-changed="${e => this.setColorTemp(e, stateObj)}">
         </ha-slider>
-        ${this.showPercent(stateObj.attributes.color_temp, stateObj.attributes.min_mireds-1, stateObj.attributes.max_mireds-1)}
+        ${this.showPercent(stateObj.attributes.color_temp, stateObj.attributes.min_mireds - 1, stateObj.attributes.max_mireds - 1)}
       </div>
     `;
   }
@@ -331,7 +339,7 @@ class LightEntityCard extends LitElement {
 
     return html`
       <div class="control light-entity-card-center light-entity-card-effectlist">
-        <paper-dropdown-menu @value-changed=${e=> this.setEffect(e, stateObj)} label="${caption}">
+        <paper-dropdown-menu @value-changed=${e => this.setEffect(e, stateObj)} label="${caption}">
           <paper-listbox selected="${selectedIndex}" slot="dropdown-content" placeholder="${caption}">
             ${listItems}
           </paper-listbox>
@@ -357,7 +365,7 @@ class LightEntityCard extends LitElement {
           saturation-segments=${this._saturationSegments}
           hue-segments=${this._hueSegments}
           throttle=500 
-          @colorselected=${e=> this.setColorPicker(e, stateObj)}
+          @colorselected=${e => this.setColorPicker(e, stateObj)}
         >
         </ha-color-picker>
       </div>
@@ -460,7 +468,7 @@ class LightEntityCard extends LitElement {
   callEntityService(payload, stateObj, state) {
     if (this._isUpdating) return;
     let entityType = stateObj.entity_id.split('.')[0];
-    if (entityType === 'group') entityType= 'homeassistant';
+    if (entityType === 'group') entityType = 'homeassistant';
 
     this.hass.callService(entityType, state || LightEntityCard.cmdToggle.on, {
       entity_id: stateObj.entity_id,

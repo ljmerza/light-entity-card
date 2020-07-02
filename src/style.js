@@ -77,7 +77,6 @@ const style = css`
     }
 
     .light-entity-card-toggle {
-        margin-top: 15px;
         margin-right: 5px;
     }
 `;

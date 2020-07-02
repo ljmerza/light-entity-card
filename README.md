@@ -59,24 +59,24 @@ group: true
 
 ## Options:
 ---
-| Name | Type | Requirement | `Default value` Description
-| ---- | ---- | ------- | -----------
-| type | string | **Required** | `custom:light-entity-card`
-| entity | string | **Required** | The entity name of the light entity to control
-| group | boolean | **Optional** | `false` Compacts card
-| persist_features | boolean | **Optional** | `false` always show entity features
-| effects_list | list/string/boolean | **Optional** | custom list of effects, an input_select entity, or set false to always hide
-| header | boolean | string | **Optional** | custom header name or `false` to hide header
-| brightness | boolean | **Optional** | `true` show brightness slider if available 
-| color_temp | boolean | **Optional** | `true` show color temp slider if available 
-| white_value | boolean | **Optional** | `true` show white value slider if available 
-| color_picker | boolean | **Optional** | `true` show color picker wheel if available 
-| full_width_sliders | boolean | **Optional** | `false` makes slider the full width of card
-| brightness_icon | string | **Optional** | `weather-sunny` change the brightness slider icon
-| white_icon | string | **Optional** | `file-word-box` change the white slider icon
-| temperature_icon | string | **Optional** | `thermometer` change the temperature slider icon
-| show_slider_percent | boolean | **Optional** | `false` show percent next to sliders
-| smooth_color_wheel | boolean | **Optional** | `false` smooth out color wheel for more colors
+| Name                | Type                | Requirement  | `Default value` Description                                                 |
+| ------------------- | ------------------- | ------------ | --------------------------------------------------------------------------- |
+| type                | string              | **Required** | `custom:light-entity-card`                                                  |
+| entity              | string              | **Required** | The entity name of the light entity to control                              |
+| shorten_cards       | boolean             | **Optional** | `false` show a compact version of the card                                  |
+| persist_features    | boolean             | **Optional** | `false` always show entity features                                         |
+| effects_list        | list/string/boolean | **Optional** | custom list of effects, an input_select entity, or set false to always hide |
+| header              | boolean/string      | **Optional** | custom header name or `false` to hide header                                |
+| brightness          | boolean             | **Optional** | `true` show brightness slider if available                                  |
+| color_temp          | boolean             | **Optional** | `true` show color temp slider if available                                  |
+| white_value         | boolean             | **Optional** | `true` show white value slider if available                                 |
+| color_picker        | boolean             | **Optional** | `true` show color picker wheel if available                                 |
+| full_width_sliders  | boolean             | **Optional** | `false` makes slider the full width of card                                 |
+| brightness_icon     | string              | **Optional** | `weather-sunny` change the brightness slider icon                           |
+| white_icon          | string              | **Optional** | `file-word-box` change the white slider icon                                |
+| temperature_icon    | string              | **Optional** | `thermometer` change the temperature slider icon                            |
+| show_slider_percent | boolean             | **Optional** | `false` show percent next to sliders                                        |
+| smooth_color_wheel  | boolean             | **Optional** | `false` smooth out color wheel for more colors                              |
 
 ---
 

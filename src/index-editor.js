@@ -34,11 +34,11 @@ export default class LightEntityCardEditor extends LitElement {
 
   get entityOptions() {
     return Object.keys(this.hass.states).filter(eid => {
-      return ['switch', 'light', 'group'].includes( eid.substr(0, eid.indexOf('.')) )
+      return ['switch', 'light', 'group'].includes(eid.substr(0, eid.indexOf('.')))
     });
   }
 
-  firstUpdated(){
+  firstUpdated() {
     this._firstRendered = true;
   }
 
@@ -49,9 +49,9 @@ export default class LightEntityCardEditor extends LitElement {
 
     // get header name
     let header = this._config.header;
-    if (!header && this._config.entity){
+    if (!header && this._config.entity) {
       let name = this._config.entity.split('.')[1] || '';
-      if (name){
+      if (name) {
         name = name.charAt(0).toUpperCase() + name.slice(1);
         header = name;
       }
@@ -80,10 +80,10 @@ export default class LightEntityCardEditor extends LitElement {
               .selected="${this.entityOptions.indexOf(this._config.entity)}"
             >
               ${
-                this.entityOptions.map(entity => {
-                  return html`<paper-item>${entity}</paper-item>`;
-                })
-              }
+      this.entityOptions.map(entity => {
+        return html`<paper-item>${entity}</paper-item>`;
+      })
+      }
             </paper-listbox>
           </paper-dropdown-menu>
           <paper-input
@@ -118,9 +118,9 @@ export default class LightEntityCardEditor extends LitElement {
               >Show Color Wheel</paper-checkbox>
               <paper-checkbox
                 @checked-changed="${this._valueChanged}" 
-                .checked=${this._config.group}
-                .configValue="${"group"}"
-              >Group Entities</paper-checkbox>
+                .checked=${this._config.shorten_cards}
+                .configValue="${"shorten_cards"}"
+              >Shorten Cards</paper-checkbox>
             </div>
 
             <div class='checkbox-options'>
@@ -181,6 +181,11 @@ export default class LightEntityCardEditor extends LitElement {
                 .checked=${this._config.smooth_color_wheel}
                 .configValue="${"smooth_color_wheel"}"
               >Smooth Color Wheel</paper-checkbox>
+              <paper-checkbox
+                @checked-changed="${this._valueChanged}" 
+                .checked=${this._config.consolidate_entites}
+                .configValue="${"consolidate_entites"}"
+              >Consolidate Entities</paper-checkbox>
           </div>
       </div>
     `;
@@ -188,9 +193,9 @@ export default class LightEntityCardEditor extends LitElement {
 
   _valueChanged(ev) {
     if (!this._config || !this.hass || !this._firstRendered) return;
-    const { target: { configValue, value }, detail: { value: checkedValue} } = ev;
+    const { target: { configValue, value }, detail: { value: checkedValue } } = ev;
 
-    if (checkedValue !== undefined || checkedValue !== null){
+    if (checkedValue !== undefined || checkedValue !== null) {
       this._config = { ...this._config, [configValue]: checkedValue };
     } else {
       this._config = { ...this._config, [configValue]: value };
