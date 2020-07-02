@@ -22,13 +22,7 @@ Control any light/switch entity through lovelace
 
 ## Installation through [HACS](https://github.com/custom-components/hacs)
 ---
-Add the following to resources in your lovelace config:
 
-```yaml
-resources:
-  - url: /community_plugin/light-entity-card/light-entity-card.js
-    type: js
-```
 
 ## Configurations:
 ---
