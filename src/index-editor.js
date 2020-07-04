@@ -183,8 +183,8 @@ export default class LightEntityCardEditor extends LitElement {
               >Smooth Color Wheel</paper-checkbox>
               <paper-checkbox
                 @checked-changed="${this._valueChanged}" 
-                .checked=${this._config.consolidate_entites}
-                .configValue="${"consolidate_entites"}"
+                .checked=${this._config.consolidate_entities}
+                .configValue="${"consolidate_entities"}"
               >Consolidate Entities</paper-checkbox>
             </div>
 
