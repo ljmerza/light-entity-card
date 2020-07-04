@@ -4,6 +4,11 @@ const style = css`
     .light-entity-card {
         padding: 16px;
     }
+    
+    .light-entity-child-card {
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
 
     .light-entity-card.group {
         padding-bottom: 0;

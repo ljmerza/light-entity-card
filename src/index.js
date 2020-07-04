@@ -171,9 +171,11 @@ class LightEntityCard extends LitElement {
       return html`${htmlTemplate}${this.createEntityTemplate(stateObj)}`;
     }, ``);
 
+    const css = `light-entity-card ${this.config.shorten_cards ? ' group' : ''} ${this.config.child_card ? ' light-entity-child-card' : ''}`
+
     return html`
       <style>${this.styles}</style>
-      <ha-card class='light-entity-card ${this.config.shorten_cards ? ' group' : ''}'>
+      <ha-card class='${css}'>
         ${templates}
       </ha-card>
     `;

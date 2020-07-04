@@ -194,6 +194,11 @@ export default class LightEntityCardEditor extends LitElement {
                 .checked=${this._config.hide_header}
                 .configValue="${"hide_header"}"
               >Hide Header</paper-checkbox>
+              <paper-checkbox
+                @checked-changed="${this._valueChanged}" 
+                .checked=${this._config.child_card}
+                .configValue="${"child_card"}"
+              >Child Card</paper-checkbox>
             </div>
           </div>
       </div>

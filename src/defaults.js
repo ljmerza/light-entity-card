@@ -10,6 +10,8 @@ export default {
     smooth_color_wheel: false,
     hide_header: false,
 
+    child_card: false,
+
     show_slider_percent: false,
 
     full_width_sliders: false,
