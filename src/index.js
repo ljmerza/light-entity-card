@@ -180,8 +180,6 @@ class LightEntityCard extends LitElement {
       this._shownStateObjects = [...this._stateObjects];
     }
 
-    console.log({ tt: this._shownStateObjects });
-
     const templates = this._shownStateObjects.reduce(
       (htmlTemplate, stateObj) => {
         return html`${htmlTemplate}${this.createEntityTemplate(stateObj)}`;
@@ -224,7 +222,6 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createEntityTemplate(stateObj) {
-    console.log({ stateObj });
     const sliderClass = this.config.full_width_sliders
       ? "ha-slider-full-width"
       : "";
