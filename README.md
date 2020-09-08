@@ -29,7 +29,7 @@ Or you can add this card manually by adding the following to resources in your l
 
 ```yaml
 resources:
-  - url: /www/light-entity-card/light-entity-card.js
+  - url: /local/light-entity-card/dist/light-entity-card.js
     type: js
 ```
 
