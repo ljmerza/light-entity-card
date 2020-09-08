@@ -1,19 +1,21 @@
-import '@babel/polyfill';
+import "@babel/polyfill";
 
-import { LitElement, html } from 'lit-element';
-import style from './style';
+import { LitElement, html } from "lit-element";
+import style from "./style";
 
-import defaultConfig from './defaults';
-import LightEntityCardEditor from './index-editor';
-import packageJson from '../package.json';
+import defaultConfig from "./defaults";
+import LightEntityCardEditor from "./index-editor";
+import packageJson from "../package.json";
 
-
-const editorName = 'light-entity-card-editor';
+const editorName = "light-entity-card-editor";
 customElements.define(editorName, LightEntityCardEditor);
 
 /* eslint no-console: 0 */
-console.info(`%c  LIGHT-ENTITY-CARD   \n%c  Version ${packageJson.version}       `, "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
-
+console.info(
+  `%c  LIGHT-ENTITY-CARD   \n%c  Version ${packageJson.version}       `,
+  "color: orange; font-weight: bold; background: black",
+  "color: white; font-weight: bold; background: dimgray"
+);
 
 class LightEntityCard extends LitElement {
   static get properties() {
@@ -28,7 +30,7 @@ class LightEntityCard extends LitElement {
    * @param {*} config
    */
   setConfig(config) {
-    if (!config.entity) throw Error('entity required.');
+    if (!config.entity) throw Error("entity required.");
 
     this.config = {
       ...defaultConfig,
@@ -55,8 +57,8 @@ class LightEntityCard extends LitElement {
 
   static get cmdToggle() {
     return {
-      on: 'turn_on',
-      off: 'turn_off',
+      on: "turn_on",
+      off: "turn_off",
     };
   }
 
@@ -72,7 +74,11 @@ class LightEntityCard extends LitElement {
    * @return {Number}
    */
   getCardSize() {
-    if (!this.config || !this.__hass || !this.__hass.states[this.config.entity]) {
+    if (
+      !this.config ||
+      !this.__hass ||
+      !this.__hass.states[this.config.entity]
+    ) {
       return 1;
     }
 
@@ -82,7 +88,9 @@ class LightEntityCard extends LitElement {
     // if given a group entity then sum length of each entity by type
     // else just get the sible entity length
     if (Array.isArray(entities.attributes.entity_id)) {
-      entities.attributes.entity_id.forEach(entity_id => cardLength += this.getEntityLength(entity_id));
+      entities.attributes.entity_id.forEach(
+        (entity_id) => (cardLength += this.getEntityLength(entity_id))
+      );
     } else {
       cardLength += this.getEntityLength(entities.attributes.entity_id);
     }
@@ -127,7 +135,7 @@ class LightEntityCard extends LitElement {
    * @return {Boolean}
    */
   isEntityOn(stateObj) {
-    return stateObj.state === 'on';
+    return stateObj.state === "on";
   }
 
   /**
@@ -143,8 +151,13 @@ class LightEntityCard extends LitElement {
       const colorpickerElement = this.shadowRoot.querySelectorAll(`#${id}`);
 
       if (colorpickerElement.length) {
-        const h = stateObj.attributes.hs_color && stateObj.attributes.hs_color[0] || 0;
-        const s = stateObj.attributes.hs_color && stateObj.attributes.hs_color[1] / 100 || 0;
+        const h =
+          (stateObj.attributes.hs_color && stateObj.attributes.hs_color[0]) ||
+          0;
+        const s =
+          (stateObj.attributes.hs_color &&
+            stateObj.attributes.hs_color[1] / 100) ||
+          0;
         colorpickerElement[0].desiredHsColor = { h, s };
       }
     });
@@ -167,17 +180,24 @@ class LightEntityCard extends LitElement {
       this._shownStateObjects = [...this._stateObjects];
     }
 
-    const templates = this._shownStateObjects.reduce((htmlTemplate, stateObj) => {
-      return html`${htmlTemplate}${this.createEntityTemplate(stateObj)}`;
-    }, ``);
+    console.log({ tt: this._shownStateObjects });
 
-    const css = `light-entity-card ${this.config.shorten_cards ? ' group' : ''} ${this.config.child_card ? ' light-entity-child-card' : ''}`
+    const templates = this._shownStateObjects.reduce(
+      (htmlTemplate, stateObj) => {
+        return html`${htmlTemplate}${this.createEntityTemplate(stateObj)}`;
+      },
+      ``
+    );
+
+    const css = `light-entity-card ${
+      this.config.shorten_cards ? " group" : ""
+    } ${this.config.child_card ? " light-entity-child-card" : ""}`;
 
     return html`
-      <style>${this.styles}</style>
-      <ha-card class='${css}'>
-        ${templates}
-      </ha-card>
+      <style>
+        ${this.styles}
+      </style>
+      <ha-card class="${css}"> ${templates} </ha-card>
     `;
   }
 
@@ -187,8 +207,13 @@ class LightEntityCard extends LitElement {
    * @return {Array<LightEntity>}
    */
   getEntitiesToShow(entities) {
-    if (entities.attributes.entity_id && Array.isArray(entities.attributes.entity_id))
-      return entities.attributes.entity_id.map(entity_id => this.__hass.states[entity_id]).filter(Boolean);
+    if (
+      entities.attributes.entity_id &&
+      Array.isArray(entities.attributes.entity_id)
+    )
+      return entities.attributes.entity_id
+        .map((entity_id) => this.__hass.states[entity_id])
+        .filter(Boolean);
 
     return [entities];
   }
@@ -199,17 +224,19 @@ class LightEntityCard extends LitElement {
    * @return {TemplateResult}
    */
   createEntityTemplate(stateObj) {
-    const sliderClass = this.config.full_width_sliders ? 'ha-slider-full-width' : '';
+    console.log({ stateObj });
+    const sliderClass = this.config.full_width_sliders
+      ? "ha-slider-full-width"
+      : "";
 
     return html`
       ${this.createHeader(stateObj)}
-      <div class='light-entity-card-sliders ${sliderClass}'>
+      <div class="light-entity-card-sliders ${sliderClass}">
         ${this.createBrightnessSlider(stateObj)}
         ${this.createColorTemperature(stateObj)}
         ${this.createWhiteValue(stateObj)}
       </div>
-      ${this.createColorPicker(stateObj)}
-      ${this.createEffectList(stateObj)}
+      ${this.createColorPicker(stateObj)} ${this.createEffectList(stateObj)}
     `;
   }
 
@@ -220,13 +247,29 @@ class LightEntityCard extends LitElement {
    */
   createHeader(stateObj) {
     if (this.config.hide_header) return html``;
-    const title = this.config.header || stateObj.attributes.friendly_name || stateObj.entity_id;
+
+    // if using group and its spread out then use name of each entity in group first else use header name first
+    let title = this.config.header;
+    if (this.config.consolidate_entities) {
+      title =
+        this.config.header ||
+        stateObj.attributes.friendly_name ||
+        stateObj.entity_id;
+    } else {
+      title =
+        stateObj.attributes.friendly_name ||
+        stateObj.entity_id ||
+        this.config.header;
+    }
 
     return html`
       <div class="light-entity-card__header">
-        <div class='light-entity-card__title'>${title}</div>
-        <div class='light-entity-card-toggle'>
-          <ha-switch .checked=${this.isEntityOn(stateObj)} @change=${e => this.setToggle(e, stateObj)}></ha-switch>
+        <div class="light-entity-card__title">${title}</div>
+        <div class="light-entity-card-toggle">
+          <ha-switch
+            .checked=${this.isEntityOn(stateObj)}
+            @change=${(e) => this.setToggle(e, stateObj)}
+          ></ha-switch>
         </div>
       </div>
     `;
@@ -239,12 +282,17 @@ class LightEntityCard extends LitElement {
    */
   createBrightnessSlider(stateObj) {
     if (this.config.brightness === false) return html``;
-    if (this.dontShowFeature('brightness', stateObj)) return html``;
+    if (this.dontShowFeature("brightness", stateObj)) return html``;
 
     return html`
-      <div class='control light-entity-card-center'>
+      <div class="control light-entity-card-center">
         <ha-icon icon="hass:${this.config.brightness_icon}"></ha-icon>
-        <ha-slider .value='${stateObj.attributes.brightness}' @value-changed="${e => this.setBrightness(e, stateObj)}" min="1" max="255"></ha-slider>
+        <ha-slider
+          .value="${stateObj.attributes.brightness}"
+          @value-changed="${(e) => this.setBrightness(e, stateObj)}"
+          min="1"
+          max="255"
+        ></ha-slider>
         ${this.showPercent(stateObj.attributes.brightness, 0, 254)}
       </div>
     `;
@@ -252,9 +300,9 @@ class LightEntityCard extends LitElement {
 
   /**
    * shows slider percent if config is set
-   * @param {number} value 
-   * @param {number} min 
-   * @param {number} max 
+   * @param {number} value
+   * @param {number} min
+   * @param {number} max
    * @return {TemplateResult}
    */
   showPercent(value, min, max) {
@@ -262,9 +310,7 @@ class LightEntityCard extends LitElement {
     let percent = parseInt(((value - min) * 100) / (max - min), 0);
     if (isNaN(percent)) percent = 0;
 
-    return html`
-      <div class='percent-slider'>${percent}%</div>
-    `;
+    return html` <div class="percent-slider">${percent}%</div> `;
   }
 
   /**
@@ -274,15 +320,24 @@ class LightEntityCard extends LitElement {
    */
   createColorTemperature(stateObj) {
     if (this.config.color_temp === false) return html``;
-    if (this.dontShowFeature('colorTemp', stateObj)) return html``;
+    if (this.dontShowFeature("colorTemp", stateObj)) return html``;
 
     return html`
       <div class="control light-entity-card-center">
         <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
-        <ha-slider class='light-entity-card-color_temp' min="${stateObj.attributes.min_mireds}" max="${stateObj.attributes.max_mireds}"
-          .value=${stateObj.attributes.color_temp} @value-changed="${e => this.setColorTemp(e, stateObj)}">
+        <ha-slider
+          class="light-entity-card-color_temp"
+          min="${stateObj.attributes.min_mireds}"
+          max="${stateObj.attributes.max_mireds}"
+          .value=${stateObj.attributes.color_temp}
+          @value-changed="${(e) => this.setColorTemp(e, stateObj)}"
+        >
         </ha-slider>
-        ${this.showPercent(stateObj.attributes.color_temp, stateObj.attributes.min_mireds - 1, stateObj.attributes.max_mireds - 1)}
+        ${this.showPercent(
+          stateObj.attributes.color_temp,
+          stateObj.attributes.min_mireds - 1,
+          stateObj.attributes.max_mireds - 1
+        )}
       </div>
     `;
   }
@@ -294,12 +349,16 @@ class LightEntityCard extends LitElement {
    */
   createWhiteValue(stateObj) {
     if (this.config.white_value === false) return html``;
-    if (this.dontShowFeature('whiteValue', stateObj)) return html``;
+    if (this.dontShowFeature("whiteValue", stateObj)) return html``;
 
     return html`
       <div class="control light-entity-card-center">
         <ha-icon icon="hass:${this.config.white_icon}"></ha-icon>
-        <ha-slider max="255" .value="${stateObj.attributes.white_value}" @value-changed="${e => this.setWhiteValue(e, stateObj)}">
+        <ha-slider
+          max="255"
+          .value="${stateObj.attributes.white_value}"
+          @value-changed="${(e) => this.setWhiteValue(e, stateObj)}"
+        >
         </ha-slider>
         ${this.showPercent(stateObj.attributes.white_value, 0, 254)}
       </div>
@@ -317,30 +376,46 @@ class LightEntityCard extends LitElement {
 
     // need to check state and persist_features here because if given custom effect list we may
     // want to sho that even if the feature doesn't exist so dont check that part to move forward just persist_features/state
-    if (!this.config.persist_features && !this.isEntityOn(stateObj)) return html``;
+    if (!this.config.persist_features && !this.isEntityOn(stateObj))
+      return html``;
 
     let effect_list = stateObj.attributes.effect_list || [];
 
     // if we were given a custom list then use that
     if (this.config.effects_list && Array.isArray(this.config.effects_list)) {
       effect_list = this.config.effects_list;
-    } else if (this.config.effects_list && this.hass.states[this.config.effects_list]) {
+    } else if (
+      this.config.effects_list &&
+      this.hass.states[this.config.effects_list]
+    ) {
       // else if given an input_select entity use that as effect list
       const inputSelect = this.hass.states[this.config.effects_list];
-      effect_list = (inputSelect.attributes && inputSelect.attributes.options) || [];
-    } else if (this.dontShowFeature('effectList', stateObj)) {
+      effect_list =
+        (inputSelect.attributes && inputSelect.attributes.options) || [];
+    } else if (this.dontShowFeature("effectList", stateObj)) {
       // finally if no custom list nor feature exists then dont show effect list
       return html``;
     }
 
-    const listItems = effect_list.map(effect => html`<paper-item>${effect}</paper-item>`);
+    const listItems = effect_list.map(
+      (effect) => html`<paper-item>${effect}</paper-item>`
+    );
     const selectedIndex = effect_list.indexOf(stateObj.attributes.effect);
-    const caption = this.language['ui.card.light.effect'];
+    const caption = this.language["ui.card.light.effect"];
 
     return html`
-      <div class="control light-entity-card-center light-entity-card-effectlist">
-        <paper-dropdown-menu @value-changed=${e => this.setEffect(e, stateObj)} label="${caption}">
-          <paper-listbox selected="${selectedIndex}" slot="dropdown-content" placeholder="${caption}">
+      <div
+        class="control light-entity-card-center light-entity-card-effectlist"
+      >
+        <paper-dropdown-menu
+          @value-changed=${(e) => this.setEffect(e, stateObj)}
+          label="${caption}"
+        >
+          <paper-listbox
+            selected="${selectedIndex}"
+            slot="dropdown-content"
+            placeholder="${caption}"
+          >
             ${listItems}
           </paper-listbox>
         </paper-dropdown-menu>
@@ -355,17 +430,17 @@ class LightEntityCard extends LitElement {
    */
   createColorPicker(stateObj) {
     if (this.config.color_picker === false) return html``;
-    if (this.dontShowFeature('color', stateObj)) return html``;
+    if (this.dontShowFeature("color", stateObj)) return html``;
 
     return html`
-      <div class='light-entity-card__color-picker'>
-        <ha-color-picker 
-          id="${this.generateColorPickerId(stateObj)}" 
-          class='control color' 
+      <div class="light-entity-card__color-picker">
+        <ha-color-picker
+          id="${this.generateColorPickerId(stateObj)}"
+          class="control color"
           saturation-segments=${this._saturationSegments}
           hue-segments=${this._hueSegments}
-          throttle=500 
-          @colorselected=${e => this.setColorPicker(e, stateObj)}
+          throttle="500"
+          @colorselected=${(e) => this.setColorPicker(e, stateObj)}
         >
         </ha-color-picker>
       </div>
@@ -379,10 +454,14 @@ class LightEntityCard extends LitElement {
    * @return {boolean}
    */
   dontShowFeature(featureName, stateObj) {
-    const feature_not_supported = !(LightEntityCard.featureNames[featureName] & stateObj.attributes.supported_features);
+    const feature_not_supported = !(
+      LightEntityCard.featureNames[featureName] &
+      stateObj.attributes.supported_features
+    );
     if (feature_not_supported) return true;
 
-    if (!this.config.persist_features && !this.isEntityOn(stateObj)) return true;
+    if (!this.config.persist_features && !this.isEntityOn(stateObj))
+      return true;
   }
 
   /**
@@ -390,7 +469,7 @@ class LightEntityCard extends LitElement {
    * @param {LightEntity} stateObj
    */
   generateColorPickerId(stateObj) {
-    const entity_id = stateObj.entity_id.replace('.', '-');
+    const entity_id = stateObj.entity_id.replace(".", "-");
     return `light-entity-card-${entity_id}`;
   }
 
@@ -400,7 +479,10 @@ class LightEntityCard extends LitElement {
    * @param {LightEntity} stateObj
    */
   setColorPicker(event, stateObj) {
-    this.callEntityService({ hs_color: [event.detail.hs.h, event.detail.hs.s * 100] }, stateObj);
+    this.callEntityService(
+      { hs_color: [event.detail.hs.h, event.detail.hs.s * 100] },
+      stateObj
+    );
   }
 
   /**
@@ -410,11 +492,14 @@ class LightEntityCard extends LitElement {
    */
   setBrightness(event, stateObj) {
     const brightness = parseInt(event.target.value, 0);
-    if (isNaN(brightness) || parseInt(stateObj.attributes.brightness, 0) === brightness) return;
+    if (
+      isNaN(brightness) ||
+      parseInt(stateObj.attributes.brightness, 0) === brightness
+    )
+      return;
 
     this.callEntityService({ brightness }, stateObj);
   }
-
 
   /**
    * sets the current Color Temperature selected for a given entity
@@ -423,7 +508,11 @@ class LightEntityCard extends LitElement {
    */
   setColorTemp(event, stateObj) {
     const colorTemp = parseInt(event.target.value, 0);
-    if (isNaN(colorTemp) || parseInt(stateObj.attributes.color_temp, 0) === colorTemp) return;
+    if (
+      isNaN(colorTemp) ||
+      parseInt(stateObj.attributes.color_temp, 0) === colorTemp
+    )
+      return;
 
     this.callEntityService({ color_temp: colorTemp }, stateObj);
   }
@@ -435,7 +524,11 @@ class LightEntityCard extends LitElement {
    */
   setWhiteValue(event, stateObj) {
     const whiteValue = parseInt(event.target.value, 0);
-    if (isNaN(whiteValue) || parseInt(stateObj.attributes.white_value, 0) === whiteValue) return;
+    if (
+      isNaN(whiteValue) ||
+      parseInt(stateObj.attributes.white_value, 0) === whiteValue
+    )
+      return;
 
     this.callEntityService({ white_value: whiteValue }, stateObj);
   }
@@ -446,7 +539,9 @@ class LightEntityCard extends LitElement {
    * @param {LightEntity} stateObj
    */
   setToggle(event, stateObj) {
-    const newState = this.isEntityOn(stateObj) ? LightEntityCard.cmdToggle.off : LightEntityCard.cmdToggle.on;
+    const newState = this.isEntityOn(stateObj)
+      ? LightEntityCard.cmdToggle.off
+      : LightEntityCard.cmdToggle.on;
     this.callEntityService({}, stateObj, newState);
   }
 
@@ -467,8 +562,8 @@ class LightEntityCard extends LitElement {
    */
   callEntityService(payload, stateObj, state) {
     if (this._isUpdating) return;
-    let entityType = stateObj.entity_id.split('.')[0];
-    if (entityType === 'group') entityType = 'homeassistant';
+    let entityType = stateObj.entity_id.split(".")[0];
+    if (entityType === "group") entityType = "homeassistant";
 
     this.hass.callService(entityType, state || LightEntityCard.cmdToggle.on, {
       entity_id: stateObj.entity_id,
@@ -477,4 +572,4 @@ class LightEntityCard extends LitElement {
   }
 }
 
-customElements.define('light-entity-card', LightEntityCard);
+customElements.define("light-entity-card", LightEntityCard);
