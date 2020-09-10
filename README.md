@@ -32,6 +32,7 @@ resources:
   - url: /local/light-entity-card/dist/light-entity-card.js
     type: js
 ```
+Issues with the installation should be asked in the [Home Asssitant forums](https://community.home-assistant.io/t/light-entity-card/96146)
 
 ## Configurations:
 ---
