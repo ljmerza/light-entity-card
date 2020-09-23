@@ -1,4 +1,5 @@
-As of Home Assistant v0.115 all custom elements lazy load which means in order for custom cards to continue to work, they will need to create their own custom elements instead of relying on Home Assistant's built in ones. This has put a lot of burden on maintaining custom cards so I will no longer be maintaining this project. You can open an issue on Home Assistant frontend repo to ask for custom elements to be available for custom cards again if you'd like. https://github.com/home-assistant/frontend
+As of Home Assistant v0.115 all custom elements lazy load which means in order for custom cards to continue to work, they will need to create their own custom elements instead of relying on Home Assistant's built in ones. This has put a lot of burden on maintaining custom cards so I will no longer be maintaining this project. The issue that breaks this card is here https://github.com/home-assistant/frontend/issues/7098
+
 # Light Entity Card
 Control any light/switch entity through lovelace
 
