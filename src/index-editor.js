@@ -2,8 +2,7 @@ import { LitElement, html } from 'lit-element';
 import style from './style-editor';
 import defaultConfig from './defaults';
 
-
-const fireEvent = (node, type, detail = {}, options = {}) => {
+export const fireEvent = (node, type, detail = {}, options = {}) => {
   const event = new Event(type, {
     bubbles: options.bubbles === undefined ? true : options.bubbles,
     cancelable: Boolean(options.cancelable),
@@ -14,7 +13,6 @@ const fireEvent = (node, type, detail = {}, options = {}) => {
   node.dispatchEvent(event);
   return event;
 };
-
 
 export default class LightEntityCardEditor extends LitElement {
   static get styles() {
@@ -28,13 +26,14 @@ export default class LightEntityCardEditor extends LitElement {
   setConfig(config) {
     this._config = {
       ...defaultConfig,
-      ...config
+      ...config,
     };
   }
 
   get entityOptions() {
+    // eslint-disable-next-line arrow-parens
     return Object.keys(this.hass.states).filter(eid => {
-      return ['switch', 'light', 'group'].includes(eid.substr(0, eid.indexOf('.')))
+      return ['switch', 'light', 'group'].includes(eid.substr(0, eid.indexOf('.')));
     });
   }
 
@@ -48,7 +47,7 @@ export default class LightEntityCardEditor extends LitElement {
     }
 
     // get header name
-    let header = this._config.header;
+    let { header } = this._config;
     if (!header && this._config.entity) {
       let name = this._config.entity.split('.')[1] || '';
       if (name) {
@@ -57,6 +56,12 @@ export default class LightEntityCardEditor extends LitElement {
       }
     }
 
+    // eslint-disable-next-line arrow-body-style
+    // eslint-disable-next-line arrow-parens
+    const options = this.entityOptions.map(entity => {
+      return html`<paper-item>${entity}</paper-item>`;
+    });
+
     return html`
       <div class="card-config">
 
@@ -64,33 +69,29 @@ export default class LightEntityCardEditor extends LitElement {
           <paper-input
             label="Header"
             .value="${header}"
-            .configValue="${"header"}"
-            @value-changed="${this._valueChanged}"
+            .configValue="${'header'}"
+            @value-changed="${this.configChanged}"
           ></paper-input>
         </div>
 
         <div class='entities'>
           <paper-dropdown-menu 
             label="Entity"
-            @value-changed="${this._valueChanged}" 
-            .configValue="${"entity"}"
+            @value-changed="${this.configChanged}" 
+            .configValue="${'entity'}"
           >
             <paper-listbox 
               slot="dropdown-content" 
               .selected="${this.entityOptions.indexOf(this._config.entity)}"
             >
-              ${
-      this.entityOptions.map(entity => {
-        return html`<paper-item>${entity}</paper-item>`;
-      })
-      }
+              ${options}
             </paper-listbox>
           </paper-dropdown-menu>
           <paper-input
             label="Brightness Icon"
             .value="${this._config.brightness_icon}"
-            .configValue="${"brightness_icon"}"
-            @value-changed="${this._valueChanged}"
+            .configValue="${'brightness_icon'}"
+            @value-changed="${this.configChanged}"
           ></paper-input>
         </div>
 
@@ -98,106 +99,106 @@ export default class LightEntityCardEditor extends LitElement {
          <paper-input
             label="White Icon"
             .value="${this._config.white_icon}"
-            .configValue="${"white_icon"}"
-            @value-changed="${this._valueChanged}"
+            .configValue="${'white_icon'}"
+            @value-changed="${this.configChanged}"
           ></paper-input>
           <paper-input
             label="Temperature Icon"
             .value="${this._config.temperature_icon}"
-            .configValue="${"temperature_icon"}"
-            @value-changed="${this._valueChanged}"
+            .configValue="${'temperature_icon'}"
+            @value-changed="${this.configChanged}"
           ></paper-input>
         </div>
 
         <div class='overall-config'>
           <div class='checkbox-options'>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.color_wheel}
-                .configValue="${"color_wheel"}"
+                .configValue="${'color_wheel'}"
               >Show Color Wheel</paper-checkbox>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.shorten_cards}
-                .configValue="${"shorten_cards"}"
+                .configValue="${'shorten_cards'}"
               >Shorten Cards</paper-checkbox>
             </div>
 
             <div class='checkbox-options'>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.persist_features}
-                .configValue="${"persist_features"}"
+                .configValue="${'persist_features'}"
               >Persist Features</paper-checkbox>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.brightness}
-                .configValue="${"brightness"}"
+                .configValue="${'brightness'}"
               >Show Brightness</paper-checkbox>
             </div>
 
             <div class='checkbox-options'>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.color_temp}
-                .configValue="${"color_temp"}"
+                .configValue="${'color_temp'}"
               >Show Color Temp</paper-checkbox>
              <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.white_value}
-                .configValue="${"white_value"}"
+                .configValue="${'white_value'}"
               >Show White Value</paper-checkbox>
             </div>
 
             <div class='checkbox-options'>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.color_picker}
-                .configValue="${"color_picker"}"
+                .configValue="${'color_picker'}"
               >Show Color Picker</paper-checkbox>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.effects_list}
-                .configValue="${"effects_list"}"
+                .configValue="${'effects_list'}"
               >Show Effects List</paper-checkbox>
             </div>
 
             <div class='checkbox-options'>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.full_width_sliders}
-                .configValue="${"full_width_sliders"}"
+                .configValue="${'full_width_sliders'}"
               >Full Width Sliders</paper-checkbox>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.show_slider_percent}
-                .configValue="${"show_slider_percent"}"
+                .configValue="${'show_slider_percent'}"
               >Show Slider Percent</paper-checkbox>
             </div>
 
             <div class='checkbox-options'>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.smooth_color_wheel}
-                .configValue="${"smooth_color_wheel"}"
+                .configValue="${'smooth_color_wheel'}"
               >Smooth Color Wheel</paper-checkbox>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.consolidate_entities}
-                .configValue="${"consolidate_entities"}"
+                .configValue="${'consolidate_entities'}"
               >Consolidate Entities</paper-checkbox>
             </div>
 
             <div class='checkbox-options'>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.hide_header}
-                .configValue="${"hide_header"}"
+                .configValue="${'hide_header'}"
               >Hide Header</paper-checkbox>
               <paper-checkbox
-                @checked-changed="${this._valueChanged}" 
+                @checked-changed="${this.configChanged}" 
                 .checked=${this._config.child_card}
-                .configValue="${"child_card"}"
+                .configValue="${'child_card'}"
               >Child Card</paper-checkbox>
             </div>
           </div>
@@ -205,9 +206,12 @@ export default class LightEntityCardEditor extends LitElement {
     `;
   }
 
-  _valueChanged(ev) {
+  configChanged(ev) {
     if (!this._config || !this.hass || !this._firstRendered) return;
-    const { target: { configValue, value }, detail: { value: checkedValue } } = ev;
+    const {
+      target: { configValue, value },
+      detail: { value: checkedValue },
+    } = ev;
 
     if (checkedValue !== undefined || checkedValue !== null) {
       this._config = { ...this._config, [configValue]: checkedValue };
@@ -218,4 +222,3 @@ export default class LightEntityCardEditor extends LitElement {
     fireEvent(this, 'config-changed', { config: this._config });
   }
 }
-
