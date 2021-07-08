@@ -17,6 +17,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.4.3",
     "core-js": "^2.6.5",
+    "lit": "^2.0.0-rc.2",
     "lit-element": "^2.1.0"
   },
   "devDependencies": {

@@ -172,7 +172,8 @@ class LightEntityCard extends LitElement {
 
     this._isUpdating = true;
     this._stateObjects = this.getEntitiesToShow(entity);
-    // need to find what state objects are actually gonig to be shown
+
+    // need to find what state objects are actually going to be shown
     if (this.config.consolidate_entities) {
       this._shownStateObjects = [entity];
     } else {
@@ -237,14 +238,7 @@ class LightEntityCard extends LitElement {
    */
   createHeader(stateObj) {
     if (this.config.hide_header) return html``;
-
-    // if using group and its spread out then use name of each entity in group first else use header name first
-    let title = this.config.header;
-    if (this.config.consolidate_entities) {
-      title = this.config.header || stateObj.attributes.friendly_name || stateObj.entity_id;
-    } else {
-      title = stateObj.attributes.friendly_name || stateObj.entity_id || this.config.header;
-    }
+    const title = this.config.header || stateObj.attributes.friendly_name || stateObj.entity_id;
 
     return html`
       <div class="light-entity-card__header">
@@ -422,9 +416,37 @@ class LightEntityCard extends LitElement {
    * @return {boolean}
    */
   dontShowFeature(featureName, stateObj) {
-    const feature_not_supported = !(LightEntityCard.featureNames[featureName] & stateObj.attributes.supported_features);
-    if (feature_not_supported) return true;
+    // old deprecated way to seeing if supported feature
+    let featureSupported = LightEntityCard.featureNames[featureName] & stateObj.attributes.supported_features;
 
+    // who the fuck knows
+    if (!featureSupported) {
+      switch (featureName) {
+        case 'brightness':
+          featureSupported = Object.prototype.hasOwnProperty.call(stateObj.attributes, 'brightness');
+          break;
+        case 'colorTemp':
+          featureSupported =
+            stateObj.attributes.supported_color_modes &&
+            stateObj.attributes.supported_color_modes.includes('color_temp');
+          break;
+        case 'effectList':
+          featureSupported = stateObj.attributes.effect_list && stateObj.attributes.effect_list.length;
+          break;
+        case 'color':
+          featureSupported =
+            stateObj.attributes.supported_color_modes && stateObj.attributes.supported_color_modes.includes('hs');
+          break;
+        case 'whiteValue':
+          featureSupported = Object.prototype.hasOwnProperty.call(stateObj.attributes, 'white_value');
+          break;
+        default:
+          featureSupported = false;
+          break;
+      }
+    }
+
+    if (!featureSupported) return true;
     if (!this.config.persist_features && !this.isEntityOn(stateObj)) return true;
   }
 
