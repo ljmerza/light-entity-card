@@ -436,6 +436,9 @@ class LightEntityCard extends LitElement {
         case 'color':
           featureSupported =
             stateObj.attributes.supported_color_modes && stateObj.attributes.supported_color_modes.includes('hs');
+          if (!featureSupported)
+            featureSupported =
+              stateObj.attributes.supported_color_modes && stateObj.attributes.supported_color_modes.includes('hs');
           break;
         case 'whiteValue':
           featureSupported = Object.prototype.hasOwnProperty.call(stateObj.attributes, 'white_value');
