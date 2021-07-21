@@ -419,26 +419,33 @@ class LightEntityCard extends LitElement {
     // old deprecated way to seeing if supported feature
     let featureSupported = LightEntityCard.featureNames[featureName] & stateObj.attributes.supported_features;
 
-    // who the fuck knows
+    // support new color modes https://developers.home-assistant.io/docs/core/entity/light/#color-modes
+    const colorModes = stateObj.attributes.supported_color_modes || [];
+
     if (!featureSupported) {
       switch (featureName) {
         case 'brightness':
           featureSupported = Object.prototype.hasOwnProperty.call(stateObj.attributes, 'brightness');
+          if (!featureSupported) {
+            const supportedModes = ['hs', 'rgb', 'rgbw', 'rgbww', 'white', 'brightness', 'color_temp', 'xy'];
+            featureSupported = [...new Set(colorModes.filter(mode => supportedModes.includes(mode)))].length > 0;
+          }
+
           break;
         case 'colorTemp':
-          featureSupported =
-            stateObj.attributes.supported_color_modes &&
-            stateObj.attributes.supported_color_modes.includes('color_temp');
+          if (colorModes) {
+            const supportedModes = ['color_temp'];
+            featureSupported = [...new Set(colorModes.filter(mode => supportedModes.includes(mode)))].length > 0;
+          }
           break;
         case 'effectList':
           featureSupported = stateObj.attributes.effect_list && stateObj.attributes.effect_list.length;
           break;
         case 'color':
-          featureSupported =
-            stateObj.attributes.supported_color_modes && stateObj.attributes.supported_color_modes.includes('hs');
-          if (!featureSupported)
-            featureSupported =
-              stateObj.attributes.supported_color_modes && stateObj.attributes.supported_color_modes.includes('rgb');
+          if (!featureSupported) {
+            const supportedModes = ['hs', 'rgb', 'rgbw', 'rgbww', 'xy'];
+            featureSupported = [...new Set(colorModes.filter(mode => supportedModes.includes(mode)))].length > 0;
+          }
           break;
         case 'whiteValue':
           featureSupported = Object.prototype.hasOwnProperty.call(stateObj.attributes, 'white_value');
