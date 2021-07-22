@@ -1,5 +1,10 @@
 # Light Entity Card
+
 Control any light/switch entity through lovelace
+
+## Support
+
+For help, visit the light entity support thread [here](https://community.home-assistant.io/t/light-entity-card/96146)
 
 <img src='https://raw.githubusercontent.com/ljmerza/light-entity-card/master/card.png' />
 
@@ -7,6 +12,8 @@ Control any light/switch entity through lovelace
 [![License][license-shield]](LICENSE.md)
 ![Project Maintenance][maintenance-shield]
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
+
+
 
 ## Features
 ---
