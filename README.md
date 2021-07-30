@@ -32,13 +32,6 @@ For help, visit the light entity support thread [here](https://community.home-as
 
 Add through  [HACS](https://github.com/custom-components/hacs)
 
-Or you can add this card manually by adding the following to resources in your lovelace config:
-
-```yaml
-resources:
-  - url: /local/light-entity-card/dist/light-entity-card.js
-    type: js
-```
 Issues with the installation should be asked in the [Home Asssitant forums](https://community.home-assistant.io/t/light-entity-card/96146)
 
 ## Configurations:
