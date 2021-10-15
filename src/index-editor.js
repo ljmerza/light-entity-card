@@ -31,10 +31,12 @@ export default class LightEntityCardEditor extends LitElement {
   }
 
   get entityOptions() {
-    // eslint-disable-next-line arrow-parens
-    return Object.keys(this.hass.states).filter(eid => {
+    let allEntities = Object.keys(this.hass.states).filter(eid => {
       return ['switch', 'light', 'group'].includes(eid.substr(0, eid.indexOf('.')));
     });
+
+    allEntities.sort();
+    return allEntities;
   }
 
   firstUpdated() {
