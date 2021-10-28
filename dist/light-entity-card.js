@@ -370,7 +370,7 @@ var Nt=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShado
               </ha-formfield>
               <ha-formfield label="Show Brightness">
                 <ha-checkbox
-                  @checked-changed="${this.checkboxConfigChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.brightness}
                   .value="${"brightness"}"
                 ></ha-checkbox>

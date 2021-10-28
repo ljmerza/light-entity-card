@@ -140,7 +140,7 @@ export default class LightEntityCardEditor extends LitElement {
               </ha-formfield>
               <ha-formfield label="Show Brightness">
                 <ha-checkbox
-                  @checked-changed="${this.checkboxConfigChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.brightness}
                   .value="${'brightness'}"
                 ></ha-checkbox>
