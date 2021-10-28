@@ -24,10 +24,6 @@ const style = css`
     width: 48%;
   }
 
-  .checkbox-options ha-formfield {
-    margin-top: 10px;
-  }
-
   .overall-config {
     margin-bottom: 20px;
   }
