@@ -7,7 +7,7 @@ const style = css`
     display: flex;
   }
 
-  .entities paper-checkbox {
+  .entities ha-formfield {
     display: block;
     margin-bottom: 10px;
     margin-left: 10px;
@@ -17,14 +17,14 @@ const style = css`
     display: flex;
   }
 
-  .checkbox-options paper-checkbox,
+  .checkbox-options ha-formfield,
   .entities paper-dropdown-menu,
   .entities paper-input {
     padding-right: 2%;
     width: 48%;
   }
 
-  .checkbox-options paper-checkbox {
+  .checkbox-options ha-formfield {
     margin-top: 10px;
   }
 

@@ -31,7 +31,7 @@ export default class LightEntityCardEditor extends LitElement {
   }
 
   get entityOptions() {
-    let allEntities = Object.keys(this.hass.states).filter(eid => {
+    const allEntities = Object.keys(this.hass.states).filter(eid => {
       return ['switch', 'light', 'group'].includes(eid.substr(0, eid.indexOf('.')));
     });
 
@@ -114,94 +114,122 @@ export default class LightEntityCardEditor extends LitElement {
 
         <div class='overall-config'>
           <div class='checkbox-options'>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
+            <ha-formfield label="Show Color Wheel">
+              <ha-checkbox
+                @change="${this.configChanged}" 
                 .checked=${this._config.color_wheel}
-                .configValue="${'color_wheel'}"
-              >Show Color Wheel</paper-checkbox>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
+                .value="${'color_wheel'}"
+              ></ha-checkbox>
+            </ha-formfield>
+            <ha-formfield label="Shorten Cards">
+              <ha-checkbox
+                @change="${this.configChanged}"
                 .checked=${this._config.shorten_cards}
-                .configValue="${'shorten_cards'}"
-              >Shorten Cards</paper-checkbox>
+                .value="${'shorten_cards'}"
+              ></ha-checkbox>
+            </ha-formfield>
             </div>
 
             <div class='checkbox-options'>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.persist_features}
-                .configValue="${'persist_features'}"
-              >Persist Features</paper-checkbox>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.brightness}
-                .configValue="${'brightness'}"
-              >Show Brightness</paper-checkbox>
+              <ha-formfield label="Persist Features">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.persist_features}
+                  .value="${'persist_features'}"
+                ></ha-checkbox>
+              </ha-formfield>
+              <ha-formfield label="Show Brightness">
+                <ha-checkbox
+                  @checked-changed="${this.configChanged}"
+                  .checked=${this._config.brightness}
+                  .value="${'brightness'}"
+                ></ha-checkbox>
+              </ha-formfield>
             </div>
 
             <div class='checkbox-options'>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.color_temp}
-                .configValue="${'color_temp'}"
-              >Show Color Temp</paper-checkbox>
-             <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.white_value}
-                .configValue="${'white_value'}"
-              >Show White Value</paper-checkbox>
+              <ha-formfield label="Show Color Temp">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.color_temp}
+                  .value="${'color_temp'}"
+                ></ha-checkbox>
+              </ha-formfield>
+              <ha-formfield label="Show White Value">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.white_value}
+                  .value="${'white_value'}"
+                ></ha-checkbox>
+              </ha-formfield>
             </div>
 
             <div class='checkbox-options'>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.color_picker}
-                .configValue="${'color_picker'}"
-              >Show Color Picker</paper-checkbox>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.effects_list}
-                .configValue="${'effects_list'}"
-              >Show Effects List</paper-checkbox>
+              <ha-formfield label="Show Color Picker">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.color_picker}
+                  .value="${'color_picker'}"
+                ></ha-checkbox>
+              </ha-formfield>
+              <ha-formfield label="Show Effects List">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.effects_list}
+                  .value="${'effects_list'}"
+                ></ha-checkbox>
+              </ha-formfield>
             </div>
 
             <div class='checkbox-options'>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.full_width_sliders}
-                .configValue="${'full_width_sliders'}"
-              >Full Width Sliders</paper-checkbox>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.show_slider_percent}
-                .configValue="${'show_slider_percent'}"
-              >Show Slider Percent</paper-checkbox>
+              <ha-formfield label="Full Width Sliders">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.full_width_sliders}
+                  .value="${'full_width_sliders'}"
+                ></ha-checkbox>
+              </ha-formfield>
+              <ha-formfield label="Show Slider Percent">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.show_slider_percent}
+                  .value="${'show_slider_percent'}"
+                ></ha-checkbox>
+              </ha-formfield>
             </div>
 
             <div class='checkbox-options'>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.smooth_color_wheel}
-                .configValue="${'smooth_color_wheel'}"
-              >Smooth Color Wheel</paper-checkbox>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.consolidate_entities}
-                .configValue="${'consolidate_entities'}"
-              >Consolidate Entities</paper-checkbox>
+              <ha-formfield label="Smooth Color Wheel">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.smooth_color_wheel}
+                  .value="${'smooth_color_wheel'}"
+                ></ha-checkbox>
+              </ha-formfield>
+              <ha-formfield label="Consolidate Entities">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.consolidate_entities}
+                  .value="${'consolidate_entities'}"
+                ></ha-checkbox>
+              </ha-formfield>
             </div>
 
             <div class='checkbox-options'>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.hide_header}
-                .configValue="${'hide_header'}"
-              >Hide Header</paper-checkbox>
-              <paper-checkbox
-                @checked-changed="${this.configChanged}" 
-                .checked=${this._config.child_card}
-                .configValue="${'child_card'}"
-              >Child Card</paper-checkbox>
+              <ha-formfield label="Hide Header">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.hide_header}
+                  .value="${'hide_header'}"
+                ></ha-checkbox>
+              </ha-formfield>
+              <ha-formfield label="Child Card">
+                <ha-checkbox
+                  @change="${this.configChanged}"
+                  .checked=${this._config.child_card}
+                  .value="${'child_card'}"
+                ></ha-checkbox>
+              </ha-formfield>
             </div>
           </div>
       </div>
