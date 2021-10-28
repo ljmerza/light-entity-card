@@ -116,14 +116,14 @@ export default class LightEntityCardEditor extends LitElement {
           <div class='checkbox-options'>
             <ha-formfield label="Show Color Wheel">
               <ha-checkbox
-                @change="${this.configChanged}" 
+                @change="${this.checkboxConfigChanged}" 
                 .checked=${this._config.color_wheel}
                 .value="${'color_wheel'}"
               ></ha-checkbox>
             </ha-formfield>
             <ha-formfield label="Shorten Cards">
               <ha-checkbox
-                @change="${this.configChanged}"
+                @change="${this.checkboxConfigChanged}"
                 .checked=${this._config.shorten_cards}
                 .value="${'shorten_cards'}"
               ></ha-checkbox>
@@ -133,14 +133,14 @@ export default class LightEntityCardEditor extends LitElement {
             <div class='checkbox-options'>
               <ha-formfield label="Persist Features">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.persist_features}
                   .value="${'persist_features'}"
                 ></ha-checkbox>
               </ha-formfield>
               <ha-formfield label="Show Brightness">
                 <ha-checkbox
-                  @checked-changed="${this.configChanged}"
+                  @checked-changed="${this.checkboxConfigChanged}"
                   .checked=${this._config.brightness}
                   .value="${'brightness'}"
                 ></ha-checkbox>
@@ -150,14 +150,14 @@ export default class LightEntityCardEditor extends LitElement {
             <div class='checkbox-options'>
               <ha-formfield label="Show Color Temp">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.color_temp}
                   .value="${'color_temp'}"
                 ></ha-checkbox>
               </ha-formfield>
               <ha-formfield label="Show White Value">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.white_value}
                   .value="${'white_value'}"
                 ></ha-checkbox>
@@ -167,14 +167,14 @@ export default class LightEntityCardEditor extends LitElement {
             <div class='checkbox-options'>
               <ha-formfield label="Show Color Picker">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.color_picker}
                   .value="${'color_picker'}"
                 ></ha-checkbox>
               </ha-formfield>
               <ha-formfield label="Show Effects List">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.effects_list}
                   .value="${'effects_list'}"
                 ></ha-checkbox>
@@ -184,14 +184,14 @@ export default class LightEntityCardEditor extends LitElement {
             <div class='checkbox-options'>
               <ha-formfield label="Full Width Sliders">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.full_width_sliders}
                   .value="${'full_width_sliders'}"
                 ></ha-checkbox>
               </ha-formfield>
               <ha-formfield label="Show Slider Percent">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.show_slider_percent}
                   .value="${'show_slider_percent'}"
                 ></ha-checkbox>
@@ -201,14 +201,14 @@ export default class LightEntityCardEditor extends LitElement {
             <div class='checkbox-options'>
               <ha-formfield label="Smooth Color Wheel">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.smooth_color_wheel}
                   .value="${'smooth_color_wheel'}"
                 ></ha-checkbox>
               </ha-formfield>
               <ha-formfield label="Consolidate Entities">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.consolidate_entities}
                   .value="${'consolidate_entities'}"
                 ></ha-checkbox>
@@ -218,14 +218,14 @@ export default class LightEntityCardEditor extends LitElement {
             <div class='checkbox-options'>
               <ha-formfield label="Hide Header">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.hide_header}
                   .value="${'hide_header'}"
                 ></ha-checkbox>
               </ha-formfield>
               <ha-formfield label="Child Card">
                 <ha-checkbox
-                  @change="${this.configChanged}"
+                  @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.child_card}
                   .value="${'child_card'}"
                 ></ha-checkbox>
@@ -248,6 +248,17 @@ export default class LightEntityCardEditor extends LitElement {
     } else {
       this._config = { ...this._config, [configValue]: value };
     }
+
+    fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  checkboxConfigChanged(ev) {
+    if (!this._config || !this.hass || !this._firstRendered) return;
+    const {
+      target: { value, checked },
+    } = ev;
+
+    this._config = { ...this._config, [value]: checked };
 
     fireEvent(this, 'config-changed', { config: this._config });
   }
