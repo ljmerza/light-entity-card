@@ -591,5 +591,5 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'light-entity-card',
   name: 'Light Entity Card',
-  description: 'Control lights and swtichs',
+  description: 'Control lights and switches',
 });
