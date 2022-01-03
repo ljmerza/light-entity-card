@@ -92,6 +92,10 @@ const style = css`
   .hidden {
     display: none;
   }
+
+  .icon-container {
+    margin-top: 4px;
+  }
 `;
 
 export default style;

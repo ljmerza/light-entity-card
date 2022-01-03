@@ -165,6 +165,23 @@ export default class LightEntityCardEditor extends LitElement {
             </div>
 
             <div class='checkbox-options'>
+              <ha-formfield label="Show Speed">
+                <ha-checkbox
+                  @change="${this.checkboxConfigChanged}"
+                  .checked=${this._config.speed}
+                  .value="${'speed'}"
+                ></ha-checkbox>
+              </ha-formfield>
+              <ha-formfield label="Show Intensity">
+                <ha-checkbox
+                  @change="${this.checkboxConfigChanged}"
+                  .checked=${this._config.intensity}
+                  .value="${'intensity'}"
+                ></ha-checkbox>
+              </ha-formfield>
+            </div>
+
+            <div class='checkbox-options'>
               <ha-formfield label="Show Color Picker">
                 <ha-checkbox
                   @change="${this.checkboxConfigChanged}"
@@ -228,6 +245,16 @@ export default class LightEntityCardEditor extends LitElement {
                   @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.child_card}
                   .value="${'child_card'}"
+                ></ha-checkbox>
+              </ha-formfield>
+            </div>
+
+            <div class='checkbox-options'>
+              <ha-formfield label="Force Features">
+                <ha-checkbox
+                  @change="${this.checkboxConfigChanged}"
+                  .checked=${this._config.force_features}
+                  .value="${'force_features'}"
                 ></ha-checkbox>
               </ha-formfield>
             </div>

@@ -13,10 +13,8 @@ For help, visit the light entity support thread [here](https://community.home-as
 ![Project Maintenance][maintenance-shield]
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
 
-
-
 ## Features
----
+
 * Works on any light and switch based entity
 * Toggle on/off
 * HS Color wheel
@@ -28,14 +26,13 @@ For help, visit the light entity support thread [here](https://community.home-as
 * always show or hide header and each input 
 
 ## Installation
----
 
 Add through  [HACS](https://github.com/custom-components/hacs)
 
 Issues with the installation should be asked in the [Home Asssitant forums](https://community.home-assistant.io/t/light-entity-card/96146)
 
-## Configurations:
----
+## Configurations
+
 ```yaml
 type: custom:light-entity-card
 entity: light.downstairs
@@ -61,8 +58,8 @@ entity: light.downstairs
 group: true
 ```
 
-## Options:
----
+## Options
+
 | Name                 | Type                | Requirement  | `Default value` Description                                                 |
 | -------------------- | ------------------- | ------------ | --------------------------------------------------------------------------- |
 | type                 | string              | **Required** | `custom:light-entity-card`                                                  |
@@ -77,10 +74,15 @@ group: true
 | color_temp           | boolean             | **Optional** | `true` show color temp slider if available                                  |
 | white_value          | boolean             | **Optional** | `true` show white value slider if available                                 |
 | color_picker         | boolean             | **Optional** | `true` show color picker wheel if available                                 |
+| speed                | boolean             | **Optional** | `false` show speed slider if available                                      |
+| intensity            | boolean             | **Optional** | `false` show intensity slider if available                                  |
+| force_features       | boolean             | **Optional** | `false` force showing all features in card                                  |
 | full_width_sliders   | boolean             | **Optional** | `false` makes slider the full width of card                                 |
 | brightness_icon      | string              | **Optional** | `weather-sunny` change the brightness slider icon                           |
 | white_icon           | string              | **Optional** | `file-word-box` change the white slider icon                                |
 | temperature_icon     | string              | **Optional** | `thermometer` change the temperature slider icon                            |
+| speed_icon           | string              | **Optional** | `speedometer` change the speed slider icon                                  |
+| intensity_icon       | string              | **Optional** | `transit-connection-horizontal` change the intensity slider icon            |
 | show_slider_percent  | boolean             | **Optional** | `false` show percent next to sliders                                        |
 | smooth_color_wheel   | boolean             | **Optional** | `false` smooth out color wheel for more colors                              |
 | child_card           | boolean             | **Optional** | `false` remove padding/margin to make this card within another card         |
@@ -90,7 +92,6 @@ group: true
 Enjoy my card? Help me out for a couple of :beers: or a :coffee:!
 
 [![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/JMISm06AD)
-
 
 [commits-shield]: https://img.shields.io/github/commit-activity/y/ljmerza/light-entity-card.svg?style=for-the-badge
 [commits]: https://github.com/ljmerza/light-entity-card/commits/master

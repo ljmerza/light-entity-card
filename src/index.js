@@ -224,7 +224,10 @@ class LightEntityCard extends LitElement {
     return html`
       ${this.createHeader(stateObj)}
       <div class="light-entity-card-sliders ${sliderClass}">
-        ${this.createBrightnessSlider(stateObj)} ${this.createColorTemperature(stateObj)}
+        ${this.createBrightnessSlider(stateObj)}
+        ${this.createSpeedSlider(stateObj)}
+        ${this.createIntensitySlider(stateObj)}
+        ${this.createColorTemperature(stateObj)}
         ${this.createWhiteValue(stateObj)}
       </div>
       ${this.createColorPicker(stateObj)} ${this.createEffectList(stateObj)}
@@ -261,14 +264,66 @@ class LightEntityCard extends LitElement {
 
     return html`
       <div class="control light-entity-card-center">
-        <ha-icon icon="hass:${this.config.brightness_icon}"></ha-icon>
+        <div class="icon-container">
+          <ha-icon icon="hass:${this.config.brightness_icon}"></ha-icon>
+        </div>
         <ha-slider
           .value="${stateObj.attributes.brightness}"
-          @value-changed="${e => this.setBrightness(e, stateObj)}"
+          @value-changed="${event => this._setValue(event, stateObj, 'brightness')}"
           min="1"
           max="255"
         ></ha-slider>
         ${this.showPercent(stateObj.attributes.brightness, 0, 254)}
+      </div>
+    `;
+  }
+
+  /**
+   * creates speed slider
+   * @param {LightEntity} stateObj
+   * @return {TemplateResult}
+   */
+  createSpeedSlider(stateObj) {
+    if (this.config.speed === false) return html``;
+    if (this.dontShowFeature('speed', stateObj)) return html``;
+
+    return html`
+      <div class="control light-entity-card-center">
+        <div class="icon-container">
+          <ha-icon icon="hass:${this.config.speed_icon}"></ha-icon>
+        </div>
+        <ha-slider
+          .value="${stateObj.attributes.speed}"
+          @value-changed="${event => this._setValue(event, stateObj, 'speed')}"
+          min="1"
+          max="255"
+        ></ha-slider>
+        ${this.showPercent(stateObj.attributes.speed, 0, 254)}
+      </div>
+    `;
+  }
+
+  /**
+   * creates intensity slider
+   * @param {LightEntity} stateObj
+   * @return {TemplateResult}
+   */
+  createIntensitySlider(stateObj) {
+    if (this.config.speed === false) return html``;
+    if (this.dontShowFeature('intensity', stateObj)) return html``;
+
+    return html`
+      <div class="control light-entity-card-center">
+        <div class="icon-container">
+          <ha-icon icon="hass:${this.config.intensity_icon}"></ha-icon>
+        </div>
+        <ha-slider
+          .value="${stateObj.attributes.intensity}"
+          @value-changed="${event => this._setValue(event, stateObj, 'intensity')}"
+          min="1"
+          max="255"
+        ></ha-slider>
+        ${this.showPercent(stateObj.attributes.intensity, 0, 254)}
       </div>
     `;
   }
@@ -312,7 +367,7 @@ class LightEntityCard extends LitElement {
           min="${stateObj.attributes.min_mireds}"
           max="${stateObj.attributes.max_mireds}"
           .value=${stateObj.attributes.color_temp}
-          @value-changed="${e => this.setColorTemp(e, stateObj)}"
+          @value-changed="${event => this._setValue(event, stateObj, 'color_temp')}"
         >
         </ha-slider>
         ${percent}
@@ -331,11 +386,13 @@ class LightEntityCard extends LitElement {
 
     return html`
       <div class="control light-entity-card-center">
-        <ha-icon icon="hass:${this.config.white_icon}"></ha-icon>
+        <div class="icon-container">
+          <ha-icon icon="hass:${this.config.white_icon}"></ha-icon>
+        </div>
         <ha-slider
           max="255"
           .value="${stateObj.attributes.white_value}"
-          @value-changed="${e => this.setWhiteValue(e, stateObj)}"
+          @value-changed="${event => this._setValue(event, stateObj, 'white_value')}"
         >
         </ha-slider>
         ${this.showPercent(stateObj.attributes.white_value, 0, 254)}
@@ -416,6 +473,13 @@ class LightEntityCard extends LitElement {
    * @return {boolean}
    */
   dontShowFeature(featureName, stateObj) {
+    // show all feature if this is set to true
+    if (this.config.force_features) return false;
+
+    // WLED support
+    if (featureName === 'speed' && 'speed' in stateObj.attributes) return true;
+    if (featureName === 'intensity' && 'intensity' in stateObj.attributes) return true;
+
     // old deprecated way to seeing if supported feature
     let featureSupported = LightEntityCard.featureNames[featureName] & stateObj.attributes.supported_features;
 
@@ -478,40 +542,11 @@ class LightEntityCard extends LitElement {
     this.callEntityService({ hs_color: [event.detail.hs.h, event.detail.hs.s * 100] }, stateObj);
   }
 
-  /**
-   * set the new brightness from the slider for a given entity
-   * @param {CustomEvent} event
-   * @param {LightEntity} stateObj
-   */
-  setBrightness(event, stateObj) {
-    const brightness = parseInt(event.target.value, 0);
-    if (isNaN(brightness) || parseInt(stateObj.attributes.brightness, 0) === brightness) return;
+  _setValue(event, stateObj, valueName) {
+    const newValue = parseInt(event.target.value, 0);
+    if (isNaN(newValue) || parseInt(stateObj.attributes[valueName], 0) === newValue) return;
 
-    this.callEntityService({ brightness }, stateObj);
-  }
-
-  /**
-   * sets the current Color Temperature selected for a given entity
-   * @param {CustomEvent} event
-   * @param {LightEntity} stateObj
-   */
-  setColorTemp(event, stateObj) {
-    const colorTemp = parseInt(event.target.value, 0);
-    if (isNaN(colorTemp) || parseInt(stateObj.attributes.color_temp, 0) === colorTemp) return;
-
-    this.callEntityService({ color_temp: colorTemp }, stateObj);
-  }
-
-  /**
-   * sets the current white Value selected for a given entity
-   * @param {CustomEvent} event
-   * @param {LightEntity} stateObj
-   */
-  setWhiteValue(event, stateObj) {
-    const whiteValue = parseInt(event.target.value, 0);
-    if (isNaN(whiteValue) || parseInt(stateObj.attributes.white_value, 0) === whiteValue) return;
-
-    this.callEntityService({ white_value: whiteValue }, stateObj);
+    this.callEntityService({ [valueName]: newValue }, stateObj);
   }
 
   /**

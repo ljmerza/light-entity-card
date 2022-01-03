@@ -12,6 +12,10 @@ export default {
   white_value: true,
   color_picker: true,
   smooth_color_wheel: false,
+  speed: true,
+  intensity: true,
+
+  force_features: false,
 
   show_slider_percent: false,
   full_width_sliders: false,
@@ -19,4 +23,6 @@ export default {
   brightness_icon: 'weather-sunny',
   white_icon: 'file-word-box',
   temperature_icon: 'thermometer',
+  speed_icon: 'speedometer',
+  intensity_icon: 'transit-connection-horizontal',
 };
