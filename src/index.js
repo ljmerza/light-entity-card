@@ -446,17 +446,14 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       return html``;
     }
 
-    const listItems = effect_list.map(effect => html`<paper-item>${effect}</paper-item>`);
-    const selectedIndex = effect_list.indexOf(stateObj.attributes.effect);
+    const listItems = effect_list.map(effect => html`<mwc-list-item value="${effect}" ?selected=${effect === stateObj.attributes.effect} >${effect}</mwc-list-item>`);
     const caption = this.language['ui.card.light.effect'];
 
     return html`
       <div class="control light-entity-card-center light-entity-card-effectlist">
-        <paper-dropdown-menu @value-changed=${e => this.setEffect(e, stateObj)} label="${caption}">
-          <paper-listbox selected="${selectedIndex}" slot="dropdown-content" placeholder="${caption}">
-            ${listItems}
-          </paper-listbox>
-        </paper-dropdown-menu>
+        <mwc-select @selected=${e => this.setEffect(e, stateObj)} label="${caption}">
+          ${listItems}
+        </mwc-select>
       </div>
     `;
   }

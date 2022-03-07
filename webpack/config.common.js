@@ -1,5 +1,15 @@
 const path = require('path');
 
+const mwcExcludes = [
+    '@material/mwc-menu/mwc-menu.js',
+    '@material/mwc-menu/mwc-menu-surface.js',
+    '@material/mwc-ripple/mwc-ripple.js',
+    '@material/mwc-list/mwc-list.js',
+    '@material/mwc-list/mwc-list-item.js',
+    '@material/mwc-icon/mwc-icon.js',
+    '@material/mwc-notched-outline/mwc-notched-outline.js',
+].map(file => require.resolve(file));
+
 module.exports = {
     entry: './src/index.js',
     output: {
@@ -11,11 +21,9 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: [
-                    '@material/mwc-menu/mwc-menu-surface.js',
-                    '@material/mwc-ripple/mwc-ripple.js',
-                    '@material/mwc-list/mwc-list.js',
-                    '@material/mwc-list/mwc-list-item.js',
-                ].map(file => require.resolve(file)),
+                  ...mwcExcludes,
+                 /node_modules\/(?!babel-runtime)/,
+                ],
                 use: {
                     loader: 'babel-loader',
                 }

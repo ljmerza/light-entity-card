@@ -17,9 +17,12 @@
   "dependencies": {
     "@babel/polyfill": "^7.4.3",
     "@lit-labs/scoped-registry-mixin": "^1.0.0",
+    "@material/mwc-icon": "^0.25.3",
     "@material/mwc-list": "^0.25.3",
     "@material/mwc-menu": "^0.25.3",
+    "@material/mwc-notched-outline": "^0.25.3",
     "@material/mwc-ripple": "^0.25.3",
+    "@material/mwc-select": "^0.25.3",
     "core-js": "^2.6.5",
     "lit": "^2.1.2"
   },
