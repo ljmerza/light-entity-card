@@ -1,11 +1,19 @@
 import '@babel/polyfill';
 
-import { LitElement, html } from 'lit-element';
+import { LitElement, html } from 'lit';
+import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import style from './style';
 
 import defaultConfig from './defaults';
 import LightEntityCardEditor from './index-editor';
 import packageJson from '../package.json';
+import buildElementDefinitions from './buildElementDefinitions';
+import HaCard from './ha/card';
+import HaMoreInfoLight from './ha/more-info-light';
+import HaSwitch from './ha/switch';
+import HaIcon from './ha/icon';
+import HaSlider from './ha/slider';
+import HaColorPicker from './ha/color-picker';
 
 const editorName = 'light-entity-card-editor';
 customElements.define(editorName, LightEntityCardEditor);
@@ -18,7 +26,18 @@ console.info(
   'color: white; font-weight: bold; background: dimgray'
 );
 
-class LightEntityCard extends LitElement {
+class LightEntityCard extends ScopedRegistryHost(LitElement) {
+  static get elementDefinitions() {
+    return buildElementDefinitions([
+      HaCard,
+      HaMoreInfoLight,
+      HaSwitch,
+      HaIcon,
+      HaSlider,
+      HaColorPicker,
+    ]);
+  }
+
   async firstUpdated() {
     if (window.loadCardHelpers) {
       const helpers = await window.loadCardHelpers();

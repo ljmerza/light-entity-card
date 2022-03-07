@@ -1,6 +1,11 @@
-import { LitElement, html } from 'lit-element';
+import { LitElement, html } from 'lit';
+import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import style from './style-editor';
 import defaultConfig from './defaults';
+import buildElementDefinitions from './buildElementDefinitions';
+import HaFormfield from './ha/formfield';
+import HaCheckbox from './ha/checkbox';
+import HaFormString from './ha/form-string';
 
 export const fireEvent = (node, type, detail = {}, options = {}) => {
   const event = new Event(type, {
@@ -14,7 +19,15 @@ export const fireEvent = (node, type, detail = {}, options = {}) => {
   return event;
 };
 
-export default class LightEntityCardEditor extends LitElement {
+export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement) {
+  static get elementDefinitions() {
+    return buildElementDefinitions([
+      HaFormfield,
+      HaCheckbox,
+      HaFormString,
+    ]);
+  }
+
   static get styles() {
     return style;
   }
@@ -31,9 +44,7 @@ export default class LightEntityCardEditor extends LitElement {
   }
 
   get entityOptions() {
-    const allEntities = Object.keys(this.hass.states).filter(eid => {
-      return ['switch', 'light', 'group'].includes(eid.substr(0, eid.indexOf('.')));
-    });
+    const allEntities = Object.keys(this.hass.states).filter(eid => ['switch', 'light', 'group'].includes(eid.substr(0, eid.indexOf('.'))));
 
     allEntities.sort();
     return allEntities;
@@ -60,20 +71,18 @@ export default class LightEntityCardEditor extends LitElement {
 
     // eslint-disable-next-line arrow-body-style
     // eslint-disable-next-line arrow-parens
-    const options = this.entityOptions.map(entity => {
-      return html`<paper-item>${entity}</paper-item>`;
-    });
+    const options = this.entityOptions.map(entity => html`<paper-item>${entity}</paper-item>`);
 
     return html`
       <div class="card-config">
 
         <div class=overall-config'>
-          <paper-input
+          <ha-form-string
             label="Header"
             .value="${header}"
-            .configValue="${'header'}"
+            .data="${'header'}"
             @value-changed="${this.configChanged}"
-          ></paper-input>
+          ></ha-form-string>
         </div>
 
         <div class='entities'>
@@ -89,27 +98,27 @@ export default class LightEntityCardEditor extends LitElement {
               ${options}
             </paper-listbox>
           </paper-dropdown-menu>
-          <paper-input
+          <ha-form-string
             label="Brightness Icon"
-            .value="${this._config.brightness_icon}"
+            .data="${this._config.brightness_icon}"
             .configValue="${'brightness_icon'}"
             @value-changed="${this.configChanged}"
-          ></paper-input>
+          ></ha-form-string>
         </div>
 
         <div class='entities'>
-         <paper-input
+         <ha-form-string
             label="White Icon"
-            .value="${this._config.white_icon}"
+            .data="${this._config.white_icon}"
             .configValue="${'white_icon'}"
             @value-changed="${this.configChanged}"
-          ></paper-input>
-          <paper-input
+          ></ha-form-string>
+          <ha-form-string
             label="Temperature Icon"
-            .value="${this._config.temperature_icon}"
+            .data="${this._config.temperature_icon}"
             .configValue="${'temperature_icon'}"
             @value-changed="${this.configChanged}"
-          ></paper-input>
+          ></ha-form-string>
         </div>
 
         <div class='overall-config'>

@@ -1,6 +1,6 @@
 {
   "name": "light-entity-card",
-  "version": "4.6.0",
+  "version": "5.0.0",
   "description": "A light-entity card for Home Assistant Lovelace UI",
   "keywords": [
     "home-assistant",
@@ -16,9 +16,12 @@
   "license": "MIT",
   "dependencies": {
     "@babel/polyfill": "^7.4.3",
+    "@lit-labs/scoped-registry-mixin": "^1.0.0",
+    "@material/mwc-list": "^0.25.3",
+    "@material/mwc-menu": "^0.25.3",
+    "@material/mwc-ripple": "^0.25.3",
     "core-js": "^2.6.5",
-    "lit": "^2.0.0-rc.2",
-    "lit-element": "^2.1.0"
+    "lit": "^2.1.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",
@@ -32,6 +35,12 @@
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.0",
     "webpack-merge": "^4.2.1"
+  },
+  "resolutions": {
+    "lit": "^2.1.2",
+    "lit-html": "2.1.2",
+    "lit-element": "3.1.2",
+    "@lit/reactive-element": "1.2.1"
   },
   "scripts": {
     "lint": "eslint ./src",

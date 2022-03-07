@@ -10,11 +10,14 @@ module.exports = {
         rules: [
             {
                 test: /\.js$/,
-                include: [
-                    /node_modules(?:\/|\\)lit-element|lit-html/
-                ],
+                exclude: [
+                    '@material/mwc-menu/mwc-menu-surface.js',
+                    '@material/mwc-ripple/mwc-ripple.js',
+                    '@material/mwc-list/mwc-list.js',
+                    '@material/mwc-list/mwc-list-item.js',
+                ].map(file => require.resolve(file)),
                 use: {
-                    loader: 'babel-loader'
+                    loader: 'babel-loader',
                 }
             }
         ]

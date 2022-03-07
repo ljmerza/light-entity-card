@@ -1,4 +1,4 @@
-import { css } from 'lit-element';
+import { css } from 'lit';
 
 const style = css`
   .light-entity-card {
