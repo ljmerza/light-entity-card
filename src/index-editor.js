@@ -3,9 +3,7 @@ import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import style from './style-editor';
 import defaultConfig from './defaults';
 import buildElementDefinitions from './buildElementDefinitions';
-import HaFormfield from './ha/formfield';
-import HaCheckbox from './ha/checkbox';
-import HaFormString from './ha/form-string';
+import haLoader from './haLoader';
 
 export const fireEvent = (node, type, detail = {}, options = {}) => {
   const event = new Event(type, {
@@ -22,10 +20,10 @@ export const fireEvent = (node, type, detail = {}, options = {}) => {
 export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement) {
   static get elementDefinitions() {
     return buildElementDefinitions([
-      HaFormfield,
-      HaCheckbox,
-      HaFormString,
-    ]);
+      haLoader('ha-checkbox'),
+      haLoader('ha-formfield'),
+      haLoader('ha-form-string'),
+    ], LightEntityCardEditor);
   }
 
   static get styles() {
