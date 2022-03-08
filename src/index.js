@@ -7,6 +7,7 @@ import packageJson from '../package.json';
 import buildElementDefinitions from './buildElementDefinitions';
 import haLoader from './haLoader';
 import MwcSelect from './mwc/select';
+import MwcListItem from './mwc/list-item';
 
 const editorName = 'light-entity-card-editor';
 customElements.define(editorName, LightEntityCardEditor);
@@ -29,6 +30,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       haLoader('ha-slider'),
       haLoader('ha-color-picker'),
       MwcSelect,
+      MwcListItem,
     ], LightEntityCard);
   }
 
@@ -575,7 +577,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @param {LightEntity} entity
    */
   setEffect(event, stateObj) {
-    this.callEntityService({ effect: event.detail.value }, stateObj);
+    this.callEntityService({ effect: event.target.value }, stateObj);
   }
 
   /**
