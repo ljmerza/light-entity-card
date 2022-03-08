@@ -18,8 +18,8 @@ const style = css`
   }
 
   .checkbox-options ha-formfield,
-  .entities paper-dropdown-menu,
-  .entities paper-input {
+  .entities mwc-switch,
+  .entities ha-form-string {
     padding-right: 2%;
     width: 48%;
   }

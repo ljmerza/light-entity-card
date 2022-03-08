@@ -4,6 +4,8 @@ import style from './style-editor';
 import defaultConfig from './defaults';
 import buildElementDefinitions from './buildElementDefinitions';
 import haLoader from './haLoader';
+import MwcListItem from './mwc/list-item';
+import MwcSelect from './mwc/select';
 
 export const fireEvent = (node, type, detail = {}, options = {}) => {
   const event = new Event(type, {
@@ -23,6 +25,8 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
       haLoader('ha-checkbox'),
       haLoader('ha-formfield'),
       haLoader('ha-form-string'),
+      MwcListItem,
+      MwcSelect,
     ], LightEntityCardEditor);
   }
 
@@ -69,7 +73,7 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
 
     // eslint-disable-next-line arrow-body-style
     // eslint-disable-next-line arrow-parens
-    const options = this.entityOptions.map(entity => html`<paper-item>${entity}</paper-item>`);
+    const options = this.entityOptions.map(entity => html`<mwc-list-item value="${entity}" ?selected=${entity === this._config.entity}>${entity}</mwc-list-item>`);
 
     return html`
       <div class="card-config">
@@ -84,18 +88,13 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
         </div>
 
         <div class='entities'>
-          <paper-dropdown-menu 
+          <mwc-select 
             label="Entity"
-            @value-changed="${this.configChanged}" 
+            @selected="${this.configChanged}" 
             .configValue="${'entity'}"
           >
-            <paper-listbox 
-              slot="dropdown-content" 
-              .selected="${this.entityOptions.indexOf(this._config.entity)}"
-            >
-              ${options}
-            </paper-listbox>
-          </paper-dropdown-menu>
+            ${options}
+          </mwc-select>
           <ha-form-string
             label="Brightness Icon"
             .data="${this._config.brightness_icon}"

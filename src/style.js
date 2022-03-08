@@ -64,13 +64,7 @@ const style = css`
     width: 50%;
     margin: 0 auto;
   }
-
-  ha-labeled-slider {
-    --paper-slider-input: {
-      width: 100%;
-    }
-  }
-
+  
   .light-entity-card-color_temp {
     background-image: var(--ha-slider-background);
   }
