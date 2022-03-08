@@ -80,7 +80,7 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
 
         <div class=overall-config'>
           <ha-form-string
-            schema=${{ name: 'header', type: 'string' }}
+            .schema=${{ name: 'header', type: 'string' }}
             label="Header"
             .data="${header}"
             .configValue="${'header'}"
@@ -93,12 +93,13 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
             .naturalMenuWidth=${true}
             label="Entity"
             @selected="${this.configChanged}" 
+            @closed="${e => e.stopPropagation()}" 
             .configValue="${'entity'}"
           >
             ${options}
           </mwc-select>
           <ha-form-string
-            schema=${{ name: 'brightness_icon', type: 'string' }}
+            .schema=${{ name: 'brightness_icon', type: 'string' }}
             label="Brightness Icon"
             .data="${this._config.brightness_icon}"
             .configValue="${'brightness_icon'}"
@@ -108,14 +109,14 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
 
         <div class='entities'>
          <ha-form-string
-           schema=${{ name: 'white_icon', type: 'string' }}
+           .schema=${{ name: 'white_icon', type: 'string' }}
            label="White Icon"
             .data="${this._config.white_icon}"
             .configValue="${'white_icon'}"
             @value-changed="${this.configChanged}"
           ></ha-form-string>
           <ha-form-string
-            schema=${{ name: 'temperature_icon', type: 'string' }}
+            .schema=${{ name: 'temperature_icon', type: 'string' }}
             label="Temperature Icon"
             .data="${this._config.temperature_icon}"
             .configValue="${'temperature_icon'}"
