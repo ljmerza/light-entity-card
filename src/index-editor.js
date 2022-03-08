@@ -281,7 +281,7 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
       detail: { value: checkedValue },
     } = ev;
 
-    if (checkedValue !== undefined || checkedValue !== null) {
+    if (checkedValue !== undefined && checkedValue !== null) {
       this._config = { ...this._config, [configValue]: checkedValue };
     } else {
       this._config = { ...this._config, [configValue]: value };
