@@ -4,7 +4,9 @@ const buildElementDefinitions = (elements = [], constructor) => elements.reduce(
     aggregate[element.defineId] = element;
   } else {
     element.promise.then((clazz) => {
-      constructor.registry.define(element.name, clazz);
+      if (!constructor.registry.get(element.name)) {
+        constructor.registry.define(element.name, clazz);
+      }
     });
   }
   return aggregate;
