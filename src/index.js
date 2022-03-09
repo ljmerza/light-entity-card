@@ -5,7 +5,7 @@ import defaultConfig from './defaults';
 import LightEntityCardEditor from './index-editor';
 import packageJson from '../package.json';
 import buildElementDefinitions from './buildElementDefinitions';
-import haLoader from './haLoader';
+import globalElementLoader from './globalElementLoader';
 import MwcSelect from './mwc/select';
 import MwcListItem from './mwc/list-item';
 
@@ -23,12 +23,12 @@ console.info(
 class LightEntityCard extends ScopedRegistryHost(LitElement) {
   static get elementDefinitions() {
     return buildElementDefinitions([
-      haLoader('ha-card'),
-      haLoader('more-info-light'),
-      haLoader('ha-switch'),
-      haLoader('ha-icon'),
-      haLoader('ha-slider'),
-      haLoader('ha-color-picker'),
+      globalElementLoader('ha-card'),
+      globalElementLoader('more-info-light'),
+      globalElementLoader('ha-switch'),
+      globalElementLoader('ha-icon'),
+      globalElementLoader('ha-slider'),
+      globalElementLoader('ha-color-picker'),
       MwcSelect,
       MwcListItem,
     ], LightEntityCard);

@@ -14,7 +14,7 @@ export default class MwcSelect extends ScopedRegistryHost(SelectBase) {
       MwcMenu,
       MwcIcon,
       MwcNotchedOutline,
-    ]);
+    ], MwcSelect);
   }
 
   static get styles() {

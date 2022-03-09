@@ -3,7 +3,7 @@ import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import style from './style-editor';
 import defaultConfig from './defaults';
 import buildElementDefinitions from './buildElementDefinitions';
-import haLoader from './haLoader';
+import globalElementLoader from './globalElementLoader';
 import MwcListItem from './mwc/list-item';
 import MwcSelect from './mwc/select';
 
@@ -22,9 +22,9 @@ export const fireEvent = (node, type, detail = {}, options = {}) => {
 export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement) {
   static get elementDefinitions() {
     return buildElementDefinitions([
-      haLoader('ha-checkbox'),
-      haLoader('ha-formfield'),
-      haLoader('ha-form-string'),
+      globalElementLoader('ha-checkbox'),
+      globalElementLoader('ha-formfield'),
+      globalElementLoader('ha-form-string'),
       MwcListItem,
       MwcSelect,
     ], LightEntityCardEditor);

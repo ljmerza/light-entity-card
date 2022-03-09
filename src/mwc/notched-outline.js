@@ -7,7 +7,7 @@ export default class MwcNotchedOutline extends ScopedRegistryHost(NotchedOutline
   static get defineId() { return 'mwc-notched-outline'; }
 
   static get elementDefinitions() {
-    return buildElementDefinitions([]);
+    return buildElementDefinitions([], MwcNotchedOutline);
   }
 
   static get styles() {

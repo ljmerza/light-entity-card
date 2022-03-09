@@ -7,7 +7,7 @@ export default class MwcMenuSurface extends ScopedRegistryHost(MenuSurfaceBase) 
   static get defineId() { return 'mwc-menu-surface'; }
 
   static get elementDefinitions() {
-    return buildElementDefinitions();
+    return buildElementDefinitions([], MwcMenuSurface);
   }
 
   static get styles() {

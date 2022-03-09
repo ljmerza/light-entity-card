@@ -9,7 +9,7 @@ export default class MwcMenu extends ScopedRegistryHost(MenuBase) {
   static get defineId() { return 'mwc-menu'; }
 
   static get elementDefinitions() {
-    return buildElementDefinitions([MwcMenuSurface, MwcList]);
+    return buildElementDefinitions([MwcMenuSurface, MwcList], MwcMenu);
   }
 
   static get styles() {

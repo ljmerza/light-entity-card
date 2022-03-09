@@ -7,7 +7,7 @@ export default class MwcRipple extends ScopedRegistryHost(RippleBase) {
   static get defineId() { return 'mwc-ripple'; }
 
   static get elementDefinitions() {
-    return buildElementDefinitions();
+    return buildElementDefinitions([], MwcRipple);
   }
 
   static get styles() {

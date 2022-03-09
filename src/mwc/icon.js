@@ -7,7 +7,7 @@ export default class MwcIcon extends ScopedRegistryHost(LitElement) {
   static get defineId() { return 'mwc-icon'; }
 
   static get elementDefinitions() {
-    return buildElementDefinitions();
+    return buildElementDefinitions([], MwcIcon);
   }
 
   render() {

@@ -8,7 +8,7 @@ export default class MwcList extends ScopedRegistryHost(ListBase) {
   static get defineId() { return 'mwc-list'; }
 
   static get elementDefinitions() {
-    return buildElementDefinitions([MwcListItem]);
+    return buildElementDefinitions([MwcListItem], MwcList);
   }
 
   static get styles() {
