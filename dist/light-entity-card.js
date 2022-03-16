@@ -7296,7 +7296,8 @@
   	rollup: "rollup -c",
   	babel: "babel dist/light-entity-card.js --out-file dist/light-entity-card.js",
   	lint: "eslint src/* --ext .js",
-  	watch: "rollup -c --watch"
+  	watch: "rollup -c --watch",
+  	start: "rollup -c --watch"
   };
   var packageJson = {
   	name: name,
