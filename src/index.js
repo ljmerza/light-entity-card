@@ -22,16 +22,19 @@ console.info(
 
 class LightEntityCard extends ScopedRegistryHost(LitElement) {
   static get elementDefinitions() {
-    return buildElementDefinitions([
-      globalElementLoader('ha-card'),
-      globalElementLoader('more-info-light'),
-      globalElementLoader('ha-switch'),
-      globalElementLoader('ha-icon'),
-      globalElementLoader('ha-slider'),
-      globalElementLoader('ha-color-picker'),
-      MwcSelect,
-      MwcListItem,
-    ], LightEntityCard);
+    return buildElementDefinitions(
+      [
+        globalElementLoader('ha-card'),
+        globalElementLoader('more-info-light'),
+        globalElementLoader('ha-switch'),
+        globalElementLoader('ha-icon'),
+        globalElementLoader('ha-slider'),
+        globalElementLoader('ha-color-picker'),
+        MwcSelect,
+        MwcListItem,
+      ],
+      LightEntityCard
+    );
   }
 
   async firstUpdated() {
@@ -183,7 +186,14 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    */
   render() {
     const entity = this.__hass.states[this.config.entity];
-    if (!entity) throw Error(`Invalid entity: ${this.config.entity}`);
+    if (!entity) {
+      return html`
+        <style>
+          ${this.styles}
+        </style>
+        <ha-card> ${`Invalid entity: ${this.config.entity}`} </ha-card>
+      `;
+    }
 
     this._isUpdating = true;
     this._stateObjects = this.getEntitiesToShow(entity);
@@ -239,10 +249,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     return html`
       ${this.createHeader(stateObj)}
       <div class="light-entity-card-sliders ${sliderClass}">
-        ${this.createBrightnessSlider(stateObj)}
-        ${this.createSpeedSlider(stateObj)}
-        ${this.createIntensitySlider(stateObj)}
-        ${this.createColorTemperature(stateObj)}
+        ${this.createBrightnessSlider(stateObj)} ${this.createSpeedSlider(stateObj)}
+        ${this.createIntensitySlider(stateObj)} ${this.createColorTemperature(stateObj)}
         ${this.createWhiteValue(stateObj)}
       </div>
       ${this.createColorPicker(stateObj)} ${this.createEffectList(stateObj)}
@@ -442,16 +450,20 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       return html``;
     }
 
-    const listItems = effect_list.map(effect => html`<mwc-list-item value="${effect}" ?selected=${effect === stateObj.attributes.effect} >${effect}</mwc-list-item>`);
+    const listItems = effect_list.map(effect => this.createListItem(stateObj, effect));
     const caption = this.language['ui.card.light.effect'];
 
     return html`
       <div class="control light-entity-card-center light-entity-card-effectlist">
-        <mwc-select @selected=${e => this.setEffect(e, stateObj)} label="${caption}">
-          ${listItems}
-        </mwc-select>
+        <mwc-select @selected=${e => this.setEffect(e, stateObj)} label="${caption}"> ${listItems} </mwc-select>
       </div>
     `;
+  }
+
+  createListItem(stateObj, effect) {
+    return html`<mwc-list-item value="${effect}" ?selected=${effect === stateObj.attributes.effect}
+      >${effect}</mwc-list-item
+    >`;
   }
 
   /**
