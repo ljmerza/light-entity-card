@@ -1,11 +1,13 @@
-import '@babel/polyfill';
-
-import { LitElement, html } from 'lit-element';
+import { LitElement, html } from 'lit';
+import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import style from './style';
-
 import defaultConfig from './defaults';
 import LightEntityCardEditor from './index-editor';
 import packageJson from '../package.json';
+import buildElementDefinitions from './buildElementDefinitions';
+import globalElementLoader from './globalElementLoader';
+import MwcSelect from './mwc/select';
+import MwcListItem from './mwc/list-item';
 
 const editorName = 'light-entity-card-editor';
 customElements.define(editorName, LightEntityCardEditor);
@@ -18,7 +20,20 @@ console.info(
   'color: white; font-weight: bold; background: dimgray'
 );
 
-class LightEntityCard extends LitElement {
+class LightEntityCard extends ScopedRegistryHost(LitElement) {
+  static get elementDefinitions() {
+    return buildElementDefinitions([
+      globalElementLoader('ha-card'),
+      globalElementLoader('more-info-light'),
+      globalElementLoader('ha-switch'),
+      globalElementLoader('ha-icon'),
+      globalElementLoader('ha-slider'),
+      globalElementLoader('ha-color-picker'),
+      MwcSelect,
+      MwcListItem,
+    ], LightEntityCard);
+  }
+
   async firstUpdated() {
     if (window.loadCardHelpers) {
       const helpers = await window.loadCardHelpers();
@@ -427,17 +442,14 @@ class LightEntityCard extends LitElement {
       return html``;
     }
 
-    const listItems = effect_list.map(effect => html`<paper-item>${effect}</paper-item>`);
-    const selectedIndex = effect_list.indexOf(stateObj.attributes.effect);
+    const listItems = effect_list.map(effect => html`<mwc-list-item value="${effect}" ?selected=${effect === stateObj.attributes.effect} >${effect}</mwc-list-item>`);
     const caption = this.language['ui.card.light.effect'];
 
     return html`
       <div class="control light-entity-card-center light-entity-card-effectlist">
-        <paper-dropdown-menu @value-changed=${e => this.setEffect(e, stateObj)} label="${caption}">
-          <paper-listbox selected="${selectedIndex}" slot="dropdown-content" placeholder="${caption}">
-            ${listItems}
-          </paper-listbox>
-        </paper-dropdown-menu>
+        <mwc-select @selected=${e => this.setEffect(e, stateObj)} label="${caption}">
+          ${listItems}
+        </mwc-select>
       </div>
     `;
   }
@@ -565,7 +577,7 @@ class LightEntityCard extends LitElement {
    * @param {LightEntity} entity
    */
   setEffect(event, stateObj) {
-    this.callEntityService({ effect: event.detail.value }, stateObj);
+    this.callEntityService({ effect: event.target.value }, stateObj);
   }
 
   /**

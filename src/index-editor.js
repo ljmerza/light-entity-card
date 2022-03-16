@@ -1,6 +1,11 @@
-import { LitElement, html } from 'lit-element';
+import { LitElement, html } from 'lit';
+import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import style from './style-editor';
 import defaultConfig from './defaults';
+import buildElementDefinitions from './buildElementDefinitions';
+import globalElementLoader from './globalElementLoader';
+import MwcListItem from './mwc/list-item';
+import MwcSelect from './mwc/select';
 
 export const fireEvent = (node, type, detail = {}, options = {}) => {
   const event = new Event(type, {
@@ -14,7 +19,17 @@ export const fireEvent = (node, type, detail = {}, options = {}) => {
   return event;
 };
 
-export default class LightEntityCardEditor extends LitElement {
+export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement) {
+  static get elementDefinitions() {
+    return buildElementDefinitions([
+      globalElementLoader('ha-checkbox'),
+      globalElementLoader('ha-formfield'),
+      globalElementLoader('ha-form-string'),
+      MwcListItem,
+      MwcSelect,
+    ], LightEntityCardEditor);
+  }
+
   static get styles() {
     return style;
   }
@@ -31,9 +46,7 @@ export default class LightEntityCardEditor extends LitElement {
   }
 
   get entityOptions() {
-    const allEntities = Object.keys(this.hass.states).filter(eid => {
-      return ['switch', 'light', 'group'].includes(eid.substr(0, eid.indexOf('.')));
-    });
+    const allEntities = Object.keys(this.hass.states).filter(eid => ['switch', 'light', 'group'].includes(eid.substr(0, eid.indexOf('.'))));
 
     allEntities.sort();
     return allEntities;
@@ -60,56 +73,55 @@ export default class LightEntityCardEditor extends LitElement {
 
     // eslint-disable-next-line arrow-body-style
     // eslint-disable-next-line arrow-parens
-    const options = this.entityOptions.map(entity => {
-      return html`<paper-item>${entity}</paper-item>`;
-    });
+    const options = this.entityOptions.map(entity => html`<mwc-list-item value="${entity}" ?selected=${entity === this._config.entity}>${entity}</mwc-list-item>`);
 
     return html`
       <div class="card-config">
 
         <div class=overall-config'>
-          <paper-input
+          <ha-form-string
+            .schema=${{ name: 'header', type: 'string' }}
             label="Header"
-            .value="${header}"
+            .data="${header}"
             .configValue="${'header'}"
             @value-changed="${this.configChanged}"
-          ></paper-input>
+          ></ha-form-string>
         </div>
 
         <div class='entities'>
-          <paper-dropdown-menu 
+          <mwc-select
+            .naturalMenuWidth=${true}
             label="Entity"
-            @value-changed="${this.configChanged}" 
+            @selected="${this.configChanged}" 
+            @closed="${e => e.stopPropagation()}" 
             .configValue="${'entity'}"
           >
-            <paper-listbox 
-              slot="dropdown-content" 
-              .selected="${this.entityOptions.indexOf(this._config.entity)}"
-            >
-              ${options}
-            </paper-listbox>
-          </paper-dropdown-menu>
-          <paper-input
+            ${options}
+          </mwc-select>
+          <ha-form-string
+            .schema=${{ name: 'brightness_icon', type: 'string' }}
             label="Brightness Icon"
-            .value="${this._config.brightness_icon}"
+            .data="${this._config.brightness_icon}"
             .configValue="${'brightness_icon'}"
             @value-changed="${this.configChanged}"
-          ></paper-input>
+          ></ha-form-string>
         </div>
 
         <div class='entities'>
-         <paper-input
-            label="White Icon"
-            .value="${this._config.white_icon}"
+         <ha-form-string
+           .schema=${{ name: 'white_icon', type: 'string' }}
+           label="White Icon"
+            .data="${this._config.white_icon}"
             .configValue="${'white_icon'}"
             @value-changed="${this.configChanged}"
-          ></paper-input>
-          <paper-input
+          ></ha-form-string>
+          <ha-form-string
+            .schema=${{ name: 'temperature_icon', type: 'string' }}
             label="Temperature Icon"
-            .value="${this._config.temperature_icon}"
+            .data="${this._config.temperature_icon}"
             .configValue="${'temperature_icon'}"
             @value-changed="${this.configChanged}"
-          ></paper-input>
+          ></ha-form-string>
         </div>
 
         <div class='overall-config'>
@@ -270,7 +282,7 @@ export default class LightEntityCardEditor extends LitElement {
       detail: { value: checkedValue },
     } = ev;
 
-    if (checkedValue !== undefined || checkedValue !== null) {
+    if (checkedValue !== undefined && checkedValue !== null) {
       this._config = { ...this._config, [configValue]: checkedValue };
     } else {
       this._config = { ...this._config, [configValue]: value };

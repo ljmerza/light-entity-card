@@ -1,4 +1,4 @@
-import { css } from 'lit-element';
+import { css } from 'lit';
 
 const style = css`
   .entities {
@@ -16,10 +16,14 @@ const style = css`
   .checkbox-options {
     display: flex;
   }
+  
+  mwc-select {
+    width: 100%;
+  }
 
   .checkbox-options ha-formfield,
-  .entities paper-dropdown-menu,
-  .entities paper-input {
+  .entities mwc-switch,
+  .entities ha-form-string {
     padding-right: 2%;
     width: 48%;
   }
