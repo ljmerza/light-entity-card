@@ -3,7 +3,7 @@
 Control any light/switch entity through lovelace
 
 ## Notice
-v5 is only compatible from version 2022.3 onwards
+v5 is only compatible from version 2022.3 onwards. This card will not work after 2023.2.x
 
 ## Support
 
