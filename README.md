@@ -87,7 +87,6 @@ group: true
 | speed_icon           | string              | **Optional** | `speedometer` change the speed slider icon                                  |
 | intensity_icon       | string              | **Optional** | `transit-connection-horizontal` change the intensity slider icon            |
 | show_slider_percent  | boolean             | **Optional** | `false` show percent next to sliders                                        |
-| smooth_color_wheel   | boolean             | **Optional** | `false` smooth out color wheel for more colors                              |
 | child_card           | boolean             | **Optional** | `false` remove padding/margin to make this card within another card         |
 
 ---

@@ -1,6 +1,6 @@
 {
   "name": "light-entity-card",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "A light-entity card for Home Assistant Lovelace UI",
   "keywords": [
     "home-assistant",
@@ -15,44 +15,31 @@
   "author": "Leonardo Merza <ljmerza@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@babel/polyfill": "^7.4.4",
+    "@jaames/iro": "^5.5.2",
     "@lit-labs/scoped-registry-mixin": "^1.0.0",
     "@material/mwc-icon": "^0.25.3",
     "@material/mwc-list": "^0.25.3",
     "@material/mwc-menu": "^0.25.3",
     "@material/mwc-notched-outline": "^0.25.3",
-    "@material/mwc-ripple": "^0.25.3",
     "@material/mwc-select": "^0.25.3",
     "core-js": "^2.6.5",
-    "lit": "^2.1.2"
+    "lit": "^2.1.2",
+    "lit-element": "^2.2.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.4.3",
-    "@babel/core": "^7.4.3",
-    "@babel/plugin-proposal-class-properties": "^7.3.3",
-    "@babel/plugin-proposal-decorators": "^7.3.0",
-    "@babel/plugin-transform-template-literals": "^7.2.0",
-    "@babel/preset-env": "^7.3.1",
-    "@rollup/plugin-json": "^4.0.3",
-    "babel-plugin-iife-wrap": "^1.1.0",
-    "babel-preset-minify": "^0.5.0",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "2.16.0",
-    "rollup": "^0.66.6",
-    "rollup-plugin-node-resolve": "^3.4.0"
-  },
-  "resolutions": {
-    "lit": "^2.1.2",
-    "lit-html": "2.1.2",
-    "lit-element": "3.1.2",
-    "@lit/reactive-element": "1.2.1"
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-loader": "^8.0.6",
+    "eslint": "^6.1.0",
+    "webpack": "^4.38.0",
+    "webpack-cli": "^3.3.6",
+    "webpack-merge": "^4.2.1"
   },
   "scripts": {
-    "build": "npm run rollup && npm run babel",
-    "rollup": "rollup -c",
-    "babel": "babel dist/light-entity-card.js --out-file dist/light-entity-card.js",
-    "lint": "eslint src/* --ext .js",
-    "watch": "rollup -c --watch",
-    "start": "rollup -c --watch"
+    "lint": "eslint  --fix ./src",
+    "start": "webpack --watch --config webpack/config.dev.js",
+    "build": "webpack --config webpack/config.prod.js"
   }
 }

@@ -4,8 +4,6 @@ import style from './style-editor';
 import defaultConfig from './defaults';
 import buildElementDefinitions from './buildElementDefinitions';
 import globalElementLoader from './globalElementLoader';
-import MwcListItem from './mwc/list-item';
-import MwcSelect from './mwc/select';
 
 export const fireEvent = (node, type, detail = {}, options = {}) => {
   const event = new Event(type, {
@@ -25,8 +23,8 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
       globalElementLoader('ha-checkbox'),
       globalElementLoader('ha-formfield'),
       globalElementLoader('ha-form-string'),
-      MwcListItem,
-      MwcSelect,
+      globalElementLoader('ha-select'),
+      globalElementLoader('mwc-list-item'),
     ], LightEntityCardEditor);
   }
 
@@ -89,7 +87,7 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
         </div>
 
         <div class='entities'>
-          <mwc-select
+          <ha-select
             .naturalMenuWidth=${true}
             label="Entity"
             @selected="${this.configChanged}" 
@@ -97,7 +95,7 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
             .configValue="${'entity'}"
           >
             ${options}
-          </mwc-select>
+          </ha-select>
           <ha-form-string
             .schema=${{ name: 'brightness_icon', type: 'string' }}
             label="Brightness Icon"
@@ -228,23 +226,6 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
             </div>
 
             <div class='checkbox-options'>
-              <ha-formfield label="Smooth Color Wheel">
-                <ha-checkbox
-                  @change="${this.checkboxConfigChanged}"
-                  .checked=${this._config.smooth_color_wheel}
-                  .value="${'smooth_color_wheel'}"
-                ></ha-checkbox>
-              </ha-formfield>
-              <ha-formfield label="Consolidate Entities">
-                <ha-checkbox
-                  @change="${this.checkboxConfigChanged}"
-                  .checked=${this._config.consolidate_entities}
-                  .value="${'consolidate_entities'}"
-                ></ha-checkbox>
-              </ha-formfield>
-            </div>
-
-            <div class='checkbox-options'>
               <ha-formfield label="Hide Header">
                 <ha-checkbox
                   @change="${this.checkboxConfigChanged}"
@@ -270,6 +251,16 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
                 ></ha-checkbox>
               </ha-formfield>
             </div>
+
+            <div class='checkbox-options'>
+            <ha-formfield label="Consolidate Entities">
+              <ha-checkbox
+                @change="${this.checkboxConfigChanged}"
+                .checked=${this._config.consolidate_entities}
+                .value="${'consolidate_entities'}"
+              ></ha-checkbox>
+            </ha-formfield>
+          </div>
           </div>
       </div>
     `;

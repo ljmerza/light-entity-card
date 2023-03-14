@@ -1,6 +1,10 @@
 import { css } from 'lit';
 
 const style = css`
+  .IroSlider {
+    display: none !important;
+  }
+
   .light-entity-card {
     padding: 16px;
   }
@@ -53,11 +57,8 @@ const style = css`
   .light-entity-card__color-picker {
     display: flex;
     justify-content: space-around;
-    --ha-color-picker-wheel-borderwidth: 5;
-    --ha-color-picker-wheel-bordercolor: white;
-    --ha-color-picker-wheel-shadow: none;
-    --ha-color-picker-marker-borderwidth: 2;
-    --ha-color-picker-marker-bordercolor: white;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 
   .group .light-entity-card__color-picker {

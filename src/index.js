@@ -1,24 +1,18 @@
 import { LitElement, html } from 'lit';
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
+import iro from '@jaames/iro';
+
 import style from './style';
 import defaultConfig from './defaults';
 import LightEntityCardEditor from './index-editor';
 import packageJson from '../package.json';
 import buildElementDefinitions from './buildElementDefinitions';
 import globalElementLoader from './globalElementLoader';
-import MwcSelect from './mwc/select';
-import MwcListItem from './mwc/list-item';
 
 const editorName = 'light-entity-card-editor';
 customElements.define(editorName, LightEntityCardEditor);
 
-/* eslint no-console: 0 */
-console.info(
-  `%c  LIGHT-ENTITY-CARD   \n%c  Version ${packageJson.version}       `,
-  'color: orange; font-weight: bold; background: black',
-  // eslint-disable-next-line comma-dangle
-  'color: white; font-weight: bold; background: dimgray'
-);
+console.info(`light-entity-card v${packageJson.version}`);
 
 class LightEntityCard extends ScopedRegistryHost(LitElement) {
   static get elementDefinitions() {
@@ -30,17 +24,45 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         globalElementLoader('ha-icon'),
         globalElementLoader('ha-slider'),
         globalElementLoader('ha-color-picker'),
-        MwcSelect,
-        MwcListItem,
+        globalElementLoader('ha-select'),
+        globalElementLoader('mwc-list-item'),
       ],
       LightEntityCard
     );
   }
 
   async firstUpdated() {
-    if (window.loadCardHelpers) {
-      const helpers = await window.loadCardHelpers();
-      helpers.importMoreInfoControl('light');
+    this.setColorWheels();
+  }
+
+  async updated() {
+    this.setColorWheels();
+  }
+
+  setColorWheels() {
+    let entities = this.__hass.states[this.config.entity];
+    if(!Array.isArray()) {
+      entities = [entities]
+    }
+
+    for(let entity of entities) {
+      const picker = this.renderRoot.getElementById(`picker-${entity.entity_id}`)
+
+      let color = '#f00000'
+
+      if(entity.attributes.hs_color) {
+        const h = (entity.attributes.hs_color && entity.attributes.hs_color[0]) || 0;
+        const s = (entity.attributes.hs_color && entity.attributes.hs_color[1] / 100) || 0;
+        color = { h, s, l: 100 }
+      }
+
+      const colorPicker = new iro.ColorPicker(picker, {
+        width: 320,
+        color,
+        sliderSize: 0
+      });
+
+      colorPicker.on("color:change", color => this.setColorPicker(color.hsl, entity));
     }
   }
 
@@ -62,9 +84,6 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       ...defaultConfig,
       ...config,
     };
-
-    this._hueSegments = this.config.smooth_color_wheel ? 0 : 24;
-    this._saturationSegments = this.config.smooth_color_wheel ? 0 : 8;
   }
 
   static async getConfigElement() {
@@ -455,7 +474,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center light-entity-card-effectlist">
-        <mwc-select @selected=${e => this.setEffect(e, stateObj)} label="${caption}"> ${listItems} </mwc-select>
+        <ha-select @selected=${e => this.setEffect(e, stateObj)} label="${caption}"> ${listItems} </ha-select>
       </div>
     `;
   }
@@ -477,17 +496,10 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="light-entity-card__color-picker">
-        <ha-color-picker
-          id="${this.generateColorPickerId(stateObj)}"
-          class="control color"
-          saturation-segments=${this._saturationSegments}
-          hue-segments=${this._hueSegments}
-          throttle="500"
-          @colorselected=${e => this.setColorPicker(e, stateObj)}
-        >
-        </ha-color-picker>
+        <div id="picker-${stateObj.entity_id}"></div>
       </div>
     `;
+    
   }
 
   /**
@@ -559,11 +571,11 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
   /**
    * change to hs color for a given entity
-   * @param {CustomEvent} event
+   * @param {HSL} hsl
    * @param {LightEntity} stateObj
    */
-  setColorPicker(event, stateObj) {
-    this.callEntityService({ hs_color: [event.detail.hs.h, event.detail.hs.s * 100] }, stateObj);
+  setColorPicker(hsl, stateObj) {
+    this.callEntityService({ hs_color: [hsl.h, hsl.s] }, stateObj);
   }
 
   _setValue(event, stateObj, valueName) {
