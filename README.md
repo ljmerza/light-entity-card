@@ -2,9 +2,6 @@
 
 Control any light/switch entity through lovelace
 
-## Notice
-v5 is only compatible from version 2022.3 onwards
-
 ## Support
 
 For help, visit the light entity support thread [here](https://community.home-assistant.io/t/light-entity-card/96146)
