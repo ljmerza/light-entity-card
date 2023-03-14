@@ -40,13 +40,11 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   setColorWheels() {
-    let entities = this.__hass.states[this.config.entity];
-    if(!Array.isArray()) {
-      entities = [entities]
-    }
+    this.colorPickers = [];
 
-    for(let entity of entities) {
+    for(let entity of this._stateObjects) {
       const picker = this.renderRoot.getElementById(`picker-${entity.entity_id}`)
+      if(!picker) continue;
 
       let color = '#f00000'
 
@@ -56,28 +54,30 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         color = { h, s, l: 100 }
       }
 
-      
-
-    this.colorPicker = new iro.ColorPicker(picker, {
+      const colorPicker = new iro.ColorPicker(picker, {
         color,
         sliderSize: 0
-      });
+      })
 
-      this.setColorPickerSize();
-      this.colorPicker.on("color:change", color => this.setColorPicker(color.hsl, entity));
+      colorPicker.on("color:change", color => this.setColorPicker(color.hsl, entity));
+      this.colorPickers.push(colorPicker);
     }
+
+    this.setColorPickersSize();
   }
 
-  setColorPickerSize() {
+  setColorPickersSize() {
     if(!this.colorPicker) return;
 
     const elem = this.shadowRoot.querySelector('.light-entity-card');
     const width = elem.offsetWidth;
+
     const calcWidth = width - 50;
     const maxWidth = 300;
-
     const realWidth = maxWidth > calcWidth ? calcWidth : maxWidth
-    this.colorPicker.resize(realWidth);
+
+    this.colorPickers.forEach((colorPicker) => colorPicker.resize(realWidth));
+
   }
 
   static get properties() {
@@ -199,7 +199,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    */
   updated() {
     this._isUpdating = false;
-    this.setColorPickerSize();
+    this.setColorPickersSize();
   }
 
   /**
