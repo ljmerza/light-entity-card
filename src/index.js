@@ -56,14 +56,28 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         color = { h, s, l: 100 }
       }
 
-      const colorPicker = new iro.ColorPicker(picker, {
-        width: 320,
+      
+
+    this.colorPicker = new iro.ColorPicker(picker, {
         color,
         sliderSize: 0
       });
 
-      colorPicker.on("color:change", color => this.setColorPicker(color.hsl, entity));
+      this.setColorPickerSize();
+      this.colorPicker.on("color:change", color => this.setColorPicker(color.hsl, entity));
     }
+  }
+
+  setColorPickerSize() {
+    if(!this.colorPicker) return;
+
+    const elem = this.shadowRoot.querySelector('.light-entity-card');
+    const width = elem.offsetWidth;
+    const calcWidth = width - 50;
+    const maxWidth = 300;
+
+    const realWidth = maxWidth > calcWidth ? calcWidth : maxWidth
+    this.colorPicker.resize(realWidth);
   }
 
   static get properties() {
@@ -185,18 +199,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    */
   updated() {
     this._isUpdating = false;
-
-    // eslint-disable-next-line arrow-parens
-    this._shownStateObjects.forEach(stateObj => {
-      const id = this.generateColorPickerId(stateObj);
-      const colorpickerElement = this.shadowRoot.querySelectorAll(`#${id}`);
-
-      if (colorpickerElement.length) {
-        const h = (stateObj.attributes.hs_color && stateObj.attributes.hs_color[0]) || 0;
-        const s = (stateObj.attributes.hs_color && stateObj.attributes.hs_color[1] / 100) || 0;
-        colorpickerElement[0].desiredHsColor = { h, s };
-      }
-    });
+    this.setColorPickerSize();
   }
 
   /**

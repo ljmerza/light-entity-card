@@ -58,7 +58,7 @@ const style = css`
     display: flex;
     justify-content: space-around;
     margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
   }
 
   .group .light-entity-card__color-picker {
