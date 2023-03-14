@@ -11,7 +11,6 @@ export default {
   color_temp: true,
   white_value: true,
   color_picker: true,
-  smooth_color_wheel: false,
   speed: true,
   intensity: true,
 
