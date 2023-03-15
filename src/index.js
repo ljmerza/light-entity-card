@@ -67,7 +67,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   setColorPickersSize() {
-    if(!this.colorPicker) return;
+    if(!this.colorPickers) return;
 
     const elem = this.shadowRoot.querySelector('.light-entity-card');
     const width = elem.offsetWidth;
