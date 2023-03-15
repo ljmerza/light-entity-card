@@ -88,7 +88,6 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
 
         <div class='entities'>
           <ha-select
-            .naturalMenuWidth=${true}
             label="Entity"
             @selected="${this.configChanged}" 
             @closed="${e => e.stopPropagation()}" 

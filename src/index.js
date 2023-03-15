@@ -42,7 +42,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   setColorWheels() {
     this.colorPickers = [];
 
-    for(let entity of this._stateObjects) {
+    for(let entity of this._shownStateObjects) {
       const picker = this.renderRoot.getElementById(`picker-${entity.entity_id}`)
       if(!picker) continue;
 
@@ -198,7 +198,6 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * https://github.com/home-assistant/home-assistant-polymer/issues/2618
    */
   updated() {
-    this._isUpdating = false;
     this.setColorPickersSize();
   }
 
@@ -217,7 +216,6 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       `;
     }
 
-    this._isUpdating = true;
     this._stateObjects = this.getEntitiesToShow(entity);
 
     // need to find what state objects are actually going to be shown
@@ -477,7 +475,13 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center light-entity-card-effectlist">
-        <ha-select @selected=${e => this.setEffect(e, stateObj)} label="${caption}"> ${listItems} </ha-select>
+        <ha-select 
+          @closed="${e => e.stopPropagation()}" 
+          @selected=${e => this.setEffect(e, stateObj)} 
+          label="${caption}" 
+        >
+          ${listItems}
+        </ha-select>
       </div>
     `;
   }
@@ -614,7 +618,12 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @param {String} state
    */
   callEntityService(payload, stateObj, state) {
-    if (this._isUpdating) return;
+    // ha-select immediately triggers a nonChange cant figure out why
+    if(!this._firstload) {
+      this._firstload = true;
+      return;
+    }
+
     let entityType = stateObj.entity_id.split('.')[0];
     if (entityType === 'group') entityType = 'homeassistant';
 
