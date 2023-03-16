@@ -82,7 +82,7 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
             label="Header"
             .data="${header}"
             .configValue="${'header'}"
-            @value-changed="${this.configChanged}"
+            @changed="${this.configChanged}"
           ></ha-form-string>
         </div>
 
@@ -100,7 +100,7 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
             label="Brightness Icon"
             .data="${this._config.brightness_icon}"
             .configValue="${'brightness_icon'}"
-            @value-changed="${this.configChanged}"
+            @changed="${this.configChanged}"
           ></ha-form-string>
         </div>
 
@@ -110,14 +110,14 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
            label="White Icon"
             .data="${this._config.white_icon}"
             .configValue="${'white_icon'}"
-            @value-changed="${this.configChanged}"
+            @changed="${this.configChanged}"
           ></ha-form-string>
           <ha-form-string
             .schema=${{ name: 'temperature_icon', type: 'string' }}
             label="Temperature Icon"
             .data="${this._config.temperature_icon}"
             .configValue="${'temperature_icon'}"
-            @value-changed="${this.configChanged}"
+            @changed="${this.configChanged}"
           ></ha-form-string>
         </div>
 

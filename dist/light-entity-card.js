@@ -1,4 +1,4 @@
-!function(t){var e={};function i(n){if(e[n])return e[n].exports;var r=e[n]={i:n,l:!1,exports:{}};return t[n].call(r.exports,r,r.exports,i),r.l=!0,r.exports}i.m=t,i.c=e,i.d=function(t,e,n){i.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:n})},i.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},i.t=function(t,e){if(1&e&&(t=i(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var n=Object.create(null);if(i.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var r in t)i.d(n,r,function(e){return t[e]}.bind(null,r));return n},i.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return i.d(e,"a",e),e},i.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},i.p="/local/",i(i.s=1)}([function(t){t.exports=JSON.parse('{"name":"light-entity-card","version":"6.0.4","description":"A light-entity card for Home Assistant Lovelace UI","keywords":["home-assistant","homeassistant","hass","automation","lovelace","custom-cards","light-entity"],"repository":"git@github.com:ljmerza/light-entity-card.git","author":"Leonardo Merza <ljmerza@gmail.com>","license":"MIT","dependencies":{"@babel/polyfill":"^7.4.4","@jaames/iro":"^5.5.2","@lit-labs/scoped-registry-mixin":"^1.0.0","@material/mwc-icon":"^0.25.3","@material/mwc-list":"^0.25.3","@material/mwc-menu":"^0.25.3","@material/mwc-notched-outline":"^0.25.3","@material/mwc-select":"^0.25.3","core-js":"^2.6.5","lit":"^2.1.2","lit-element":"^2.2.1"},"devDependencies":{"@babel/cli":"^7.5.5","@babel/core":"^7.5.5","@babel/preset-env":"^7.5.5","babel-loader":"^8.0.6","eslint":"^6.1.0","webpack":"^4.38.0","webpack-cli":"^3.3.6","webpack-merge":"^4.2.1"},"scripts":{"lint":"eslint  --fix ./src","start":"webpack --watch --config webpack/config.dev.js","build":"webpack --config webpack/config.prod.js"}}')},function(t,e,i){"use strict";i.r(e);
+!function(t){var e={};function i(n){if(e[n])return e[n].exports;var r=e[n]={i:n,l:!1,exports:{}};return t[n].call(r.exports,r,r.exports,i),r.l=!0,r.exports}i.m=t,i.c=e,i.d=function(t,e,n){i.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:n})},i.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},i.t=function(t,e){if(1&e&&(t=i(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var n=Object.create(null);if(i.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var r in t)i.d(n,r,function(e){return t[e]}.bind(null,r));return n},i.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return i.d(e,"a",e),e},i.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},i.p="/local/",i(i.s=1)}([function(t){t.exports=JSON.parse('{"name":"light-entity-card","version":"6.0.5","description":"A light-entity card for Home Assistant Lovelace UI","keywords":["home-assistant","homeassistant","hass","automation","lovelace","custom-cards","light-entity"],"repository":"git@github.com:ljmerza/light-entity-card.git","author":"Leonardo Merza <ljmerza@gmail.com>","license":"MIT","dependencies":{"@babel/polyfill":"^7.4.4","@jaames/iro":"^5.5.2","@lit-labs/scoped-registry-mixin":"^1.0.0","@material/mwc-icon":"^0.25.3","@material/mwc-list":"^0.25.3","@material/mwc-menu":"^0.25.3","@material/mwc-notched-outline":"^0.25.3","@material/mwc-select":"^0.25.3","core-js":"^2.6.5","lit":"^2.1.2","lit-element":"^2.2.1"},"devDependencies":{"@babel/cli":"^7.5.5","@babel/core":"^7.5.5","@babel/preset-env":"^7.5.5","babel-loader":"^8.0.6","eslint":"^6.1.0","webpack":"^4.38.0","webpack-cli":"^3.3.6","webpack-merge":"^4.2.1"},"scripts":{"lint":"eslint  --fix ./src","start":"webpack --watch --config webpack/config.dev.js","build":"webpack --config webpack/config.prod.js"}}')},function(t,e,i){"use strict";i.r(e);
 /**
  * @license
  * Copyright 2019 Google LLC
@@ -95,20 +95,19 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
     display: flex;
     justify-content: space-around;
     margin-top: 10px;
-    margin-bottom: 20px;
-  }
-
-  .group .light-entity-card__color-picker {
-    width: 50%;
-    margin: 0 auto;
   }
   
   .light-entity-card-color_temp {
     background-image: var(--ha-slider-background);
   }
 
+  .light-entity-card-effectlist {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
   .group .light-entity-card-effectlist {
-    margin-top: -25px;
+    padding-bottom: 20px;
   }
 
   .light-entity-card-center {
@@ -172,7 +171,7 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
             label="Header"
             .data="${t}"
             .configValue="${"header"}"
-            @value-changed="${this.configChanged}"
+            @changed="${this.configChanged}"
           ></ha-form-string>
         </div>
 
@@ -190,7 +189,7 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
             label="Brightness Icon"
             .data="${this._config.brightness_icon}"
             .configValue="${"brightness_icon"}"
-            @value-changed="${this.configChanged}"
+            @changed="${this.configChanged}"
           ></ha-form-string>
         </div>
 
@@ -200,14 +199,14 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
            label="White Icon"
             .data="${this._config.white_icon}"
             .configValue="${"white_icon"}"
-            @value-changed="${this.configChanged}"
+            @changed="${this.configChanged}"
           ></ha-form-string>
           <ha-form-string
             .schema=${{name:"temperature_icon",type:"string"}}
             label="Temperature Icon"
             .data="${this._config.temperature_icon}"
             .configValue="${"temperature_icon"}"
-            @value-changed="${this.configChanged}"
+            @changed="${this.configChanged}"
           ></ha-form-string>
         </div>
 
@@ -352,7 +351,7 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
           </div>
           </div>
       </div>
-    `}configChanged(t){if(!this._config||!this.hass||!this._firstRendered)return;const{target:{configValue:e,value:i},detail:{value:n}}=t;this._config=null!=n?{...this._config,[e]:n}:{...this._config,[e]:i},ai(this,"config-changed",{config:this._config})}checkboxConfigChanged(t){if(!this._config||!this.hass||!this._firstRendered)return;const{target:{value:e,checked:i}}=t;this._config={...this._config,[e]:i},ai(this,"config-changed",{config:this._config})}}var ci=i(0);customElements.define("light-entity-card-editor",li),console.info("light-entity-card v"+ci.version);class hi extends(jt(Ct)){static get elementDefinitions(){return oi([si("ha-card"),si("more-info-light"),si("ha-switch"),si("ha-icon"),si("ha-slider"),si("ha-color-picker"),si("ha-select"),si("mwc-list-item")],hi)}async firstUpdated(){this.setColorWheels()}async updated(){this.setColorWheels()}setColorWheels(){this.colorPickers=[];for(let t of this._shownStateObjects){const e=this.renderRoot.getElementById("picker-"+t.entity_id);if(!e)continue;let i="#f00000";if(t.attributes.hs_color){i={h:t.attributes.hs_color&&t.attributes.hs_color[0]||0,s:t.attributes.hs_color&&t.attributes.hs_color[1]/100||0,l:100}}const n=new ei.ColorPicker(e,{color:i,sliderSize:0});n.on("color:change",e=>this.setColorPicker(e.hsl,t)),this.colorPickers.push(n)}this.setColorPickersSize()}setColorPickersSize(){if(!this.colorPickers)return;const t=this.shadowRoot.querySelector(".light-entity-card").offsetWidth-50,e=300>t?t:300;this.colorPickers.forEach(t=>t.resize(e))}static get properties(){return{hass:Object,config:Object}}setConfig(t){if(!t.entity)throw Error("entity required.");this.config={...ni,...t}}static async getConfigElement(){return document.createElement("light-entity-card-editor")}static get featureNames(){return{brightness:1,colorTemp:2,effectList:4,color:16,whiteValue:128}}static get cmdToggle(){return{on:"turn_on",off:"turn_off"}}static get entityLength(){return{light:10,switch:1}}getCardSize(){if(!this.config||!this.__hass||!this.__hass.states[this.config.entity])return 1;let t=0;const e=this.__hass.states[this.config.entity];return Array.isArray(e.attributes.entity_id)?e.attributes.entity_id.forEach(e=>t+=this.getEntityLength(e)):t+=this.getEntityLength(e.attributes.entity_id),this.config.group&&(t*=.8),parseInt(t,1)}getEntityLength(t){return/^light\./.test(t)?hi.entityLength.light:/^switch\./.test(t)?hi.entityLength.switch:0}get styles(){return ii}get language(){return this.__hass.resources[this.__hass.language]}isEntityOn(t){return"on"===t.state}updated(){this.setColorPickersSize()}render(){const t=this.__hass.states[this.config.entity];if(!t)return Q`
+    `}configChanged(t){if(!this._config||!this.hass||!this._firstRendered)return;const{target:{configValue:e,value:i},detail:{value:n}}=t;this._config=null!=n?{...this._config,[e]:n}:{...this._config,[e]:i},ai(this,"config-changed",{config:this._config})}checkboxConfigChanged(t){if(!this._config||!this.hass||!this._firstRendered)return;const{target:{value:e,checked:i}}=t;this._config={...this._config,[e]:i},ai(this,"config-changed",{config:this._config})}}var ci=i(0);customElements.define("light-entity-card-editor",li),console.info("light-entity-card v"+ci.version);class hi extends(jt(Ct)){static get elementDefinitions(){return oi([si("ha-card"),si("more-info-light"),si("ha-switch"),si("ha-icon"),si("ha-slider"),si("ha-color-picker"),si("ha-select"),si("mwc-list-item")],hi)}async firstUpdated(){this.setColorWheels(),this._firstUpdate=!0}async updated(){this.setColorWheels()}setColorWheels(){this.colorPickers=[];for(let t of this._shownStateObjects){const e=this.renderRoot.getElementById("picker-"+t.entity_id);if(!e)continue;let i="#f00000";if(t.attributes.hs_color){i={h:t.attributes.hs_color&&t.attributes.hs_color[0]||0,s:t.attributes.hs_color&&t.attributes.hs_color[1]/100||0,l:100}}const n=new ei.ColorPicker(e,{color:i,sliderSize:0});n.on("color:change",e=>this.setColorPicker(e.hsl,t)),this.colorPickers.push(n)}this.setColorPickersSize()}setColorPickersSize(){if(!this.colorPickers)return;const t=this.shadowRoot.querySelector(".light-entity-card").offsetWidth,e=this.config.shorten_cards,i=t-(e?100:50),n=e?200:300,r=n>i?i:n;this.colorPickers.forEach(t=>t.resize(r))}static get properties(){return{hass:Object,config:Object}}setConfig(t){if(!t.entity)throw Error("entity required.");this.config={...ni,...t}}static async getConfigElement(){return document.createElement("light-entity-card-editor")}static get featureNames(){return{brightness:1,colorTemp:2,effectList:4,color:16,whiteValue:128}}static get cmdToggle(){return{on:"turn_on",off:"turn_off"}}static get entityLength(){return{light:10,switch:1}}getCardSize(){if(!this.config||!this.__hass||!this.__hass.states[this.config.entity])return 1;let t=0;const e=this.__hass.states[this.config.entity];return Array.isArray(e.attributes.entity_id)?e.attributes.entity_id.forEach(e=>t+=this.getEntityLength(e)):t+=this.getEntityLength(e.attributes.entity_id),this.config.group&&(t*=.8),parseInt(t,1)}getEntityLength(t){return/^light\./.test(t)?hi.entityLength.light:/^switch\./.test(t)?hi.entityLength.switch:0}get styles(){return ii}get language(){return this.__hass.resources[this.__hass.language]}isEntityOn(t){return"on"===t.state}updated(){this.setColorPickersSize()}render(){const t=this.__hass.states[this.config.entity];if(!t)return Q`
         <style>
           ${this.styles}
         </style>
@@ -386,8 +385,8 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
           <ha-icon icon="hass:${this.config.brightness_icon}"></ha-icon>
         </div>
         <ha-slider
-          .value="${t.attributes.brightness}"
-          @value-changed="${e=>this._setValue(e,t,"brightness")}"
+          .value="${t.attributes.brightness||0}"
+          @change="${e=>this._setValue(e,t,"brightness")}"
           min="1"
           max="255"
         ></ha-slider>
@@ -399,8 +398,8 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
           <ha-icon icon="hass:${this.config.speed_icon}"></ha-icon>
         </div>
         <ha-slider
-          .value="${t.attributes.speed}"
-          @value-changed="${e=>this._setValue(e,t,"speed")}"
+          .value="${t.attributes.speed||0}"
+          @change="${e=>this._setValue(e,t,"speed")}"
           min="1"
           max="255"
         ></ha-slider>
@@ -412,8 +411,8 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
           <ha-icon icon="hass:${this.config.intensity_icon}"></ha-icon>
         </div>
         <ha-slider
-          .value="${t.attributes.intensity}"
-          @value-changed="${e=>this._setValue(e,t,"intensity")}"
+          .value="${t.attributes.intensity||0}"
+          @change="${e=>this._setValue(e,t,"intensity")}"
           min="1"
           max="255"
         ></ha-slider>
@@ -426,8 +425,8 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
           class="light-entity-card-color_temp"
           min="${t.attributes.min_mireds}"
           max="${t.attributes.max_mireds}"
-          .value=${t.attributes.color_temp}
-          @value-changed="${e=>this._setValue(e,t,"color_temp")}"
+          .value=${t.attributes.color_temp||0}
+          @change="${e=>this._setValue(e,t,"color_temp")}"
         >
         </ha-slider>
         ${e}
@@ -439,8 +438,8 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
         </div>
         <ha-slider
           max="255"
-          .value="${t.attributes.white_value}"
-          @value-changed="${e=>this._setValue(e,t,"white_value")}"
+          .value="${t.attributes.white_value||0}"
+          @change="${e=>this._setValue(e,t,"white_value")}"
         >
         </ha-slider>
         ${this.showPercent(t.attributes.white_value,0,254)}
@@ -461,5 +460,5 @@ function jt(t){return class extends t{createRenderRoot(){const t=this.constructo
       <div class="light-entity-card__color-picker">
         <div id="picker-${t.entity_id}"></div>
       </div>
-    `}dontShowFeature(t,e){if(this.config.force_features)return!1;if("speed"===t&&"speed"in e.attributes)return!0;if("intensity"===t&&"intensity"in e.attributes)return!0;let i=hi.featureNames[t]&e.attributes.supported_features;const n=e.attributes.supported_color_modes||[];if(!i)switch(t){case"brightness":if(i=Object.prototype.hasOwnProperty.call(e.attributes,"brightness"),!i){const t=["hs","rgb","rgbw","rgbww","white","brightness","color_temp","xy"];i=[...new Set(n.filter(e=>t.includes(e)))].length>0}break;case"colorTemp":if(n){const t=["color_temp"];i=[...new Set(n.filter(e=>t.includes(e)))].length>0}break;case"effectList":i=e.attributes.effect_list&&e.attributes.effect_list.length;break;case"color":if(!i){const t=["hs","rgb","rgbw","rgbww","xy"];i=[...new Set(n.filter(e=>t.includes(e)))].length>0}break;case"whiteValue":i=Object.prototype.hasOwnProperty.call(e.attributes,"white_value");break;default:i=!1}return!i||(!this.config.persist_features&&!this.isEntityOn(e)||void 0)}generateColorPickerId(t){return"light-entity-card-"+t.entity_id.replace(".","-")}setColorPicker(t,e){this.callEntityService({hs_color:[t.h,t.s]},e)}_setValue(t,e,i){const n=parseInt(t.target.value,0);isNaN(n)||parseInt(e.attributes[i],0)===n||this.callEntityService({[i]:n},e)}setToggle(t,e){const i=this.isEntityOn(e)?hi.cmdToggle.off:hi.cmdToggle.on;this.callEntityService({},e,i)}setEffect(t,e){this.callEntityService({effect:t.target.value},e)}callEntityService(t,e,i){if(!this._firstload)return void(this._firstload=!0);let n=e.entity_id.split(".")[0];"group"===n&&(n="homeassistant"),this.hass.callService(n,i||hi.cmdToggle.on,{entity_id:e.entity_id,...t})}}customElements.define("light-entity-card",hi),window.customCards=window.customCards||[],window.customCards.push({type:"light-entity-card",name:"Light Entity Card",description:"Control lights and switches"})}]);
+    `}dontShowFeature(t,e){if(this.config.force_features)return!1;if("speed"===t&&"speed"in e.attributes)return!0;if("intensity"===t&&"intensity"in e.attributes)return!0;let i=hi.featureNames[t]&e.attributes.supported_features;const n=e.attributes.supported_color_modes||[];if(!i)switch(t){case"brightness":if(i=Object.prototype.hasOwnProperty.call(e.attributes,"brightness"),!i){const t=["hs","rgb","rgbw","rgbww","white","brightness","color_temp","xy"];i=[...new Set(n.filter(e=>t.includes(e)))].length>0}break;case"colorTemp":if(n){const t=["color_temp"];i=[...new Set(n.filter(e=>t.includes(e)))].length>0}break;case"effectList":i=e.attributes.effect_list&&e.attributes.effect_list.length;break;case"color":if(!i){const t=["hs","rgb","rgbw","rgbww","xy"];i=[...new Set(n.filter(e=>t.includes(e)))].length>0}break;case"whiteValue":i=Object.prototype.hasOwnProperty.call(e.attributes,"white_value");break;default:i=!1}return!i||(!this.config.persist_features&&!this.isEntityOn(e)||void 0)}setColorPicker(t,e){this.callEntityService({hs_color:[t.h,t.s]},e)}_setValue(t,e,i){const n=parseInt(t.target.value,0);isNaN(n)||parseInt(e.attributes[i],0)===n||this.callEntityService({[i]:n},e)}setToggle(t,e){const i=this.isEntityOn(e)?hi.cmdToggle.off:hi.cmdToggle.on;this.callEntityService({},e,i)}setEffect(t,e){this.callEntityService({effect:t.target.value},e)}callEntityService(t,e,i){if(!this._firstUpdate)return;let n=e.entity_id.split(".")[0];"group"===n&&(n="homeassistant"),this.hass.callService(n,i||hi.cmdToggle.on,{entity_id:e.entity_id,...t})}}customElements.define("light-entity-card",hi),window.customCards=window.customCards||[],window.customCards.push({type:"light-entity-card",name:"Light Entity Card",description:"Control lights and switches"})}]);
 //# sourceMappingURL=light-entity-card.js.map

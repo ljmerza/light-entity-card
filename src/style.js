@@ -58,20 +58,19 @@ const style = css`
     display: flex;
     justify-content: space-around;
     margin-top: 10px;
-    margin-bottom: 20px;
-  }
-
-  .group .light-entity-card__color-picker {
-    width: 50%;
-    margin: 0 auto;
   }
   
   .light-entity-card-color_temp {
     background-image: var(--ha-slider-background);
   }
 
+  .light-entity-card-effectlist {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
   .group .light-entity-card-effectlist {
-    margin-top: -25px;
+    padding-bottom: 20px;
   }
 
   .light-entity-card-center {

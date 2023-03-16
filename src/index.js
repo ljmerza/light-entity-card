@@ -33,6 +33,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
   async firstUpdated() {
     this.setColorWheels();
+    this._firstUpdate = true;
   }
 
   async updated() {
@@ -72,12 +73,13 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     const elem = this.shadowRoot.querySelector('.light-entity-card');
     const width = elem.offsetWidth;
 
-    const calcWidth = width - 50;
-    const maxWidth = 300;
+    const shorten = this.config.shorten_cards;
+
+    const calcWidth = width - (shorten ? 100: 50);
+    const maxWidth = shorten ? 200 : 300;
     const realWidth = maxWidth > calcWidth ? calcWidth : maxWidth
 
     this.colorPickers.forEach((colorPicker) => colorPicker.resize(realWidth));
-
   }
 
   static get properties() {
@@ -311,8 +313,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
           <ha-icon icon="hass:${this.config.brightness_icon}"></ha-icon>
         </div>
         <ha-slider
-          .value="${stateObj.attributes.brightness}"
-          @value-changed="${event => this._setValue(event, stateObj, 'brightness')}"
+          .value="${stateObj.attributes.brightness || 0}"
+          @change="${event => this._setValue(event, stateObj, 'brightness')}"
           min="1"
           max="255"
         ></ha-slider>
@@ -336,8 +338,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
           <ha-icon icon="hass:${this.config.speed_icon}"></ha-icon>
         </div>
         <ha-slider
-          .value="${stateObj.attributes.speed}"
-          @value-changed="${event => this._setValue(event, stateObj, 'speed')}"
+          .value="${stateObj.attributes.speed || 0}"
+          @change="${event => this._setValue(event, stateObj, 'speed')}"
           min="1"
           max="255"
         ></ha-slider>
@@ -361,8 +363,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
           <ha-icon icon="hass:${this.config.intensity_icon}"></ha-icon>
         </div>
         <ha-slider
-          .value="${stateObj.attributes.intensity}"
-          @value-changed="${event => this._setValue(event, stateObj, 'intensity')}"
+          .value="${stateObj.attributes.intensity || 0}"
+          @change="${event => this._setValue(event, stateObj, 'intensity')}"
           min="1"
           max="255"
         ></ha-slider>
@@ -409,8 +411,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
           class="light-entity-card-color_temp"
           min="${stateObj.attributes.min_mireds}"
           max="${stateObj.attributes.max_mireds}"
-          .value=${stateObj.attributes.color_temp}
-          @value-changed="${event => this._setValue(event, stateObj, 'color_temp')}"
+          .value=${stateObj.attributes.color_temp || 0}
+          @change="${event => this._setValue(event, stateObj, 'color_temp')}"
         >
         </ha-slider>
         ${percent}
@@ -434,8 +436,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         </div>
         <ha-slider
           max="255"
-          .value="${stateObj.attributes.white_value}"
-          @value-changed="${event => this._setValue(event, stateObj, 'white_value')}"
+          .value="${stateObj.attributes.white_value || 0}"
+          @change="${event => this._setValue(event, stateObj, 'white_value')}"
         >
         </ha-slider>
         ${this.showPercent(stateObj.attributes.white_value, 0, 254)}
@@ -568,15 +570,6 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   /**
-   *
-   * @param {LightEntity} stateObj
-   */
-  generateColorPickerId(stateObj) {
-    const entity_id = stateObj.entity_id.replace('.', '-');
-    return `light-entity-card-${entity_id}`;
-  }
-
-  /**
    * change to hs color for a given entity
    * @param {HSL} hsl
    * @param {LightEntity} stateObj
@@ -618,12 +611,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @param {String} state
    */
   callEntityService(payload, stateObj, state) {
-    // ha-select immediately triggers a nonChange cant figure out why
-    if(!this._firstload) {
-      this._firstload = true;
-      return;
-    }
-
+    if(!this._firstUpdate) return;
+    
     let entityType = stateObj.entity_id.split('.')[0];
     if (entityType === 'group') entityType = 'homeassistant';
 
