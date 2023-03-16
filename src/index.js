@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
-import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import iro from '@jaames/iro';
+import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 
 import style from './style';
 import defaultConfig from './defaults';
@@ -30,63 +30,63 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       LightEntityCard
     );
   }
+  
+  static get properties() {
+    return {
+      hass: {},
+      config: {},
+    };
+  }
 
   async firstUpdated() {
     this.setColorWheels();
     this._firstUpdate = true;
   }
-
+  
   async updated() {
     this.setColorWheels();
   }
 
   setColorWheels() {
-    this.colorPickers = [];
+    if(!this._shownStateObjects) return;
 
-    for(let entity of this._shownStateObjects) {
+    const colorPickerWidth = this.getColorPickerWidth();
+
+    for(const entity of this._shownStateObjects) {
       const picker = this.renderRoot.getElementById(`picker-${entity.entity_id}`)
       if(!picker) continue;
+      picker.innerHTML = '';
 
-      let color = '#f00000'
+      let color = { h: 0, s: 0, l: 50 }
 
       if(entity.attributes.hs_color) {
-        const h = (entity.attributes.hs_color && entity.attributes.hs_color[0]) || 0;
-        const s = (entity.attributes.hs_color && entity.attributes.hs_color[1] / 100) || 0;
-        color = { h, s, l: 100 }
+        const h = parseInt(entity.attributes.hs_color[0]);
+        const s = parseInt(entity.attributes.hs_color[1]);
+        color = { h, s, l: 50 }
       }
 
       const colorPicker = new iro.ColorPicker(picker, {
+        sliderSize: 0,
         color,
-        sliderSize: 0
+        width: colorPickerWidth,
+        wheelLightness: false,
       })
 
-      colorPicker.on("color:change", color => this.setColorPicker(color.hsl, entity));
-      this.colorPickers.push(colorPicker);
+      colorPicker.on("input:change", color => this.setColorPicker(color.hsl, entity));
     }
-
-    this.setColorPickersSize();
   }
 
-  setColorPickersSize() {
-    if(!this.colorPickers) return;
-
+  getColorPickerWidth() {
     const elem = this.shadowRoot.querySelector('.light-entity-card');
-    const width = elem.offsetWidth;
 
+    const width = elem.offsetWidth;
     const shorten = this.config.shorten_cards;
 
     const calcWidth = width - (shorten ? 100: 50);
     const maxWidth = shorten ? 200 : 300;
     const realWidth = maxWidth > calcWidth ? calcWidth : maxWidth
 
-    this.colorPickers.forEach((colorPicker) => colorPicker.resize(realWidth));
-  }
-
-  static get properties() {
-    return {
-      hass: Object,
-      config: Object,
-    };
+    return realWidth;
   }
 
   /**
@@ -195,20 +195,11 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   /**
-   * bug in ha-color-picker dones't allow you to set desiredHsColor until
-   * after it's in DOM so we wait until it's in the DOM and set it here
-   * https://github.com/home-assistant/home-assistant-polymer/issues/2618
-   */
-  updated() {
-    this.setColorPickersSize();
-  }
-
-  /**
    * generates a card for each given entiy in the config
    * @return {TemplateResult}
    */
   render() {
-    const entity = this.__hass.states[this.config.entity];
+    const entity = this.hass.states[this.config.entity];
     if (!entity) {
       return html`
         <style>
@@ -237,12 +228,15 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       this.config.child_card ? ' light-entity-child-card' : ''
     }`;
 
+    setTimeout(() => {
+      this.setColorWheels();
+    }, 100)
+
     return html`
       <style>
         ${this.styles}
       </style>
       <ha-card class="${css}">
-        <more-info-light .hass=${this.hass}></more-info-light>
         ${templates}
       </ha-card>
     `;
@@ -255,7 +249,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    */
   getEntitiesToShow(entities) {
     if (entities.attributes.entity_id && Array.isArray(entities.attributes.entity_id))
-      return entities.attributes.entity_id.map(entity_id => this.__hass.states[entity_id]).filter(Boolean);
+      return entities.attributes.entity_id.map(entity_id => this.hass.states[entity_id]).filter(Boolean);
 
     return [entities];
   }
