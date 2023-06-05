@@ -595,6 +595,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @param {LightEntity} entity
    */
   setEffect(event, stateObj) {
+    if(!event.target.value ) return;
     this.callEntityService({ effect: event.target.value }, stateObj);
   }
 
