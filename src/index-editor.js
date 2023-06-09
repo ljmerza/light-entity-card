@@ -232,6 +232,13 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
                   .value="${'hide_header'}"
                 ></ha-checkbox>
               </ha-formfield>
+              <ha-formfield label="Show Header Icon">
+                <ha-checkbox
+                  @change="${this.checkboxConfigChanged}"
+                  .checked=${this._config.show_header_icon}
+                  .value="${'show_header_icon'}"
+                ></ha-checkbox>
+              </ha-formfield>
               <ha-formfield label="Child Card">
                 <ha-checkbox
                   @change="${this.checkboxConfigChanged}"

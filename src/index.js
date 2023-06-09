@@ -22,6 +22,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         globalElementLoader('more-info-light'),
         globalElementLoader('ha-switch'),
         globalElementLoader('ha-icon'),
+        globalElementLoader('state-badge'),
         globalElementLoader('ha-slider'),
         globalElementLoader('ha-color-picker'),
         globalElementLoader('ha-select'),
@@ -284,10 +285,21 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="light-entity-card__header">
+        ${this.showHeaderIcon(stateObj)}
         <div class="light-entity-card__title">${title}</div>
         <div class="light-entity-card-toggle">
           <ha-switch .checked=${this.isEntityOn(stateObj)} @change=${e => this.setToggle(e, stateObj)}></ha-switch>
         </div>
+      </div>
+    `;
+  }
+
+  showHeaderIcon(stateObj) {
+    if (!this.config.show_header_icon) return html``;
+
+    return html`
+      <div class="icon-container">
+        <state-badge .stateObj=${stateObj}></state-badge>
       </div>
     `;
   }

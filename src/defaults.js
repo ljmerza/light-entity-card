@@ -3,6 +3,7 @@ export default {
   consolidate_entities: false,
   child_card: false,
   hide_header: false,
+  show_header_icon: false,
   header: '',
 
   color_wheel: true,
