@@ -73,7 +73,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         wheelLightness: false,
       })
 
-      colorPicker.on("input:change", color => this.setColorPicker(color.hsl, entity));
+      colorPicker.on("input:end", color => this.setColorPicker(color.hsl, entity));
     }
   }
 
