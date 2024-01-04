@@ -24,6 +24,20 @@ jobs:
     - name: Run Build
       run: npm run build
 
+    - name: Commit dist folder
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add dist/
+        git commit -m "Add dist folder"
+    
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        force: true
+        directory: dist
+
     - name: Extract Tag Name
       id: tag_name
       run: echo "::set-output name=tag::$(echo ${GITHUB_REF#refs/tags/})"
