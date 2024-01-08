@@ -15,7 +15,7 @@ const style = css`
   }
 
   .light-entity-card.group {
-    padding-bottom: 0;
+    padding-bottom: 5;
     padding-top: 0;
   }
 
@@ -25,7 +25,9 @@ const style = css`
 
   .percent-slider {
     color: var(--primary-text-color);
-    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .light-entity-card__header {
@@ -34,11 +36,9 @@ const style = css`
     @apply --paper-font-headline;
     line-height: 40px;
     color: var(--primary-text-color);
-    font-size: 24px;
   }
 
   .group .light-entity-card__header {
-    font-size: 16px;
   }
 
   .light-entity-card-sliders > div {
@@ -79,16 +79,14 @@ const style = css`
     cursor: pointer;
   }
 
-  .light-entity-card-toggle {
-    margin-right: 5px;
-  }
-
   .hidden {
     display: none;
   }
 
   .icon-container {
-    margin-top: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 `;
 

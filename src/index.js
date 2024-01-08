@@ -412,7 +412,9 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
+        <div class="icon-container">
+          <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
+        </div>
         <ha-slider
           class="light-entity-card-color_temp"
           min="${stateObj.attributes.min_mireds}"
