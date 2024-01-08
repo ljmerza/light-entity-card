@@ -39,18 +39,29 @@ jobs:
         force: true
         directory: dist
 
-    - name: Extract Tag Name
-      id: tag_name
-      run: echo "::set-output name=tag::$(echo ${GITHUB_REF#refs/tags/})"
+    - name: Get current and previous tags
+      id: tags
+      run: |
+        current_tag=$(git describe --tags --abbrev=0)
+        previous_tag=$(git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 --max-count=1))
+        echo ::set-output name=current_tag::${current_tag}
+        echo ::set-output name=previous_tag::${previous_tag}
+
+    - name: Generate release notes
+      id: releasenotes
+      run: |
+        echo "Release Notes:" > release_notes.md
+        git log ${previous_tag}..${current_tag} --pretty=format:"%h - %s" >> release_notes.md
+        echo ::set-output name=notes::$(cat release_notes.md)
 
     - name: Create Release
-      id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.tag_name.outputs.tag }}
-        release_name: Release ${{ steps.tag_name.outputs.tag }}
+        tag_name: ${{ steps.tags.outputs.current_tag }}
+        release_name: Release ${{ steps.tags.outputs.current_tag }}
+        body: ${{ steps.releasenotes.outputs.notes }}
         draft: false
         prerelease: false
 
