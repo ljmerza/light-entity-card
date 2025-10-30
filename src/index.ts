@@ -1,20 +1,65 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, PropertyValues } from 'lit';
+import { property } from 'lit/decorators.js';
 import iro from '@jaames/iro';
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 
 import style from './style';
 import defaultConfig from './defaults';
 import LightEntityCardEditor from './index-editor';
-import packageJson from '../package.json';
 import buildElementDefinitions from './buildElementDefinitions';
 import globalElementLoader from './globalElementLoader';
+import './types';
+
+const VERSION = '6.1.3';
 
 const editorName = 'light-entity-card-editor';
 customElements.define(editorName, LightEntityCardEditor);
 
-console.info(`light-entity-card v${packageJson.version}`);
+console.info(`light-entity-card v${VERSION}`);
+
+interface HomeAssistant {
+  states: Record<string, any>;
+  callService: (domain: string, service: string, data: any) => void;
+  resources: Record<string, any>;
+  language: string;
+}
+
+interface LightEntityCardConfig {
+  entity: string;
+  shorten_cards?: boolean;
+  consolidate_entities?: boolean;
+  child_card?: boolean;
+  hide_header?: boolean;
+  show_header_icon?: boolean;
+  header?: string;
+  brightness?: boolean;
+  color_temp?: boolean;
+  white_value?: boolean;
+  color_picker?: boolean;
+  speed?: boolean;
+  intensity?: boolean;
+  effects_list?: boolean | string | string[];
+  persist_features?: boolean;
+  force_features?: boolean;
+  show_slider_percent?: boolean;
+  full_width_sliders?: boolean;
+  brightness_icon?: string;
+  white_icon?: string;
+  temperature_icon?: string;
+  speed_icon?: string;
+  intensity_icon?: string;
+  group?: boolean;
+}
 
 class LightEntityCard extends ScopedRegistryHost(LitElement) {
+  @property({ type: Object }) hass!: HomeAssistant;
+  @property({ type: Object }) config!: LightEntityCardConfig;
+
+  private _firstUpdate = false;
+  private _firstRendered = false;
+  private _stateObjects: any[] = [];
+  private _shownStateObjects: any[] = [];
+
   static get elementDefinitions() {
     return buildElementDefinitions(
       [
@@ -30,13 +75,6 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       ],
       LightEntityCard
     );
-  }
-  
-  static get properties() {
-    return {
-      hass: {},
-      config: {},
-    };
   }
 
   async firstUpdated() {
@@ -54,7 +92,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     const colorPickerWidth = this.getColorPickerWidth();
 
     for(const entity of this._shownStateObjects) {
-      const picker = this.renderRoot.getElementById(`picker-${entity.entity_id}`)
+      const picker = (this.renderRoot as any).getElementById(`picker-${entity.entity_id}`)
       if(!picker) continue;
       picker.innerHTML = '';
 
@@ -66,7 +104,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         color = { h, s, l: 50 }
       }
 
-      const colorPicker = new iro.ColorPicker(picker, {
+      const colorPicker = new (iro as any).ColorPicker(picker, {
         sliderSize: 0,
         color,
         width: colorPickerWidth,
@@ -78,9 +116,9 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   getColorPickerWidth() {
-    const elem = this.shadowRoot.querySelector('.light-entity-card');
+    const elem = this.shadowRoot!.querySelector('.light-entity-card') as HTMLElement;
 
-    const width = elem.offsetWidth;
+    const width = elem?.offsetWidth || 0;
     const shorten = this.config.shorten_cards;
 
     const calcWidth = width - (shorten ? 100: 50);
@@ -137,12 +175,12 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {Number}
    */
   getCardSize() {
-    if (!this.config || !this.__hass || !this.__hass.states[this.config.entity]) {
+    if (!this.config || !this.hass || !this.hass.states[this.config.entity]) {
       return 1;
     }
 
     let cardLength = 0;
-    const entities = this.__hass.states[this.config.entity];
+    const entities = this.hass.states[this.config.entity];
 
     // if given a group entity then sum length of each entity by type
     // else just get the sible entity length
@@ -157,7 +195,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       cardLength *= 0.8;
     }
 
-    return parseInt(cardLength, 1);
+    return parseInt(cardLength.toString());
   }
 
   /**
@@ -183,7 +221,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   get language() {
-    return this.__hass.resources[this.__hass.language];
+    return this.hass.resources[this.hass.language];
   }
 
   /**
@@ -388,7 +426,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    */
   showPercent(value, min, max) {
     if (!this.config.show_slider_percent) return html``;
-    let percent = parseInt(((value - min) * 100) / (max - min), 0);
+    let percent = Math.floor(((value - min) * 100) / (max - min));
     if (isNaN(percent)) percent = 0;
 
     return html` <div class="percent-slider">${percent}%</div> `;
@@ -619,7 +657,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @param {LightEntity} entity
    * @param {String} state
    */
-  callEntityService(payload, stateObj, state) {
+  callEntityService(payload: any, stateObj: any, state?: string) {
     if(!this._firstUpdate) return;
     
     let entityType = stateObj.entity_id.split('.')[0];

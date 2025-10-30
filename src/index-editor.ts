@@ -1,39 +1,62 @@
 import { LitElement, html } from 'lit';
+import { property } from 'lit/decorators.js';
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import style from './style-editor';
 import defaultConfig from './defaults';
 import buildElementDefinitions from './buildElementDefinitions';
 import globalElementLoader from './globalElementLoader';
 
-export const fireEvent = (node, type, detail = {}, options = {}) => {
+interface HomeAssistant {
+  states: Record<string, any>;
+  callService: (domain: string, service: string, data: any) => void;
+  resources: Record<string, any>;
+  language: string;
+}
+
+interface FireEventOptions {
+  bubbles?: boolean;
+  cancelable?: boolean;
+  composed?: boolean;
+}
+
+export const fireEvent = (
+  node: HTMLElement,
+  type: string,
+  detail: any = {},
+  options: FireEventOptions = {}
+): Event => {
   const event = new Event(type, {
     bubbles: options.bubbles === undefined ? true : options.bubbles,
     cancelable: Boolean(options.cancelable),
     composed: options.composed === undefined ? true : options.composed,
   });
 
-  event.detail = detail;
+  (event as any).detail = detail;
   node.dispatchEvent(event);
   return event;
 };
 
 export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement) {
+  @property({ type: Object }) hass!: HomeAssistant;
+  @property({ type: Object }) _config: any = {};
+
+  private _firstRendered = false;
+
   static get elementDefinitions() {
-    return buildElementDefinitions([
-      globalElementLoader('ha-checkbox'),
-      globalElementLoader('ha-formfield'),
-      globalElementLoader('ha-form-string'),
-      globalElementLoader('ha-select'),
-      globalElementLoader('mwc-list-item'),
-    ], LightEntityCardEditor);
+    return buildElementDefinitions(
+      [
+        globalElementLoader('ha-checkbox'),
+        globalElementLoader('ha-formfield'),
+        globalElementLoader('ha-form-string'),
+        globalElementLoader('ha-select'),
+        globalElementLoader('mwc-list-item'),
+      ],
+      LightEntityCardEditor
+    );
   }
 
   static get styles() {
     return style;
-  }
-
-  static get properties() {
-    return { hass: {}, _config: {} };
   }
 
   setConfig(config) {
