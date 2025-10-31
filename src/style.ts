@@ -1,10 +1,6 @@
 import { css } from 'lit';
 
 const style = css`
-  .IroSlider {
-    display: none !important;
-  }
-
   .light-entity-card {
     padding: 16px;
   }
@@ -58,6 +54,15 @@ const style = css`
     display: flex;
     justify-content: space-around;
     margin-top: 10px;
+    min-height: 200px;
+  }
+
+  .light-entity-card__color-picker ha-color-picker {
+    width: 100%;
+    max-width: 300px;
+    height: 200px;
+    margin: 0 auto;
+    display: block;
   }
   
   .light-entity-card-color_temp {
@@ -76,6 +81,8 @@ const style = css`
   .light-entity-card-center {
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: 12px;
     cursor: pointer;
   }
 

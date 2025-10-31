@@ -16,7 +16,6 @@
   "author": "Leonardo Merza <ljmerza@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@jaames/iro": "^5.5.2",
     "@lit-labs/scoped-registry-mixin": "^1.0.0",
     "@material/mwc-icon": "^0.25.3",
     "@material/mwc-list": "^0.25.3",
@@ -26,20 +25,29 @@
     "lit": "^2.1.2"
   },
   "devDependencies": {
+    "@esm-bundle/chai": "^4.3.4-fix.0",
+    "@open-wc/testing": "^4.0.0",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
+    "@web/dev-server-esbuild": "^1.0.4",
+    "@web/test-runner": "^0.20.2",
+    "@web/test-runner-playwright": "^0.11.1",
     "eslint": "^6.1.0",
     "rollup": "^4.9.5",
     "rollup-plugin-serve": "^2.0.2",
+    "sinon": "^21.0.0",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3"
   },
   "scripts": {
     "lint": "eslint --fix ./src",
     "start": "rollup -c rollup.config.dev.js --watch",
-    "build": "rollup -c rollup.config.prod.js"
+    "build": "rollup -c rollup.config.prod.js",
+    "test": "web-test-runner",
+    "test:watch": "web-test-runner --watch",
+    "test:coverage": "web-test-runner --coverage"
   }
 }

@@ -19,5 +19,5 @@
     "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/color-wheel"]
+  "exclude": ["node_modules", "dist"]
 }

@@ -1,6 +1,5 @@
 import { LitElement, html, PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
-import iro from '@jaames/iro';
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 
 import style from './style';
@@ -8,57 +7,50 @@ import defaultConfig from './defaults';
 import LightEntityCardEditor from './index-editor';
 import buildElementDefinitions from './buildElementDefinitions';
 import globalElementLoader from './globalElementLoader';
-import './types';
+import { logger } from './utils/logger';
+import type {
+  HomeAssistant,
+  LightEntityCardConfig,
+  LightEntity,
+  CardEntity,
+  FeatureName,
+  ColorPickerEvent,
+} from './types/index';
+import {
+  VERSION,
+  CARD_INFO,
+  LIGHT_FEATURES,
+  ENTITY_DOMAINS,
+  LIGHT_SERVICES,
+  SIZES,
+  TIMING,
+} from './constants';
+import { renderBrightnessSlider, renderSpeedSlider, renderIntensitySlider } from './features/brightness';
+import { renderColorTemperature } from './features/color-temperature';
+import { renderWhiteValue } from './features/white-value';
+import { renderColorPicker, handleColorChanged, createDebouncedColorHandler } from './features/color-picker';
+import { renderEffectList, handleEffectChange } from './features/effects';
 
-const VERSION = '6.1.3';
-
-const editorName = 'light-entity-card-editor';
+const editorName = CARD_INFO.EDITOR_NAME;
 customElements.define(editorName, LightEntityCardEditor);
 
 console.info(`light-entity-card v${VERSION}`);
-
-interface HomeAssistant {
-  states: Record<string, any>;
-  callService: (domain: string, service: string, data: any) => void;
-  resources: Record<string, any>;
-  language: string;
-}
-
-interface LightEntityCardConfig {
-  entity: string;
-  shorten_cards?: boolean;
-  consolidate_entities?: boolean;
-  child_card?: boolean;
-  hide_header?: boolean;
-  show_header_icon?: boolean;
-  header?: string;
-  brightness?: boolean;
-  color_temp?: boolean;
-  white_value?: boolean;
-  color_picker?: boolean;
-  speed?: boolean;
-  intensity?: boolean;
-  effects_list?: boolean | string | string[];
-  persist_features?: boolean;
-  force_features?: boolean;
-  show_slider_percent?: boolean;
-  full_width_sliders?: boolean;
-  brightness_icon?: string;
-  white_icon?: string;
-  temperature_icon?: string;
-  speed_icon?: string;
-  intensity_icon?: string;
-  group?: boolean;
-}
 
 class LightEntityCard extends ScopedRegistryHost(LitElement) {
   @property({ type: Object }) hass!: HomeAssistant;
   @property({ type: Object }) config!: LightEntityCardConfig;
 
   private _firstUpdate = false;
-  private _firstRendered = false;
-  private _stateObjects: any[] = [];
-  private _shownStateObjects: any[] = [];
+  private _stateObjects: CardEntity[] = [];
+  private _shownStateObjects: CardEntity[] = [];
+
+  // Debounced color change handler to prevent excessive API calls
+  private _debouncedColorChange = createDebouncedColorHandler(
+    (hsColor: [number, number], stateObj: CardEntity) => {
+      this.callEntityService({ hs_color: hsColor }, stateObj);
+    },
+    100
+  );
 
   static get elementDefinitions() {
     return buildElementDefinitions(
@@ -70,6 +62,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         globalElementLoader('state-badge'),
         globalElementLoader('ha-slider'),
         globalElementLoader('ha-color-picker'),
+        globalElementLoader('ha-lovelace-color-picker'),
         globalElementLoader('ha-select'),
         globalElementLoader('mwc-list-item'),
       ],
@@ -78,54 +71,145 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   async firstUpdated() {
-    this.setColorWheels();
     this._firstUpdate = true;
+
+    // Ensure ha-color-picker is loaded
+    await this._ensureColorPickerLoaded();
   }
-  
-  async updated() {
-    this.setColorWheels();
-  }
 
-  setColorWheels() {
-    if(!this._shownStateObjects) return;
-
-    const colorPickerWidth = this.getColorPickerWidth();
-
-    for(const entity of this._shownStateObjects) {
-      const picker = (this.renderRoot as any).getElementById(`picker-${entity.entity_id}`)
-      if(!picker) continue;
-      picker.innerHTML = '';
-
-      let color = { h: 0, s: 0, l: 50 }
-
-      if(entity.attributes.hs_color) {
-        const h = parseInt(entity.attributes.hs_color[0]);
-        const s = parseInt(entity.attributes.hs_color[1]);
-        color = { h, s, l: 50 }
+  /**
+   * Ensures ha-color-picker element is loaded
+   * Uses multiple strategies to trigger element loading
+   */
+  private async _ensureColorPickerLoaded(): Promise<void> {
+    try {
+      // Check if element is already defined
+      if (customElements.get('ha-color-picker')) {
+        logger.debug('ha-color-picker already loaded');
+        return;
       }
 
-      const colorPicker = new (iro as any).ColorPicker(picker, {
-        sliderSize: 0,
-        color,
-        width: colorPickerWidth,
-        wheelLightness: false,
-      })
+      logger.debug('Attempting to load ha-color-picker');
 
-      colorPicker.on("input:end", color => this.setColorPicker(color.hsl, entity));
+      // Strategy 1: Use Home Assistant card helpers to import the
+      // more-info control for lights. This typically registers
+      // ha-color-picker without showing any dialogs.
+      if (!customElements.get('ha-color-picker') && (window as any).loadCardHelpers) {
+        try {
+          const helpers = await (window as any).loadCardHelpers();
+          if (helpers?.importMoreInfoControl) {
+            await helpers.importMoreInfoControl('light');
+            logger.debug('importMoreInfoControl("light") resolved');
+          } else if (helpers?.importMoreInfo) {
+            await helpers.importMoreInfo('light');
+            logger.debug('importMoreInfo("light") resolved');
+          }
+
+          // As an additional nudge, create a temporary built-in light card
+          // and attach it briefly to the DOM to ensure its modules load.
+          if (!customElements.get('ha-color-picker') && helpers?.createCardElement && this.config?.entity) {
+            try {
+              const tmp = await helpers.createCardElement({ type: 'light', entity: this.config.entity });
+              // Set hass so the element can render and trigger dynamic imports
+              // @ts-ignore
+              tmp.hass = this.hass;
+              const holder = document.createElement('div');
+              holder.style.cssText = 'position:absolute; left:-99999px; top:-99999px; width:0; height:0; overflow:hidden;';
+              holder.appendChild(tmp);
+              // Append to the document so connectedCallback runs
+              document.body.appendChild(holder);
+              logger.debug('Attached temporary hui-light-card to DOM to trigger imports');
+
+              // Wait a short moment or until the color picker is defined
+              await Promise.race([
+                customElements.whenDefined('ha-color-picker'),
+                customElements.whenDefined('ha-lovelace-color-picker'),
+                new Promise((resolve) => setTimeout(resolve, 1000)),
+              ]);
+
+              // Clean up
+              try {
+                document.body.removeChild(holder);
+              } catch (_) {}
+            } catch (e3) {
+              logger.debug('Temporary hui-light-card creation/attach failed', e3);
+            }
+          }
+        } catch (e) {
+          logger.debug('loadCardHelpers failed', e);
+        }
+      }
+
+      // Strategy 2: Retry helpers a few times in case helpers are not ready yet
+      if (!customElements.get('ha-color-picker') && (window as any).loadCardHelpers) {
+        for (let i = 0; i < 8 && !customElements.get('ha-color-picker'); i++) {
+          try {
+            const helpers = await (window as any).loadCardHelpers();
+            if (helpers?.importMoreInfoControl) {
+              await helpers.importMoreInfoControl('light');
+              logger.debug('Retry importMoreInfoControl("light") resolved');
+            } else if (helpers?.importMoreInfo) {
+              await helpers.importMoreInfo('light');
+              logger.debug('Retry importMoreInfo("light") resolved');
+            }
+          } catch (e) {
+            // ignore
+          }
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((r) => setTimeout(r, 250));
+        }
+      }
+
+      // Strategy 3: Try to get the element from somewhere in the DOM
+      if (!customElements.get('ha-color-picker')) {
+        const existingPicker = document.querySelector('ha-color-picker');
+        if (existingPicker) {
+          logger.debug('Found existing ha-color-picker in DOM');
+        }
+      }
+
+      // Wait for the element (either variant) with a reasonable timeout
+      if (!customElements.get('ha-color-picker') && !customElements.get('ha-lovelace-color-picker')) {
+        const timeout = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout waiting for ha-color-picker')), 3000)
+        );
+
+        try {
+          await Promise.race([
+            customElements.whenDefined('ha-color-picker'),
+            customElements.whenDefined('ha-lovelace-color-picker'),
+            timeout,
+          ]);
+          logger.debug('Color picker element loaded successfully');
+          // Ensure we re-render so bindings (like desiredHsColor) apply
+          this.requestUpdate();
+        } catch (e) {
+          logger.warn('ha-color-picker not available, color picker will not be displayed');
+        }
+      }
+
+      // Regardless of the timeout outcome, attach listeners so if HA
+      // defines the color picker later (e.g., after opening More Info),
+      // we will re-render and show it.
+      try {
+        if (!customElements.get('ha-color-picker')) {
+          customElements.whenDefined('ha-color-picker').then(() => {
+            logger.debug('ha-color-picker became available later');
+            this.requestUpdate();
+          });
+        }
+        if (!customElements.get('ha-lovelace-color-picker')) {
+          customElements.whenDefined('ha-lovelace-color-picker').then(() => {
+            logger.debug('ha-lovelace-color-picker became available later');
+            this.requestUpdate();
+          });
+        }
+      } catch (_) {
+        // no-op
+      }
+    } catch (error) {
+      logger.warn('Failed to load ha-color-picker', error);
     }
-  }
-
-  getColorPickerWidth() {
-    const elem = this.shadowRoot!.querySelector('.light-entity-card') as HTMLElement;
-
-    const width = elem?.offsetWidth || 0;
-    const shorten = this.config.shorten_cards;
-
-    const calcWidth = width - (shorten ? 100: 50);
-    const maxWidth = shorten ? 200 : 300;
-    const realWidth = maxWidth > calcWidth ? calcWidth : maxWidth
-
-    return realWidth;
   }
 
   /**
@@ -147,26 +231,20 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   static get featureNames() {
-    return {
-      brightness: 1,
-      colorTemp: 2,
-      effectList: 4,
-      color: 16,
-      whiteValue: 128,
-    };
+    return LIGHT_FEATURES;
   }
 
   static get cmdToggle() {
     return {
-      on: 'turn_on',
-      off: 'turn_off',
+      on: LIGHT_SERVICES.TURN_ON,
+      off: LIGHT_SERVICES.TURN_OFF,
     };
   }
 
   static get entityLength() {
     return {
-      light: 10,
-      switch: 1,
+      light: SIZES.CARD_LENGTH_LIGHT,
+      switch: SIZES.CARD_LENGTH_SWITCH,
     };
   }
 
@@ -267,10 +345,6 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       this.config.child_card ? ' light-entity-child-card' : ''
     }`;
 
-    setTimeout(() => {
-      this.setColorWheels();
-    }, 100)
-
     return html`
       <style>
         ${this.styles}
@@ -348,23 +422,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {TemplateResult}
    */
   createBrightnessSlider(stateObj) {
-    if (this.config.brightness === false) return html``;
-    if (this.dontShowFeature('brightness', stateObj)) return html``;
-
-    return html`
-      <div class="control light-entity-card-center">
-        <div class="icon-container">
-          <ha-icon icon="hass:${this.config.brightness_icon}"></ha-icon>
-        </div>
-        <ha-slider
-          .value="${stateObj.attributes.brightness || 0}"
-          @change="${event => this._setValue(event, stateObj, 'brightness')}"
-          min="1"
-          max="255"
-        ></ha-slider>
-        ${this.showPercent(stateObj.attributes.brightness, 0, 254)}
-      </div>
-    `;
+    return renderBrightnessSlider(stateObj, this.config, this._setValue.bind(this));
   }
 
   /**
@@ -373,23 +431,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {TemplateResult}
    */
   createSpeedSlider(stateObj) {
-    if (this.config.speed === false) return html``;
-    if (this.dontShowFeature('speed', stateObj)) return html``;
-
-    return html`
-      <div class="control light-entity-card-center">
-        <div class="icon-container">
-          <ha-icon icon="hass:${this.config.speed_icon}"></ha-icon>
-        </div>
-        <ha-slider
-          .value="${stateObj.attributes.speed || 0}"
-          @change="${event => this._setValue(event, stateObj, 'speed')}"
-          min="1"
-          max="255"
-        ></ha-slider>
-        ${this.showPercent(stateObj.attributes.speed, 0, 254)}
-      </div>
-    `;
+    return renderSpeedSlider(stateObj, this.config, this._setValue.bind(this));
   }
 
   /**
@@ -398,38 +440,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {TemplateResult}
    */
   createIntensitySlider(stateObj) {
-    if (this.config.speed === false) return html``;
-    if (this.dontShowFeature('intensity', stateObj)) return html``;
-
-    return html`
-      <div class="control light-entity-card-center">
-        <div class="icon-container">
-          <ha-icon icon="hass:${this.config.intensity_icon}"></ha-icon>
-        </div>
-        <ha-slider
-          .value="${stateObj.attributes.intensity || 0}"
-          @change="${event => this._setValue(event, stateObj, 'intensity')}"
-          min="1"
-          max="255"
-        ></ha-slider>
-        ${this.showPercent(stateObj.attributes.intensity, 0, 254)}
-      </div>
-    `;
-  }
-
-  /**
-   * shows slider percent if config is set
-   * @param {number} value
-   * @param {number} min
-   * @param {number} max
-   * @return {TemplateResult}
-   */
-  showPercent(value, min, max) {
-    if (!this.config.show_slider_percent) return html``;
-    let percent = Math.floor(((value - min) * 100) / (max - min));
-    if (isNaN(percent)) percent = 0;
-
-    return html` <div class="percent-slider">${percent}%</div> `;
+    return renderIntensitySlider(stateObj, this.config, this._setValue.bind(this));
   }
 
   /**
@@ -438,32 +449,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {TemplateResult}
    */
   createColorTemperature(stateObj) {
-    if (this.config.color_temp === false) return html``;
-    if (this.dontShowFeature('colorTemp', stateObj)) return html``;
-
-    const percent = this.showPercent(
-      stateObj.attributes.color_temp,
-      stateObj.attributes.min_mireds - 1,
-      // eslint-disable-next-line comma-dangle
-      stateObj.attributes.max_mireds - 1
-    );
-
-    return html`
-      <div class="control light-entity-card-center">
-        <div class="icon-container">
-          <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
-        </div>
-        <ha-slider
-          class="light-entity-card-color_temp"
-          min="${stateObj.attributes.min_mireds}"
-          max="${stateObj.attributes.max_mireds}"
-          .value=${stateObj.attributes.color_temp || 0}
-          @change="${event => this._setValue(event, stateObj, 'color_temp')}"
-        >
-        </ha-slider>
-        ${percent}
-      </div>
-    `;
+    return renderColorTemperature(stateObj, this.config, this._setValue.bind(this));
   }
 
   /**
@@ -472,23 +458,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {TemplateResult}
    */
   createWhiteValue(stateObj) {
-    if (this.config.white_value === false) return html``;
-    if (this.dontShowFeature('whiteValue', stateObj)) return html``;
-
-    return html`
-      <div class="control light-entity-card-center">
-        <div class="icon-container">
-          <ha-icon icon="hass:${this.config.white_icon}"></ha-icon>
-        </div>
-        <ha-slider
-          max="255"
-          .value="${stateObj.attributes.white_value || 0}"
-          @change="${event => this._setValue(event, stateObj, 'white_value')}"
-        >
-        </ha-slider>
-        ${this.showPercent(stateObj.attributes.white_value, 0, 254)}
-      </div>
-    `;
+    return renderWhiteValue(stateObj, this.config, this._setValue.bind(this));
   }
 
   /**
@@ -497,47 +467,17 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {TemplateResult}
    */
   createEffectList(stateObj) {
-    // do we disable effect list always?
-    if (this.config.effects_list === false) return html``;
-
-    // need to check state and persist_features here because if given custom effect list we may
-    // want to sho that even if the feature doesn't exist so dont check that part to move forward just persist_features/state
-    if (!this.config.persist_features && !this.isEntityOn(stateObj)) return html``;
-
-    let effect_list = stateObj.attributes.effect_list || [];
-
-    // if we were given a custom list then use that
-    if (this.config.effects_list && Array.isArray(this.config.effects_list)) {
-      effect_list = this.config.effects_list;
-    } else if (this.config.effects_list && this.hass.states[this.config.effects_list]) {
-      // else if given an input_select entity use that as effect list
-      const inputSelect = this.hass.states[this.config.effects_list];
-      effect_list = (inputSelect.attributes && inputSelect.attributes.options) || [];
-    } else if (this.dontShowFeature('effectList', stateObj)) {
-      // finally if no custom list nor feature exists then dont show effect list
-      return html``;
-    }
-
-    const listItems = effect_list.map(effect => this.createListItem(stateObj, effect));
-    const caption = this.language['ui.card.light.effect'];
-
-    return html`
-      <div class="control light-entity-card-center light-entity-card-effectlist">
-        <ha-select 
-          @closed="${e => e.stopPropagation()}" 
-          @selected=${e => this.setEffect(e, stateObj)} 
-          label="${caption}" 
-        >
-          ${listItems}
-        </ha-select>
-      </div>
-    `;
-  }
-
-  createListItem(stateObj, effect) {
-    return html`<mwc-list-item value="${effect}" ?selected=${effect === stateObj.attributes.effect}
-      >${effect}</mwc-list-item
-    >`;
+    return renderEffectList(
+      stateObj,
+      this.config,
+      this.hass,
+      this.language,
+      (event, stateObj) => {
+        handleEffectChange(event, stateObj, (effect, stateObj) => {
+          this.callEntityService({ effect }, stateObj);
+        });
+      }
+    );
   }
 
   /**
@@ -546,83 +486,16 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {TemplateResult}
    */
   createColorPicker(stateObj) {
-    if (this.config.color_picker === false) return html``;
-    if (this.dontShowFeature('color', stateObj)) return html``;
-
-    return html`
-      <div class="light-entity-card__color-picker">
-        <div id="picker-${stateObj.entity_id}"></div>
-      </div>
-    `;
-    
-  }
-
-  /**
-   * do we show a feature or not?
-   * @param {string} featureName
-   * @param {LightEntity} stateObj
-   * @return {boolean}
-   */
-  dontShowFeature(featureName, stateObj) {
-    // show all feature if this is set to true
-    if (this.config.force_features) return false;
-
-    // WLED support
-    if (featureName === 'speed' && 'speed' in stateObj.attributes) return true;
-    if (featureName === 'intensity' && 'intensity' in stateObj.attributes) return true;
-
-    // old deprecated way to seeing if supported feature
-    let featureSupported = LightEntityCard.featureNames[featureName] & stateObj.attributes.supported_features;
-
-    // support new color modes https://developers.home-assistant.io/docs/core/entity/light/#color-modes
-    const colorModes = stateObj.attributes.supported_color_modes || [];
-
-    if (!featureSupported) {
-      switch (featureName) {
-        case 'brightness':
-          featureSupported = Object.prototype.hasOwnProperty.call(stateObj.attributes, 'brightness');
-          if (!featureSupported) {
-            const supportedModes = ['hs', 'rgb', 'rgbw', 'rgbww', 'white', 'brightness', 'color_temp', 'xy'];
-            featureSupported = [...new Set(colorModes.filter(mode => supportedModes.includes(mode)))].length > 0;
-          }
-
-          break;
-        case 'colorTemp':
-          if (colorModes) {
-            const supportedModes = ['color_temp'];
-            featureSupported = [...new Set(colorModes.filter(mode => supportedModes.includes(mode)))].length > 0;
-          }
-          break;
-        case 'effectList':
-          featureSupported = stateObj.attributes.effect_list && stateObj.attributes.effect_list.length;
-          break;
-        case 'color':
-          if (!featureSupported) {
-            const supportedModes = ['hs', 'rgb', 'rgbw', 'rgbww', 'xy'];
-            featureSupported = [...new Set(colorModes.filter(mode => supportedModes.includes(mode)))].length > 0;
-          }
-          break;
-        case 'whiteValue':
-          featureSupported = Object.prototype.hasOwnProperty.call(stateObj.attributes, 'white_value');
-          break;
-        default:
-          featureSupported = false;
-          break;
+    return renderColorPicker(
+      stateObj,
+      this.config,
+      this.hass,
+      (event, stateObj) => {
+        handleColorChanged(event, stateObj, this._debouncedColorChange);
       }
-    }
-
-    if (!featureSupported) return true;
-    if (!this.config.persist_features && !this.isEntityOn(stateObj)) return true;
+    );
   }
 
-  /**
-   * change to hs color for a given entity
-   * @param {HSL} hsl
-   * @param {LightEntity} stateObj
-   */
-  setColorPicker(hsl, stateObj) {
-    this.callEntityService({ hs_color: [hsl.h, hsl.s] }, stateObj);
-  }
 
   _setValue(event, stateObj, valueName) {
     const newValue = parseInt(event.target.value, 0);
@@ -642,31 +515,61 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   /**
-   * sets the current effect selected for an entity
-   * @param {CustomEvent} event
-   * @param {LightEntity} entity
+   * Calls a Home Assistant service to update the state of an entity
+   *
+   * This method includes error handling and logging to help debug issues.
+   * It automatically determines the correct service domain (light, switch, or homeassistant).
+   *
+   * @param payload - Service data (brightness, color, etc.)
+   * @param stateObj - The entity state object
+   * @param state - Optional service name (defaults to 'turn_on')
    */
-  setEffect(event, stateObj) {
-    if(!event.target.value ) return;
-    this.callEntityService({ effect: event.target.value }, stateObj);
-  }
+  callEntityService(payload: any, stateObj: any, state?: string): void {
+    // Don't call services before the component is fully initialized
+    if (!this._firstUpdate) {
+      logger.debug('Skipping service call - component not yet initialized');
+      return;
+    }
 
-  /**
-   * call light service to update a state of an entity
-   * @param {Object} payload
-   * @param {LightEntity} entity
-   * @param {String} state
-   */
-  callEntityService(payload: any, stateObj: any, state?: string) {
-    if(!this._firstUpdate) return;
-    
-    let entityType = stateObj.entity_id.split('.')[0];
-    if (entityType === 'group') entityType = 'homeassistant';
+    try {
+      // Determine the correct service domain
+      let entityType = stateObj.entity_id.split('.')[0];
+      if (entityType === 'group') {
+        entityType = 'homeassistant';
+      }
 
-    this.hass.callService(entityType, state || LightEntityCard.cmdToggle.on, {
-      entity_id: stateObj.entity_id,
-      ...payload,
-    });
+      const service = state || LightEntityCard.cmdToggle.on;
+      const serviceData = {
+        entity_id: stateObj.entity_id,
+        ...payload,
+      };
+
+      logger.debug('Calling service', {
+        domain: entityType,
+        service,
+        data: serviceData,
+      });
+
+      this.hass.callService(entityType, service, serviceData);
+    } catch (error) {
+      logger.error('Failed to call service', error, {
+        entity: stateObj.entity_id,
+        payload,
+        state,
+      });
+
+      // Optionally dispatch an event that the UI can listen to for error display
+      this.dispatchEvent(
+        new CustomEvent('service-call-error', {
+          detail: {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            entity: stateObj.entity_id,
+          },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
   }
 }
 

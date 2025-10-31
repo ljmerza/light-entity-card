@@ -5,6 +5,7 @@ declare global {
             name: string;
             description: string;
         }>;
+        loadCardHelpers?: () => Promise<any>;
     }
 }
 export {};

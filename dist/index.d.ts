@@ -1,2 +1,2 @@
-import './types';
+export {};
 //# sourceMappingURL=index.d.ts.map
