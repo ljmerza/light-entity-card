@@ -85,13 +85,14 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       colorPicker.on("input:start", () => { this._colorPickerInteracting = true; });
       colorPicker.on("input:end", color => {
         this._colorPickerInteracting = false;
-        this.setColorPicker(color.hsl, entity);
+        this.setColorPicker(color.hsv, entity);
       });
     }
   }
 
   getColorPickerWidth() {
     const elem = this.shadowRoot.querySelector('.light-entity-card');
+    if (!elem) return 300;
 
     const width = elem.offsetWidth;
     const shorten = this.config.shorten_cards;
@@ -170,7 +171,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       cardLength *= 0.8;
     }
 
-    return parseInt(cardLength, 1);
+    return parseInt(cardLength, 10);
   }
 
   /**
@@ -602,8 +603,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @param {HSL} hsl
    * @param {LightEntity} stateObj
    */
-  setColorPicker(hsl, stateObj) {
-    this.callEntityService({ hs_color: [hsl.h, hsl.s] }, stateObj);
+  setColorPicker(hsv, stateObj) {
+    this.callEntityService({ hs_color: [hsv.h, hsv.s] }, stateObj);
   }
 
   _setValue(event, stateObj, valueName) {
