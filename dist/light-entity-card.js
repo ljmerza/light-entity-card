@@ -433,20 +433,20 @@ function ei(t){return class extends t{createRenderRoot(){const t=this.constructo
         ></ha-slider>
         ${this.showPercent(t.attributes.intensity,0,254)}
       </div>
-    `}showPercent(t,e,i){if(!this.config.show_slider_percent)return Q``;let n=parseInt(100*(t-e)/(i-e),0);return isNaN(n)&&(n=0),Q` <div class="percent-slider">${n}%</div> `}createColorTemperature(t){if(!1===this.config.color_temp)return Q``;if(this.dontShowFeature("colorTemp",t))return Q``;const e=this.showPercent(t.attributes.color_temp,t.attributes.min_mireds-1,t.attributes.max_mireds-1);return Q`
+    `}showPercent(t,e,i){if(!this.config.show_slider_percent)return Q``;let n=parseInt(100*(t-e)/(i-e),0);return isNaN(n)&&(n=0),Q` <div class="percent-slider">${n}%</div> `}createColorTemperature(t){if(!1===this.config.color_temp)return Q``;if(this.dontShowFeature("colorTemp",t))return Q``;const e=void 0!==t.attributes.min_color_temp_kelvin,i=e?t.attributes.color_temp_kelvin:t.attributes.color_temp,n=e?t.attributes.min_color_temp_kelvin:t.attributes.min_mireds,r=e?t.attributes.max_color_temp_kelvin:t.attributes.max_mireds,o=e?"color_temp_kelvin":"color_temp",s=this.showPercent(i,n,r);return Q`
       <div class="control light-entity-card-center">
         <div class="icon-container">
           <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
         </div>
         <ha-slider
           class="light-entity-card-color_temp"
-          min="${t.attributes.min_mireds}"
-          max="${t.attributes.max_mireds}"
-          .value=${t.attributes.color_temp||Math.round((t.attributes.min_mireds+t.attributes.max_mireds)/2)}
-          @change="${e=>this._setValue(e,t,"color_temp")}"
+          min="${n}"
+          max="${r}"
+          .value=${i||Math.round((n+r)/2)}
+          @change="${e=>this._setValue(e,t,o)}"
         >
         </ha-slider>
-        ${e}
+        ${s}
       </div>
     `}createWhiteValue(t){return!1===this.config.white_value||this.dontShowFeature("whiteValue",t)?Q``:Q`
       <div class="control light-entity-card-center">

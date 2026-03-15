@@ -416,12 +416,20 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     if (this.config.color_temp === false) return html``;
     if (this.dontShowFeature('colorTemp', stateObj)) return html``;
 
-    const percent = this.showPercent(
-      stateObj.attributes.color_temp,
-      stateObj.attributes.min_mireds - 1,
-      // eslint-disable-next-line comma-dangle
-      stateObj.attributes.max_mireds - 1
-    );
+    // HA 2026.3+ uses kelvin-based attributes; fall back to mireds for older HA
+    const usesKelvin = stateObj.attributes.min_color_temp_kelvin !== undefined;
+    const currentTemp = usesKelvin
+      ? stateObj.attributes.color_temp_kelvin
+      : stateObj.attributes.color_temp;
+    const minTemp = usesKelvin
+      ? stateObj.attributes.min_color_temp_kelvin
+      : stateObj.attributes.min_mireds;
+    const maxTemp = usesKelvin
+      ? stateObj.attributes.max_color_temp_kelvin
+      : stateObj.attributes.max_mireds;
+    const serviceAttr = usesKelvin ? 'color_temp_kelvin' : 'color_temp';
+
+    const percent = this.showPercent(currentTemp, minTemp, maxTemp);
 
     return html`
       <div class="control light-entity-card-center">
@@ -430,11 +438,10 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         </div>
         <ha-slider
           class="light-entity-card-color_temp"
-          min="${stateObj.attributes.min_mireds}"
-          max="${stateObj.attributes.max_mireds}"
-          .value=${stateObj.attributes.color_temp ||
-            Math.round((stateObj.attributes.min_mireds + stateObj.attributes.max_mireds) / 2)}
-          @change="${event => this._setValue(event, stateObj, 'color_temp')}"
+          min="${minTemp}"
+          max="${maxTemp}"
+          .value=${currentTemp || Math.round((minTemp + maxTemp) / 2)}
+          @change="${event => this._setValue(event, stateObj, serviceAttr)}"
         >
         </ha-slider>
         ${percent}
