@@ -50,19 +50,28 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
   setColorWheels() {
     if(!this._shownStateObjects) return;
+    if(!this._lastHsColors) this._lastHsColors = new Map();
 
     const colorPickerWidth = this.getColorPickerWidth();
 
     for(const entity of this._shownStateObjects) {
       const picker = this.renderRoot.getElementById(`picker-${entity.entity_id}`)
       if(!picker) continue;
+
+      if(this._colorPickerInteracting) continue;
+
+      const hsColor = entity.attributes.hs_color;
+      const hsKey = hsColor ? `${hsColor[0]},${hsColor[1]}` : '';
+      if(this._lastHsColors.get(entity.entity_id) === hsKey) continue;
+      this._lastHsColors.set(entity.entity_id, hsKey);
+
       picker.innerHTML = '';
 
       let color = { h: 0, s: 0, l: 50 }
 
-      if(entity.attributes.hs_color) {
-        const h = parseInt(entity.attributes.hs_color[0]);
-        const s = parseInt(entity.attributes.hs_color[1]);
+      if(hsColor) {
+        const h = parseInt(hsColor[0]);
+        const s = parseInt(hsColor[1]);
         color = { h, s, l: 50 }
       }
 
@@ -73,7 +82,11 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         wheelLightness: false,
       })
 
-      colorPicker.on("input:end", color => this.setColorPicker(color.hsl, entity));
+      colorPicker.on("input:start", () => { this._colorPickerInteracting = true; });
+      colorPicker.on("input:end", color => {
+        this._colorPickerInteracting = false;
+        this.setColorPicker(color.hsl, entity);
+      });
     }
   }
 
@@ -419,7 +432,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
           class="light-entity-card-color_temp"
           min="${stateObj.attributes.min_mireds}"
           max="${stateObj.attributes.max_mireds}"
-          .value=${stateObj.attributes.color_temp || 0}
+          .value=${stateObj.attributes.color_temp ||
+            Math.round((stateObj.attributes.min_mireds + stateObj.attributes.max_mireds) / 2)}
           @change="${event => this._setValue(event, stateObj, 'color_temp')}"
         >
         </ha-slider>
@@ -530,8 +544,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     if (this.config.force_features) return false;
 
     // WLED support
-    if (featureName === 'speed' && 'speed' in stateObj.attributes) return true;
-    if (featureName === 'intensity' && 'intensity' in stateObj.attributes) return true;
+    if (featureName === 'speed' && 'speed' in stateObj.attributes) return false;
+    if (featureName === 'intensity' && 'intensity' in stateObj.attributes) return false;
 
     // old deprecated way to seeing if supported feature
     let featureSupported = LightEntityCard.featureNames[featureName] & stateObj.attributes.supported_features;
@@ -558,12 +572,11 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         case 'effectList':
           featureSupported = stateObj.attributes.effect_list && stateObj.attributes.effect_list.length;
           break;
-        case 'color':
-          if (!featureSupported) {
-            const supportedModes = ['hs', 'rgb', 'rgbw', 'rgbww', 'xy'];
-            featureSupported = [...new Set(colorModes.filter(mode => supportedModes.includes(mode)))].length > 0;
-          }
+        case 'color': {
+          const supportedModes = ['hs', 'rgb', 'rgbw', 'rgbww', 'xy'];
+          featureSupported = [...new Set(colorModes.filter(mode => supportedModes.includes(mode)))].length > 0;
           break;
+        }
         case 'whiteValue':
           featureSupported = Object.prototype.hasOwnProperty.call(stateObj.attributes, 'white_value');
           break;
