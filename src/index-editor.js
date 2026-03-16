@@ -55,7 +55,7 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
   }
 
   render() {
-    if (!this.hass) {
+    if (!this.hass || !this._config) {
       return html``;
     }
 
@@ -113,6 +113,16 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
             @changed="${this.configChanged}"
           ></ha-form-string>
           <ha-form-string
+            .schema=${{ name: 'warm_white_icon', type: 'string' }}
+            label="Warm White Icon"
+            .data="${this._config.warm_white_icon}"
+            .configValue="${'warm_white_icon'}"
+            @changed="${this.configChanged}"
+          ></ha-form-string>
+        </div>
+
+        <div class='entities'>
+          <ha-form-string
             .schema=${{ name: 'temperature_icon', type: 'string' }}
             label="Temperature Icon"
             .data="${this._config.temperature_icon}"
@@ -164,11 +174,21 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
                   .value="${'color_temp'}"
                 ></ha-checkbox>
               </ha-formfield>
-              <ha-formfield label="Show White Value">
+              <ha-formfield label="Show White Channel">
                 <ha-checkbox
                   @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.white_value}
                   .value="${'white_value'}"
+                ></ha-checkbox>
+              </ha-formfield>
+            </div>
+
+            <div class='checkbox-options'>
+              <ha-formfield label="Show Warm White">
+                <ha-checkbox
+                  @change="${this.checkboxConfigChanged}"
+                  .checked=${this._config.warm_white_value}
+                  .value="${'warm_white_value'}"
                 ></ha-checkbox>
               </ha-formfield>
             </div>

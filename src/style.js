@@ -1,10 +1,6 @@
 import { css } from 'lit';
 
 const style = css`
-  .IroSlider {
-    display: none !important;
-  }
-
   .light-entity-card {
     padding: 16px;
   }
@@ -28,6 +24,9 @@ const style = css`
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: 8px;
+    min-width: 40px;
+    text-align: right;
   }
 
   .light-entity-card__header {
@@ -56,8 +55,13 @@ const style = css`
 
   .light-entity-card__color-picker {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     margin-top: 10px;
+  }
+
+  .light-entity-card__color-picker ha-hs-color-picker {
+    max-width: 300px;
+    width: 100%;
   }
   
   .light-entity-card-color_temp {
@@ -76,6 +80,7 @@ const style = css`
   .light-entity-card-center {
     display: flex;
     justify-content: center;
+    align-items: center;
     cursor: pointer;
   }
 
@@ -87,7 +92,9 @@ const style = css`
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-right: 8px;
   }
+
 `;
 
 export default style;

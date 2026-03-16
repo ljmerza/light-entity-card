@@ -11,7 +11,9 @@ export default {
   brightness: true,
   color_temp: true,
   white_value: true,
+  warm_white_value: true,
   color_picker: true,
+  effects_list: true,
   speed: true,
   intensity: true,
 
@@ -22,6 +24,7 @@ export default {
 
   brightness_icon: 'weather-sunny',
   white_icon: 'file-word-box',
+  warm_white_icon: 'weather-sunset',
   temperature_icon: 'thermometer',
   speed_icon: 'speedometer',
   intensity_icon: 'transit-connection-horizontal',

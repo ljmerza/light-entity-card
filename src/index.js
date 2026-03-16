@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import iro from '@jaames/iro';
+
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 
 import style from './style';
@@ -24,7 +24,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         globalElementLoader('ha-icon'),
         globalElementLoader('state-badge'),
         globalElementLoader('ha-slider'),
-        globalElementLoader('ha-color-picker'),
+        globalElementLoader('ha-hs-color-picker'),
         globalElementLoader('ha-select'),
         globalElementLoader('mwc-list-item'),
       ],
@@ -36,58 +36,50 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     return {
       hass: {},
       config: {},
+      _colorPickerValues: { state: true },
     };
   }
 
   async firstUpdated() {
-    this.setColorWheels();
     this._firstUpdate = true;
-  }
-  
-  async updated() {
-    this.setColorWheels();
-  }
 
-  setColorWheels() {
-    if(!this._shownStateObjects) return;
+    // ha-hs-color-picker is lazy-loaded by HA (only when more-info dialog opens).
+    // Force it to load by opening a more-info dialog hidden via CSS, then closing it.
+    const needsColorPicker = this.config.color_picker !== false
+      && this.config.entity.startsWith('light.');
+    if (needsColorPicker && !customElements.get('ha-hs-color-picker')) {
+      const ha = document.querySelector('home-assistant');
+      if (ha) {
+        // Hide the dialog to prevent visible flash
+        const hideStyle = document.createElement('style');
+        hideStyle.textContent = 'ha-more-info-dialog { display: none !important; }';
+        ha.shadowRoot.appendChild(hideStyle);
 
-    const colorPickerWidth = this.getColorPickerWidth();
+        const ev = new CustomEvent('hass-more-info', {
+          detail: { entityId: this.config.entity },
+          bubbles: true, composed: true,
+        });
+        ha.dispatchEvent(ev);
 
-    for(const entity of this._shownStateObjects) {
-      const picker = this.renderRoot.getElementById(`picker-${entity.entity_id}`)
-      if(!picker) continue;
-      picker.innerHTML = '';
-
-      let color = { h: 0, s: 0, l: 50 }
-
-      if(entity.attributes.hs_color) {
-        const h = parseInt(entity.attributes.hs_color[0]);
-        const s = parseInt(entity.attributes.hs_color[1]);
-        color = { h, s, l: 50 }
+        try {
+          await Promise.race([
+            customElements.whenDefined('ha-hs-color-picker'),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+          ]);
+        } catch (e) {
+          // Timed out — color picker element not available, continue gracefully
+        } finally {
+          // Always close the hidden dialog and remove the style
+          const closeEv = new CustomEvent('hass-more-info', {
+            detail: { entityId: '' },
+            bubbles: true, composed: true,
+          });
+          ha.dispatchEvent(closeEv);
+          hideStyle.remove();
+        }
       }
-
-      const colorPicker = new iro.ColorPicker(picker, {
-        sliderSize: 0,
-        color,
-        width: colorPickerWidth,
-        wheelLightness: false,
-      })
-
-      colorPicker.on("input:end", color => this.setColorPicker(color.hsl, entity));
+      this.requestUpdate();
     }
-  }
-
-  getColorPickerWidth() {
-    const elem = this.shadowRoot.querySelector('.light-entity-card');
-
-    const width = elem.offsetWidth;
-    const shorten = this.config.shorten_cards;
-
-    const calcWidth = width - (shorten ? 100: 50);
-    const maxWidth = shorten ? 200 : 300;
-    const realWidth = maxWidth > calcWidth ? calcWidth : maxWidth
-
-    return realWidth;
   }
 
   /**
@@ -157,7 +149,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       cardLength *= 0.8;
     }
 
-    return parseInt(cardLength, 1);
+    return parseInt(cardLength, 10);
   }
 
   /**
@@ -182,9 +174,6 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     return style;
   }
 
-  get language() {
-    return this.__hass.resources[this.__hass.language];
-  }
 
   /**
    * check if the given entity is on or off
@@ -229,10 +218,6 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       this.config.child_card ? ' light-entity-child-card' : ''
     }`;
 
-    setTimeout(() => {
-      this.setColorWheels();
-    }, 100)
-
     return html`
       <style>
         ${this.styles}
@@ -269,6 +254,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         ${this.createBrightnessSlider(stateObj)} ${this.createSpeedSlider(stateObj)}
         ${this.createIntensitySlider(stateObj)} ${this.createColorTemperature(stateObj)}
         ${this.createWhiteValue(stateObj)}
+        ${this.createWarmWhiteValue(stateObj)}
       </div>
       ${this.createColorPicker(stateObj)} ${this.createEffectList(stateObj)}
     `;
@@ -360,7 +346,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {TemplateResult}
    */
   createIntensitySlider(stateObj) {
-    if (this.config.speed === false) return html``;
+    if (this.config.intensity === false) return html``;
     if (this.dontShowFeature('intensity', stateObj)) return html``;
 
     return html`
@@ -388,7 +374,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    */
   showPercent(value, min, max) {
     if (!this.config.show_slider_percent) return html``;
-    let percent = parseInt(((value - min) * 100) / (max - min), 0);
+    let percent = parseInt(((value - min) * 100) / (max - min), 10);
     if (isNaN(percent)) percent = 0;
 
     return html` <div class="percent-slider">${percent}%</div> `;
@@ -403,12 +389,31 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     if (this.config.color_temp === false) return html``;
     if (this.dontShowFeature('colorTemp', stateObj)) return html``;
 
-    const percent = this.showPercent(
-      stateObj.attributes.color_temp,
-      stateObj.attributes.min_mireds - 1,
-      // eslint-disable-next-line comma-dangle
-      stateObj.attributes.max_mireds - 1
-    );
+    // HA 2026.3+ uses kelvin-based attributes; fall back to mireds for older HA
+    const usesKelvin = stateObj.attributes.min_color_temp_kelvin !== undefined;
+
+    // Slider always works in mireds (cool→warm, left→right matches CSS gradient).
+    // For kelvin entities, convert to mireds; note min/max invert.
+    let currentTemp, minTemp, maxTemp;
+    if (usesKelvin) {
+      const kelvin = stateObj.attributes.color_temp_kelvin;
+      const minK = stateObj.attributes.min_color_temp_kelvin;
+      const maxK = stateObj.attributes.max_color_temp_kelvin;
+      if (!minK || !maxK) return html``;
+      currentTemp = (typeof kelvin === 'number' && Number.isFinite(kelvin) && kelvin > 0)
+        ? Math.round(1000000 / kelvin) : null;
+      minTemp = Math.round(1000000 / maxK);
+      maxTemp = Math.round(1000000 / minK);
+    } else {
+      currentTemp = stateObj.attributes.color_temp;
+      minTemp = stateObj.attributes.min_mireds;
+      maxTemp = stateObj.attributes.max_mireds;
+    }
+
+    // When not in color_temp mode (e.g. hs mode), currentTemp is null — fall back to midpoint
+    const midpoint = (minTemp != null && maxTemp != null) ? Math.round((minTemp + maxTemp) / 2) : 0;
+    const sliderValue = currentTemp || midpoint;
+    const percent = this.showPercent(sliderValue, minTemp, maxTemp);
 
     return html`
       <div class="control light-entity-card-center">
@@ -417,10 +422,10 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         </div>
         <ha-slider
           class="light-entity-card-color_temp"
-          min="${stateObj.attributes.min_mireds}"
-          max="${stateObj.attributes.max_mireds}"
-          .value=${stateObj.attributes.color_temp || 0}
-          @change="${event => this._setValue(event, stateObj, 'color_temp')}"
+          min="${minTemp}"
+          max="${maxTemp}"
+          .value=${sliderValue}
+          @change="${event => this._setColorTemp(event, stateObj, usesKelvin)}"
         >
         </ha-slider>
         ${percent}
@@ -429,13 +434,38 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   /**
+   * gets the current white value from entity state
+   * supports modern rgbw_color/rgbww_color and legacy white_value
+   * @param {LightEntity} stateObj
+   * @param {number} index - index in the color tuple (3 for white/cool white, 4 for warm white)
+   * @return {number}
+   */
+  getWhiteValue(stateObj, index = 3) {
+    const rgbwColor = stateObj.attributes.rgbw_color;
+    const rgbwwColor = stateObj.attributes.rgbww_color;
+
+    if (rgbwColor && index === 3) return rgbwColor[3] || 0;
+    if (rgbwwColor && index < rgbwwColor.length) return rgbwwColor[index] || 0;
+
+    // Legacy fallback
+    if (index === 3 && stateObj.attributes.white_value !== undefined) {
+      return stateObj.attributes.white_value ?? 0;
+    }
+
+    return 0;
+  }
+
+  /**
    * creates white value slider for a given entity
+   * supports modern RGBW/RGBWW color modes and legacy white_value
    * @param {LightEntity} stateObj
    * @return {TemplateResult}
    */
   createWhiteValue(stateObj) {
     if (this.config.white_value === false) return html``;
     if (this.dontShowFeature('whiteValue', stateObj)) return html``;
+
+    const whiteValue = this.getWhiteValue(stateObj, 3);
 
     return html`
       <div class="control light-entity-card-center">
@@ -444,13 +474,77 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         </div>
         <ha-slider
           max="255"
-          .value="${stateObj.attributes.white_value || 0}"
-          @change="${event => this._setValue(event, stateObj, 'white_value')}"
+          .value="${whiteValue}"
+          @change="${event => this._setWhiteValue(event, stateObj, 3)}"
         >
         </ha-slider>
-        ${this.showPercent(stateObj.attributes.white_value, 0, 254)}
+        ${this.showPercent(whiteValue, 0, 254)}
       </div>
     `;
+  }
+
+  /**
+   * creates warm white value slider for RGBWW entities
+   * @param {LightEntity} stateObj
+   * @return {TemplateResult}
+   */
+  createWarmWhiteValue(stateObj) {
+    if (this.config.warm_white_value === false) return html``;
+    if (this.dontShowFeature('warmWhiteValue', stateObj)) return html``;
+
+    const warmWhiteValue = this.getWhiteValue(stateObj, 4);
+
+    return html`
+      <div class="control light-entity-card-center">
+        <div class="icon-container">
+          <ha-icon icon="hass:${this.config.warm_white_icon}"></ha-icon>
+        </div>
+        <ha-slider
+          max="255"
+          .value="${warmWhiteValue}"
+          @change="${event => this._setWhiteValue(event, stateObj, 4)}"
+        >
+        </ha-slider>
+        ${this.showPercent(warmWhiteValue, 0, 254)}
+      </div>
+    `;
+  }
+
+  /**
+   * sets the white value for RGBW/RGBWW lights using modern color mode API
+   * falls back to legacy white_value for older HA installations
+   * @param {CustomEvent} event
+   * @param {LightEntity} stateObj
+   * @param {number} index - 3 for white/cool white, 4 for warm white
+   */
+  _setWhiteValue(event, stateObj, index) {
+    const newValue = parseInt(event.target.value, 10);
+    if (isNaN(newValue)) return;
+
+    const colorModes = stateObj.attributes.supported_color_modes || [];
+    const rgbwColor = stateObj.attributes.rgbw_color;
+    const rgbwwColor = stateObj.attributes.rgbww_color;
+
+    if (colorModes.includes('rgbw') && index === 3) {
+      const rgb = rgbwColor ? rgbwColor.slice(0, 3) : (stateObj.attributes.rgb_color || [255, 255, 255]);
+      this.callEntityService({ rgbw_color: [rgb[0], rgb[1], rgb[2], newValue] }, stateObj);
+    } else if (colorModes.includes('rgbww')) {
+      let base;
+      if (rgbwwColor) {
+        base = rgbwwColor;
+      } else if (rgbwColor) {
+        base = [rgbwColor[0], rgbwColor[1], rgbwColor[2], rgbwColor[3], 0];
+      } else {
+        const rgb = stateObj.attributes.rgb_color || [255, 255, 255];
+        base = [rgb[0], rgb[1], rgb[2], 0, 0];
+      }
+      const newColor = [...base];
+      newColor[index] = newValue;
+      this.callEntityService({ rgbww_color: newColor }, stateObj);
+    } else {
+      // Legacy fallback
+      this.callEntityService({ white_value: newValue }, stateObj);
+    }
   }
 
   /**
@@ -481,7 +575,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     }
 
     const listItems = effect_list.map(effect => this.createListItem(stateObj, effect));
-    const caption = this.language['ui.card.light.effect'];
+    const caption = this.hass.localize('ui.card.light.effect') || 'Effect';
 
     return html`
       <div class="control light-entity-card-center light-entity-card-effectlist">
@@ -511,12 +605,20 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     if (this.config.color_picker === false) return html``;
     if (this.dontShowFeature('color', stateObj)) return html``;
 
+    // ha-hs-color-picker uses saturation 0-1, HA uses 0-100
+    const haHs = stateObj.attributes.hs_color || [0, 0];
+    const pickerValue = (this._colorPickerValues && this._colorPickerValues[stateObj.entity_id])
+      || [haHs[0], haHs[1] / 100];
+
     return html`
       <div class="light-entity-card__color-picker">
-        <div id="picker-${stateObj.entity_id}"></div>
+        <ha-hs-color-picker
+          .value=${pickerValue}
+          @cursor-moved=${(e) => { this._colorPickerValues = { ...this._colorPickerValues, [stateObj.entity_id]: e.detail.value }; }}
+          @value-changed=${(e) => this._onColorPickerChanged(e.detail.value, stateObj)}
+        ></ha-hs-color-picker>
       </div>
     `;
-    
   }
 
   /**
@@ -530,8 +632,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     if (this.config.force_features) return false;
 
     // WLED support
-    if (featureName === 'speed' && 'speed' in stateObj.attributes) return true;
-    if (featureName === 'intensity' && 'intensity' in stateObj.attributes) return true;
+    if (featureName === 'speed' && 'speed' in stateObj.attributes) return false;
+    if (featureName === 'intensity' && 'intensity' in stateObj.attributes) return false;
 
     // old deprecated way to seeing if supported feature
     let featureSupported = LightEntityCard.featureNames[featureName] & stateObj.attributes.supported_features;
@@ -558,15 +660,23 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         case 'effectList':
           featureSupported = stateObj.attributes.effect_list && stateObj.attributes.effect_list.length;
           break;
-        case 'color':
-          if (!featureSupported) {
-            const supportedModes = ['hs', 'rgb', 'rgbw', 'rgbww', 'xy'];
-            featureSupported = [...new Set(colorModes.filter(mode => supportedModes.includes(mode)))].length > 0;
-          }
+        case 'color': {
+          const supportedModes = ['hs', 'rgb', 'rgbw', 'rgbww', 'xy'];
+          featureSupported = [...new Set(colorModes.filter(mode => supportedModes.includes(mode)))].length > 0;
           break;
+        }
         case 'whiteValue':
           featureSupported = Object.prototype.hasOwnProperty.call(stateObj.attributes, 'white_value');
+          if (!featureSupported) {
+            const supportedModes = ['rgbw', 'rgbww'];
+            featureSupported = colorModes.some(mode => supportedModes.includes(mode));
+          }
           break;
+        case 'warmWhiteValue': {
+          const supportedModes = ['rgbww'];
+          featureSupported = colorModes.some(mode => supportedModes.includes(mode));
+          break;
+        }
         default:
           featureSupported = false;
           break;
@@ -575,22 +685,53 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     if (!featureSupported) return true;
     if (!this.config.persist_features && !this.isEntityOn(stateObj)) return true;
+    return false;
   }
 
   /**
    * change to hs color for a given entity
-   * @param {HSL} hsl
+   * @param {HSV} hsv
    * @param {LightEntity} stateObj
    */
-  setColorPicker(hsl, stateObj) {
-    this.callEntityService({ hs_color: [hsl.h, hsl.s] }, stateObj);
+  _onColorPickerChanged(value, stateObj) {
+    if (this._colorPickerValues) {
+      const { [stateObj.entity_id]: _, ...rest } = this._colorPickerValues;
+      this._colorPickerValues = rest;
+    }
+    this.setColorPicker(value, stateObj);
+  }
+
+  setColorPicker(value, stateObj) {
+    if (!value) return;
+    // Convert saturation back from 0-1 to 0-100 for HA
+    this.callEntityService({ hs_color: [value[0], value[1] * 100] }, stateObj);
   }
 
   _setValue(event, stateObj, valueName) {
-    const newValue = parseInt(event.target.value, 0);
-    if (isNaN(newValue) || parseInt(stateObj.attributes[valueName], 0) === newValue) return;
+    const newValue = parseInt(event.target.value, 10);
+    if (isNaN(newValue) || parseInt(stateObj.attributes[valueName], 10) === newValue) return;
 
     this.callEntityService({ [valueName]: newValue }, stateObj);
+  }
+
+  /**
+   * handles color temperature slider changes, converting mireds↔kelvin as needed
+   * @param {CustomEvent} event
+   * @param {LightEntity} stateObj
+   * @param {boolean} usesKelvin
+   */
+  _setColorTemp(event, stateObj, usesKelvin) {
+    const miredValue = parseInt(event.target.value, 10);
+    if (isNaN(miredValue)) return;
+
+    if (usesKelvin) {
+      const kelvinValue = Math.round(1000000 / miredValue);
+      if (kelvinValue === parseInt(stateObj.attributes.color_temp_kelvin, 10)) return;
+      this.callEntityService({ color_temp_kelvin: kelvinValue }, stateObj);
+    } else {
+      if (miredValue === parseInt(stateObj.attributes.color_temp, 10)) return;
+      this.callEntityService({ color_temp: miredValue }, stateObj);
+    }
   }
 
   /**
