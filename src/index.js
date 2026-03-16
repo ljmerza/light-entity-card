@@ -62,7 +62,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
       const hsColor = entity.attributes.hs_color;
       const hsKey = hsColor ? `${hsColor[0]},${hsColor[1]}` : '';
-      if(this._lastHsColors.get(entity.entity_id) === hsKey) continue;
+      if(this._lastHsColors.get(entity.entity_id) === hsKey && picker.hasChildNodes()) continue;
       this._lastHsColors.set(entity.entity_id, hsKey);
 
       picker.innerHTML = '';
