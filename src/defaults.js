@@ -6,7 +6,6 @@ export default {
   show_header_icon: false,
   header: '',
 
-  color_wheel: true,
   persist_features: false,
   brightness: true,
   color_temp: true,
@@ -21,6 +20,8 @@ export default {
 
   show_slider_percent: false,
   full_width_sliders: false,
+  color_temp_in_kelvin: false,
+  transition: 0,
 
   brightness_icon: 'weather-sunny',
   white_icon: 'file-word-box',

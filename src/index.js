@@ -301,7 +301,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="Brightness">
           <ha-icon icon="hass:${this.config.brightness_icon}"></ha-icon>
         </div>
         <ha-slider
@@ -310,7 +310,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
           min="1"
           max="255"
         ></ha-slider>
-        ${this.showPercent(stateObj.attributes.brightness, 0, 254)}
+        ${this.showPercent(stateObj.attributes.brightness, 0, 254, 'brightness')}
       </div>
     `;
   }
@@ -326,7 +326,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="Speed">
           <ha-icon icon="hass:${this.config.speed_icon}"></ha-icon>
         </div>
         <ha-slider
@@ -351,7 +351,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="Intensity">
           <ha-icon icon="hass:${this.config.intensity_icon}"></ha-icon>
         </div>
         <ha-slider
@@ -366,14 +366,30 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   /**
-   * shows slider percent if config is set
+   * shows slider value label if config is set
    * @param {number} value
    * @param {number} min
    * @param {number} max
+   * @param {string} [sliderType] - 'brightness' or 'color_temp' for per-slider overrides
    * @return {TemplateResult}
    */
-  showPercent(value, min, max) {
-    if (!this.config.show_slider_percent) return html``;
+  showPercent(value, min, max, sliderType) {
+    // Per-slider visibility overrides
+    if (sliderType === 'brightness' && this.config.show_brightness_percent !== undefined) {
+      if (!this.config.show_brightness_percent) return html``;
+    } else if (sliderType === 'color_temp' && this.config.show_color_temp_percent !== undefined) {
+      if (!this.config.show_color_temp_percent) return html``;
+    } else if (sliderType === 'color_temp' && this.config.color_temp_in_kelvin) {
+      // color_temp_in_kelvin implies showing the value label
+    } else if (!this.config.show_slider_percent) {
+      return html``;
+    }
+
+    // Show kelvin for color temp if configured (slider value is already in kelvin)
+    if (sliderType === 'color_temp' && this.config.color_temp_in_kelvin) {
+      return html` <div class="percent-slider">${value}K</div> `;
+    }
+
     let percent = parseInt(((value - min) * 100) / (max - min), 10);
     if (isNaN(percent)) percent = 0;
 
@@ -391,44 +407,90 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     // HA 2026.3+ uses kelvin-based attributes; fall back to mireds for older HA
     const usesKelvin = stateObj.attributes.min_color_temp_kelvin !== undefined;
+    const showInKelvin = this.config.color_temp_in_kelvin;
 
-    // Slider always works in mireds (cool→warm, left→right matches CSS gradient).
-    // For kelvin entities, convert to mireds; note min/max invert.
     let currentTemp, minTemp, maxTemp;
+    if (showInKelvin) {
+      // Slider works in kelvin so the native popup shows kelvin values.
+      // Kelvin: low=warm, high=cool — slider left=warm, right=cool.
+      let minK, maxK, kelvin;
+      if (usesKelvin) {
+        kelvin = stateObj.attributes.color_temp_kelvin;
+        minK = stateObj.attributes.min_color_temp_kelvin;
+        maxK = stateObj.attributes.max_color_temp_kelvin;
+      } else {
+        kelvin = stateObj.attributes.color_temp
+          ? Math.round(1000000 / stateObj.attributes.color_temp) : null;
+        minK = stateObj.attributes.max_mireds
+          ? Math.round(1000000 / stateObj.attributes.max_mireds) : null;
+        maxK = stateObj.attributes.min_mireds
+          ? Math.round(1000000 / stateObj.attributes.min_mireds) : null;
+      }
+      if (!minK || !maxK) return html``;
+      const midpoint = Math.round((minK + maxK) / 2);
+      currentTemp = (typeof kelvin === 'number' && Number.isFinite(kelvin) && kelvin > 0)
+        ? kelvin : null;
+      minTemp = minK;
+      maxTemp = maxK;
+      const sliderValue = currentTemp || midpoint;
+      const label = this.showPercent(sliderValue, minTemp, maxTemp, 'color_temp');
+
+      return html`
+        <div class="control light-entity-card-center">
+          <div class="icon-container" title="Color Temperature">
+            <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
+          </div>
+          <ha-slider
+            class="light-entity-card-color_temp light-entity-card-color_temp--kelvin"
+            min="${minTemp}"
+            max="${maxTemp}"
+            .value=${sliderValue}
+            @change="${event => this._setColorTemp(event, stateObj, usesKelvin, true)}"
+          >
+          </ha-slider>
+          ${label}
+        </div>
+      `;
+    }
+
+    // Compute mired range for percentage-based slider.
+    // Slider works in 0–100 so the native popup shows a percentage value.
+    let minMired, maxMired, currentMired;
     if (usesKelvin) {
       const kelvin = stateObj.attributes.color_temp_kelvin;
       const minK = stateObj.attributes.min_color_temp_kelvin;
       const maxK = stateObj.attributes.max_color_temp_kelvin;
       if (!minK || !maxK) return html``;
-      currentTemp = (typeof kelvin === 'number' && Number.isFinite(kelvin) && kelvin > 0)
+      currentMired = (typeof kelvin === 'number' && Number.isFinite(kelvin) && kelvin > 0)
         ? Math.round(1000000 / kelvin) : null;
-      minTemp = Math.round(1000000 / maxK);
-      maxTemp = Math.round(1000000 / minK);
+      minMired = Math.round(1000000 / maxK);
+      maxMired = Math.round(1000000 / minK);
     } else {
-      currentTemp = stateObj.attributes.color_temp;
-      minTemp = stateObj.attributes.min_mireds;
-      maxTemp = stateObj.attributes.max_mireds;
+      currentMired = stateObj.attributes.color_temp;
+      minMired = stateObj.attributes.min_mireds;
+      maxMired = stateObj.attributes.max_mireds;
+      if (!minMired || !maxMired) return html``;
     }
 
-    // When not in color_temp mode (e.g. hs mode), currentTemp is null — fall back to midpoint
-    const midpoint = (minTemp != null && maxTemp != null) ? Math.round((minTemp + maxTemp) / 2) : 0;
-    const sliderValue = currentTemp || midpoint;
-    const percent = this.showPercent(sliderValue, minTemp, maxTemp);
+    const miredRange = (maxMired && minMired) ? maxMired - minMired : 0;
+    const percentValue = (miredRange > 0 && currentMired != null)
+      ? Math.round(((currentMired - minMired) / miredRange) * 100) : 50;
+    const label = this.showPercent(percentValue, 0, 100, 'color_temp');
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="Color Temperature">
           <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
         </div>
         <ha-slider
           class="light-entity-card-color_temp"
-          min="${minTemp}"
-          max="${maxTemp}"
-          .value=${sliderValue}
-          @change="${event => this._setColorTemp(event, stateObj, usesKelvin)}"
+          min="0"
+          max="100"
+          .value=${percentValue}
+          @change="${event => this._setColorTemp(event, stateObj, usesKelvin, false, minMired, maxMired)}"
         >
         </ha-slider>
-        ${percent}
+        ${label}
       </div>
     `;
   }
@@ -469,7 +531,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="White">
           <ha-icon icon="hass:${this.config.white_icon}"></ha-icon>
         </div>
         <ha-slider
@@ -496,7 +558,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="Warm White">
           <ha-icon icon="hass:${this.config.warm_white_icon}"></ha-icon>
         </div>
         <ha-slider
@@ -715,22 +777,40 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   /**
-   * handles color temperature slider changes, converting mireds↔kelvin as needed
+   * handles color temperature slider changes, converting to the correct unit for HA
    * @param {CustomEvent} event
    * @param {LightEntity} stateObj
-   * @param {boolean} usesKelvin
+   * @param {boolean} usesKelvin - whether the HA entity uses kelvin-based attributes
+   * @param {boolean} sliderInKelvin - whether the slider value is in kelvin
+   * @param {number} [minMired] - min mired value (needed for percentage→mired conversion)
+   * @param {number} [maxMired] - max mired value (needed for percentage→mired conversion)
    */
-  _setColorTemp(event, stateObj, usesKelvin) {
-    const miredValue = parseInt(event.target.value, 10);
-    if (isNaN(miredValue)) return;
+  _setColorTemp(event, stateObj, usesKelvin, sliderInKelvin, minMired, maxMired) {
+    const rawValue = parseInt(event.target.value, 10);
+    if (isNaN(rawValue)) return;
 
-    if (usesKelvin) {
-      const kelvinValue = Math.round(1000000 / miredValue);
-      if (kelvinValue === parseInt(stateObj.attributes.color_temp_kelvin, 10)) return;
-      this.callEntityService({ color_temp_kelvin: kelvinValue }, stateObj);
+    if (sliderInKelvin) {
+      // Slider value is kelvin
+      if (usesKelvin) {
+        if (rawValue === parseInt(stateObj.attributes.color_temp_kelvin, 10)) return;
+        this.callEntityService({ color_temp_kelvin: rawValue }, stateObj);
+      } else {
+        const miredValue = Math.round(1000000 / rawValue);
+        if (miredValue === parseInt(stateObj.attributes.color_temp, 10)) return;
+        this.callEntityService({ color_temp: miredValue }, stateObj);
+      }
     } else {
-      if (miredValue === parseInt(stateObj.attributes.color_temp, 10)) return;
-      this.callEntityService({ color_temp: miredValue }, stateObj);
+      // Slider value is percentage (0–100), convert back to mireds
+      if (!Number.isFinite(minMired) || !Number.isFinite(maxMired) || maxMired <= minMired) return;
+      const miredValue = Math.round(minMired + (rawValue / 100) * (maxMired - minMired));
+      if (usesKelvin) {
+        const kelvinValue = Math.round(1000000 / miredValue);
+        if (kelvinValue === parseInt(stateObj.attributes.color_temp_kelvin, 10)) return;
+        this.callEntityService({ color_temp_kelvin: kelvinValue }, stateObj);
+      } else {
+        if (miredValue === parseInt(stateObj.attributes.color_temp, 10)) return;
+        this.callEntityService({ color_temp: miredValue }, stateObj);
+      }
     }
   }
 
@@ -762,9 +842,14 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    */
   callEntityService(payload, stateObj, state) {
     if(!this._firstUpdate) return;
-    
+
     let entityType = stateObj.entity_id.split('.')[0];
     if (entityType === 'group') entityType = 'homeassistant';
+
+    const transition = parseFloat(this.config.transition) || 0;
+    if (transition > 0 && entityType === 'light') {
+      payload = { ...payload, transition };
+    }
 
     this.hass.callService(entityType, state || LightEntityCard.cmdToggle.on, {
       entity_id: stateObj.entity_id,

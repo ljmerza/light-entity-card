@@ -65,7 +65,12 @@ const style = css`
   }
   
   .light-entity-card-color_temp {
-    background-image: var(--ha-slider-background);
+    background-image: var(--ha-slider-background, linear-gradient(to right, #a6d1ff, #ffb74d));
+    border-radius: 4px;
+  }
+
+  .light-entity-card-color_temp--kelvin {
+    background-image: var(--ha-slider-background, linear-gradient(to right, #ffb74d, #a6d1ff));
   }
 
   .light-entity-card-effectlist {
