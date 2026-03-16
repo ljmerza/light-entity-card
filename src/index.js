@@ -469,6 +469,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       currentMired = stateObj.attributes.color_temp;
       minMired = stateObj.attributes.min_mireds;
       maxMired = stateObj.attributes.max_mireds;
+      if (!minMired || !maxMired) return html``;
     }
 
     const miredRange = (maxMired && minMired) ? maxMired - minMired : 0;
@@ -800,6 +801,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       }
     } else {
       // Slider value is percentage (0–100), convert back to mireds
+      if (!Number.isFinite(minMired) || !Number.isFinite(maxMired) || maxMired <= minMired) return;
       const miredValue = Math.round(minMired + (rawValue / 100) * (maxMired - minMired));
       if (usesKelvin) {
         const kelvinValue = Math.round(1000000 / miredValue);
@@ -845,7 +847,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     if (entityType === 'group') entityType = 'homeassistant';
 
     const transition = parseFloat(this.config.transition) || 0;
-    if (transition > 0) {
+    if (transition > 0 && entityType === 'light') {
       payload = { ...payload, transition };
     }
 
