@@ -301,7 +301,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="Brightness">
           <ha-icon icon="hass:${this.config.brightness_icon}"></ha-icon>
         </div>
         <ha-slider
@@ -326,7 +326,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="Speed">
           <ha-icon icon="hass:${this.config.speed_icon}"></ha-icon>
         </div>
         <ha-slider
@@ -351,7 +351,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="Intensity">
           <ha-icon icon="hass:${this.config.intensity_icon}"></ha-icon>
         </div>
         <ha-slider
@@ -437,7 +437,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
       return html`
         <div class="control light-entity-card-center">
-          <div class="icon-container">
+          <div class="icon-container" title="Color Temperature">
             <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
           </div>
           <ha-slider
@@ -478,7 +478,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="Color Temperature">
           <ha-icon icon="hass:${this.config.temperature_icon}"></ha-icon>
         </div>
         <ha-slider
@@ -530,7 +530,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="White">
           <ha-icon icon="hass:${this.config.white_icon}"></ha-icon>
         </div>
         <ha-slider
@@ -557,7 +557,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     return html`
       <div class="control light-entity-card-center">
-        <div class="icon-container">
+        <div class="icon-container" title="Warm White">
           <ha-icon icon="hass:${this.config.warm_white_icon}"></ha-icon>
         </div>
         <ha-slider
