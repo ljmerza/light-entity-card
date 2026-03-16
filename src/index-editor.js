@@ -55,7 +55,7 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
   }
 
   render() {
-    if (!this.hass) {
+    if (!this.hass || !this._config) {
       return html``;
     }
 

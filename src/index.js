@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import iro from '@jaames/iro';
+
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 
 import style from './style';
@@ -24,7 +24,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         globalElementLoader('ha-icon'),
         globalElementLoader('state-badge'),
         globalElementLoader('ha-slider'),
-        globalElementLoader('ha-color-picker'),
+        globalElementLoader('ha-hs-color-picker'),
         globalElementLoader('ha-select'),
         globalElementLoader('mwc-list-item'),
       ],
@@ -40,68 +40,32 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   async firstUpdated() {
-    this.setColorWheels();
     this._firstUpdate = true;
-  }
-  
-  async updated() {
-    this.setColorWheels();
-  }
 
-  setColorWheels() {
-    if(!this._shownStateObjects) return;
-    if(!this._lastHsColors) this._lastHsColors = new Map();
+    // ha-hs-color-picker is lazy-loaded by HA (only when more-info dialog opens).
+    // Force it to load by opening a more-info dialog hidden via CSS, then closing it.
+    if (!customElements.get('ha-hs-color-picker')) {
+      const ha = document.querySelector('home-assistant');
+      if (ha) {
+        // Hide the dialog to prevent visible flash
+        const hideStyle = document.createElement('style');
+        hideStyle.textContent = 'ha-more-info-dialog { display: none !important; }';
+        ha.shadowRoot.appendChild(hideStyle);
 
-    const colorPickerWidth = this.getColorPickerWidth();
+        const ev = new Event('hass-more-info', { bubbles: true, composed: true });
+        ev.detail = { entityId: this.config.entity };
+        ha.dispatchEvent(ev);
 
-    for(const entity of this._shownStateObjects) {
-      const picker = this.renderRoot.getElementById(`picker-${entity.entity_id}`)
-      if(!picker) continue;
+        await customElements.whenDefined('ha-hs-color-picker');
 
-      if(this._colorPickerInteracting) continue;
-
-      const hsColor = entity.attributes.hs_color;
-      const hsKey = hsColor ? `${hsColor[0]},${hsColor[1]}` : '';
-      if(this._lastHsColors.get(entity.entity_id) === hsKey && picker.hasChildNodes()) continue;
-      this._lastHsColors.set(entity.entity_id, hsKey);
-
-      picker.innerHTML = '';
-
-      let color = { h: 0, s: 0, v: 100 }
-
-      if(hsColor) {
-        const h = parseInt(hsColor[0], 10);
-        const s = parseInt(hsColor[1], 10);
-        color = { h, s, v: 100 }
+        // Close the hidden dialog and remove the style
+        const closeEv = new Event('hass-more-info', { bubbles: true, composed: true });
+        closeEv.detail = { entityId: '' };
+        ha.dispatchEvent(closeEv);
+        hideStyle.remove();
       }
-
-      const colorPicker = new iro.ColorPicker(picker, {
-        sliderSize: 0,
-        color,
-        width: colorPickerWidth,
-        wheelLightness: false,
-      })
-
-      colorPicker.on("input:start", () => { this._colorPickerInteracting = true; });
-      colorPicker.on("input:end", color => {
-        this._colorPickerInteracting = false;
-        this.setColorPicker(color.hsv, entity);
-      });
+      this.requestUpdate();
     }
-  }
-
-  getColorPickerWidth() {
-    const elem = this.shadowRoot.querySelector('.light-entity-card');
-    if (!elem) return 300;
-
-    const width = elem.offsetWidth;
-    const shorten = this.config.shorten_cards;
-
-    const calcWidth = width - (shorten ? 100: 50);
-    const maxWidth = shorten ? 200 : 300;
-    const realWidth = maxWidth > calcWidth ? calcWidth : maxWidth
-
-    return realWidth;
   }
 
   /**
@@ -196,9 +160,6 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     return style;
   }
 
-  get language() {
-    return this.__hass.resources[this.__hass.language];
-  }
 
   /**
    * check if the given entity is on or off
@@ -242,10 +203,6 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     const css = `light-entity-card ${this.config.shorten_cards ? ' group' : ''} ${
       this.config.child_card ? ' light-entity-child-card' : ''
     }`;
-
-    setTimeout(() => {
-      this.setColorWheels();
-    }, 100)
 
     return html`
       <style>
@@ -587,7 +544,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     }
 
     const listItems = effect_list.map(effect => this.createListItem(stateObj, effect));
-    const caption = this.language['ui.card.light.effect'];
+    const caption = this.hass.localize('ui.card.light.effect') || 'Effect';
 
     return html`
       <div class="control light-entity-card-center light-entity-card-effectlist">
@@ -617,12 +574,17 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     if (this.config.color_picker === false) return html``;
     if (this.dontShowFeature('color', stateObj)) return html``;
 
+    const hsColor = stateObj.attributes.hs_color || [0, 0];
+
     return html`
       <div class="light-entity-card__color-picker">
-        <div id="picker-${stateObj.entity_id}"></div>
+        <ha-hs-color-picker
+          .value=${hsColor}
+          @value-changed=${(e) => this.setColorPicker(e.detail.value, stateObj)}
+          @cursor-moved=${(e) => this.setColorPicker(e.detail.value, stateObj)}
+        ></ha-hs-color-picker>
       </div>
     `;
-    
   }
 
   /**
@@ -697,8 +659,9 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @param {HSV} hsv
    * @param {LightEntity} stateObj
    */
-  setColorPicker(hsv, stateObj) {
-    this.callEntityService({ hs_color: [hsv.h, hsv.s] }, stateObj);
+  setColorPicker(value, stateObj) {
+    if (!value) return;
+    this.callEntityService({ hs_color: [value[0], value[1]] }, stateObj);
   }
 
   _setValue(event, stateObj, valueName) {
