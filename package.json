@@ -16,8 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
-    "@jaames/iro": "^5.5.2",
-    "@lit-labs/scoped-registry-mixin": "^1.0.0",
+"@lit-labs/scoped-registry-mixin": "^1.0.0",
     "@material/mwc-icon": "^0.25.3",
     "@material/mwc-list": "^0.25.3",
     "@material/mwc-menu": "^0.25.3",

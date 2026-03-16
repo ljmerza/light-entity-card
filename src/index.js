@@ -36,6 +36,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     return {
       hass: {},
       config: {},
+      _colorPickerValue: { state: true },
     };
   }
 
@@ -56,13 +57,20 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         ev.detail = { entityId: this.config.entity };
         ha.dispatchEvent(ev);
 
-        await customElements.whenDefined('ha-hs-color-picker');
-
-        // Close the hidden dialog and remove the style
-        const closeEv = new Event('hass-more-info', { bubbles: true, composed: true });
-        closeEv.detail = { entityId: '' };
-        ha.dispatchEvent(closeEv);
-        hideStyle.remove();
+        try {
+          await Promise.race([
+            customElements.whenDefined('ha-hs-color-picker'),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+          ]);
+        } catch (e) {
+          // Timed out — color picker element not available, continue gracefully
+        } finally {
+          // Always close the hidden dialog and remove the style
+          const closeEv = new Event('hass-more-info', { bubbles: true, composed: true });
+          closeEv.detail = { entityId: '' };
+          ha.dispatchEvent(closeEv);
+          hideStyle.remove();
+        }
       }
       this.requestUpdate();
     }
@@ -380,15 +388,20 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     // Slider always works in mireds (cool→warm, left→right matches CSS gradient).
     // For kelvin entities, convert to mireds; note min/max invert.
-    const currentTemp = usesKelvin
-      ? Math.round(1000000 / stateObj.attributes.color_temp_kelvin)
-      : stateObj.attributes.color_temp;
-    const minTemp = usesKelvin
-      ? Math.round(1000000 / stateObj.attributes.max_color_temp_kelvin)
-      : stateObj.attributes.min_mireds;
-    const maxTemp = usesKelvin
-      ? Math.round(1000000 / stateObj.attributes.min_color_temp_kelvin)
-      : stateObj.attributes.max_mireds;
+    let currentTemp, minTemp, maxTemp;
+    if (usesKelvin) {
+      const kelvin = stateObj.attributes.color_temp_kelvin;
+      const minK = stateObj.attributes.min_color_temp_kelvin;
+      const maxK = stateObj.attributes.max_color_temp_kelvin;
+      if (!minK || !maxK) return html``;
+      currentTemp = kelvin ? Math.round(1000000 / kelvin) : null;
+      minTemp = Math.round(1000000 / maxK);
+      maxTemp = Math.round(1000000 / minK);
+    } else {
+      currentTemp = stateObj.attributes.color_temp;
+      minTemp = stateObj.attributes.min_mireds;
+      maxTemp = stateObj.attributes.max_mireds;
+    }
 
     const percent = this.showPercent(currentTemp, minTemp, maxTemp);
 
