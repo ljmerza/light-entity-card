@@ -67,12 +67,12 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
       picker.innerHTML = '';
 
-      let color = { h: 0, s: 0, l: 50 }
+      let color = { h: 0, s: 0, v: 100 }
 
       if(hsColor) {
         const h = parseInt(hsColor[0], 10);
         const s = parseInt(hsColor[1], 10);
-        color = { h, s, l: 50 }
+        color = { h, s, v: 100 }
       }
 
       const colorPicker = new iro.ColorPicker(picker, {
@@ -469,7 +469,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     // Legacy fallback
     if (index === 3 && stateObj.attributes.white_value !== undefined) {
-      return stateObj.attributes.white_value;
+      return stateObj.attributes.white_value ?? 0;
     }
 
     return 0;
@@ -546,10 +546,10 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     const rgbwwColor = stateObj.attributes.rgbww_color;
 
     if (colorModes.includes('rgbw') && index === 3) {
-      const base = rgbwColor || [0, 0, 0, 0];
-      this.callEntityService({ rgbw_color: [base[0], base[1], base[2], newValue] }, stateObj);
+      const rgb = rgbwColor ? rgbwColor.slice(0, 3) : (stateObj.attributes.rgb_color || [255, 255, 255]);
+      this.callEntityService({ rgbw_color: [rgb[0], rgb[1], rgb[2], newValue] }, stateObj);
     } else if (colorModes.includes('rgbww')) {
-      const base = rgbwwColor || [0, 0, 0, 0, 0];
+      const base = rgbwwColor || [...(stateObj.attributes.rgb_color || [255, 255, 255]), 0, 0];
       const newColor = [base[0], base[1], base[2], base[3], base[4]];
       newColor[index] = newValue;
       this.callEntityService({ rgbww_color: newColor }, stateObj);
