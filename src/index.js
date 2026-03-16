@@ -70,8 +70,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
       let color = { h: 0, s: 0, l: 50 }
 
       if(hsColor) {
-        const h = parseInt(hsColor[0]);
-        const s = parseInt(hsColor[1]);
+        const h = parseInt(hsColor[0], 10);
+        const s = parseInt(hsColor[1], 10);
         color = { h, s, l: 50 }
       }
 
@@ -374,7 +374,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {TemplateResult}
    */
   createIntensitySlider(stateObj) {
-    if (this.config.speed === false) return html``;
+    if (this.config.intensity === false) return html``;
     if (this.dontShowFeature('intensity', stateObj)) return html``;
 
     return html`
@@ -402,7 +402,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    */
   showPercent(value, min, max) {
     if (!this.config.show_slider_percent) return html``;
-    let percent = parseInt(((value - min) * 100) / (max - min), 0);
+    let percent = parseInt(((value - min) * 100) / (max - min), 10);
     if (isNaN(percent)) percent = 0;
 
     return html` <div class="percent-slider">${percent}%</div> `;
@@ -441,7 +441,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
           class="light-entity-card-color_temp"
           min="${minTemp}"
           max="${maxTemp}"
-          .value=${currentTemp || Math.round((minTemp + maxTemp) / 2)}
+          .value=${currentTemp || (minTemp != null && maxTemp != null ? Math.round((minTemp + maxTemp) / 2) : 0)}
           @change="${event => this._setValue(event, stateObj, serviceAttr)}"
         >
         </ha-slider>
@@ -596,11 +596,12 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     if (!featureSupported) return true;
     if (!this.config.persist_features && !this.isEntityOn(stateObj)) return true;
+    return false;
   }
 
   /**
    * change to hs color for a given entity
-   * @param {HSL} hsl
+   * @param {HSV} hsv
    * @param {LightEntity} stateObj
    */
   setColorPicker(hsv, stateObj) {
@@ -608,8 +609,8 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   _setValue(event, stateObj, valueName) {
-    const newValue = parseInt(event.target.value, 0);
-    if (isNaN(newValue) || parseInt(stateObj.attributes[valueName], 0) === newValue) return;
+    const newValue = parseInt(event.target.value, 10);
+    if (isNaN(newValue) || parseInt(stateObj.attributes[valueName], 10) === newValue) return;
 
     this.callEntityService({ [valueName]: newValue }, stateObj);
   }
