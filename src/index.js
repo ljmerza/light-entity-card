@@ -283,6 +283,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         ${this.createBrightnessSlider(stateObj)} ${this.createSpeedSlider(stateObj)}
         ${this.createIntensitySlider(stateObj)} ${this.createColorTemperature(stateObj)}
         ${this.createWhiteValue(stateObj)}
+        ${this.createWarmWhiteValue(stateObj)}
       </div>
       ${this.createColorPicker(stateObj)} ${this.createEffectList(stateObj)}
     `;
@@ -451,13 +452,38 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   /**
+   * gets the current white value from entity state
+   * supports modern rgbw_color/rgbww_color and legacy white_value
+   * @param {LightEntity} stateObj
+   * @param {number} index - index in the color tuple (3 for white/cool white, 4 for warm white)
+   * @return {number}
+   */
+  getWhiteValue(stateObj, index = 3) {
+    const rgbwColor = stateObj.attributes.rgbw_color;
+    const rgbwwColor = stateObj.attributes.rgbww_color;
+
+    if (rgbwColor && index === 3) return rgbwColor[3] || 0;
+    if (rgbwwColor && index < rgbwwColor.length) return rgbwwColor[index] || 0;
+
+    // Legacy fallback
+    if (index === 3 && stateObj.attributes.white_value !== undefined) {
+      return stateObj.attributes.white_value;
+    }
+
+    return 0;
+  }
+
+  /**
    * creates white value slider for a given entity
+   * supports modern RGBW/RGBWW color modes and legacy white_value
    * @param {LightEntity} stateObj
    * @return {TemplateResult}
    */
   createWhiteValue(stateObj) {
     if (this.config.white_value === false) return html``;
     if (this.dontShowFeature('whiteValue', stateObj)) return html``;
+
+    const whiteValue = this.getWhiteValue(stateObj, 3);
 
     return html`
       <div class="control light-entity-card-center">
@@ -466,13 +492,69 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         </div>
         <ha-slider
           max="255"
-          .value="${stateObj.attributes.white_value || 0}"
-          @change="${event => this._setValue(event, stateObj, 'white_value')}"
+          .value="${whiteValue}"
+          @change="${event => this._setWhiteValue(event, stateObj, 3)}"
         >
         </ha-slider>
-        ${this.showPercent(stateObj.attributes.white_value, 0, 254)}
+        ${this.showPercent(whiteValue, 0, 254)}
       </div>
     `;
+  }
+
+  /**
+   * creates warm white value slider for RGBWW entities
+   * @param {LightEntity} stateObj
+   * @return {TemplateResult}
+   */
+  createWarmWhiteValue(stateObj) {
+    if (this.config.warm_white_value === false) return html``;
+    if (this.dontShowFeature('warmWhiteValue', stateObj)) return html``;
+
+    const warmWhiteValue = this.getWhiteValue(stateObj, 4);
+
+    return html`
+      <div class="control light-entity-card-center">
+        <div class="icon-container">
+          <ha-icon icon="hass:${this.config.warm_white_icon}"></ha-icon>
+        </div>
+        <ha-slider
+          max="255"
+          .value="${warmWhiteValue}"
+          @change="${event => this._setWhiteValue(event, stateObj, 4)}"
+        >
+        </ha-slider>
+        ${this.showPercent(warmWhiteValue, 0, 254)}
+      </div>
+    `;
+  }
+
+  /**
+   * sets the white value for RGBW/RGBWW lights using modern color mode API
+   * falls back to legacy white_value for older HA installations
+   * @param {CustomEvent} event
+   * @param {LightEntity} stateObj
+   * @param {number} index - 3 for white/cool white, 4 for warm white
+   */
+  _setWhiteValue(event, stateObj, index) {
+    const newValue = parseInt(event.target.value, 10);
+    if (isNaN(newValue)) return;
+
+    const colorModes = stateObj.attributes.supported_color_modes || [];
+    const rgbwColor = stateObj.attributes.rgbw_color;
+    const rgbwwColor = stateObj.attributes.rgbww_color;
+
+    if (colorModes.includes('rgbw') && index === 3) {
+      const base = rgbwColor || [0, 0, 0, 0];
+      this.callEntityService({ rgbw_color: [base[0], base[1], base[2], newValue] }, stateObj);
+    } else if (colorModes.includes('rgbww')) {
+      const base = rgbwwColor || [0, 0, 0, 0, 0];
+      const newColor = [base[0], base[1], base[2], base[3], base[4]];
+      newColor[index] = newValue;
+      this.callEntityService({ rgbww_color: newColor }, stateObj);
+    } else {
+      // Legacy fallback
+      this.callEntityService({ white_value: newValue }, stateObj);
+    }
   }
 
   /**
@@ -587,7 +669,16 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
         }
         case 'whiteValue':
           featureSupported = Object.prototype.hasOwnProperty.call(stateObj.attributes, 'white_value');
+          if (!featureSupported) {
+            const supportedModes = ['rgbw', 'rgbww'];
+            featureSupported = colorModes.some(mode => supportedModes.includes(mode));
+          }
           break;
+        case 'warmWhiteValue': {
+          const supportedModes = ['rgbww'];
+          featureSupported = colorModes.some(mode => supportedModes.includes(mode));
+          break;
+        }
         default:
           featureSupported = false;
           break;
