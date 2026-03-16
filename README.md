@@ -29,7 +29,7 @@ For help, visit the light entity support thread [here](https://community.home-as
 
 Add through  [HACS](https://github.com/custom-components/hacs)
 
-Issues with the installation should be asked in the [Home Asssitant forums](https://community.home-assistant.io/t/light-entity-card/96146)
+Issues with the installation should be asked in the [Home Assistant forums](https://community.home-assistant.io/t/light-entity-card/96146)
 
 ## Configurations
 
