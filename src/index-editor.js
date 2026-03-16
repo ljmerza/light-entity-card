@@ -129,17 +129,17 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
             .configValue="${'temperature_icon'}"
             @changed="${this.configChanged}"
           ></ha-form-string>
+          <ha-form-string
+            .schema=${{ name: 'transition', type: 'string' }}
+            label="Transition (seconds)"
+            .data="${String(this._config.transition || '')}"
+            .configValue="${'transition'}"
+            @changed="${this.configChanged}"
+          ></ha-form-string>
         </div>
 
         <div class='overall-config'>
           <div class='checkbox-options'>
-            <ha-formfield label="Show Color Wheel">
-              <ha-checkbox
-                @change="${this.checkboxConfigChanged}" 
-                .checked=${this._config.color_wheel}
-                .value="${'color_wheel'}"
-              ></ha-checkbox>
-            </ha-formfield>
             <ha-formfield label="Shorten Cards">
               <ha-checkbox
                 @change="${this.checkboxConfigChanged}"
@@ -174,6 +174,16 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
                   .value="${'color_temp'}"
                 ></ha-checkbox>
               </ha-formfield>
+              <ha-formfield label="Color Temp in Kelvin">
+                <ha-checkbox
+                  @change="${this.checkboxConfigChanged}"
+                  .checked=${this._config.color_temp_in_kelvin}
+                  .value="${'color_temp_in_kelvin'}"
+                ></ha-checkbox>
+              </ha-formfield>
+            </div>
+
+            <div class='checkbox-options'>
               <ha-formfield label="Show White Channel">
                 <ha-checkbox
                   @change="${this.checkboxConfigChanged}"
@@ -240,6 +250,23 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
                   @change="${this.checkboxConfigChanged}"
                   .checked=${this._config.show_slider_percent}
                   .value="${'show_slider_percent'}"
+                ></ha-checkbox>
+              </ha-formfield>
+            </div>
+
+            <div class='checkbox-options'>
+              <ha-formfield label="Show Brightness %">
+                <ha-checkbox
+                  @change="${this.checkboxConfigChanged}"
+                  .checked=${this._config.show_brightness_percent}
+                  .value="${'show_brightness_percent'}"
+                ></ha-checkbox>
+              </ha-formfield>
+              <ha-formfield label="Show Color Temp %">
+                <ha-checkbox
+                  @change="${this.checkboxConfigChanged}"
+                  .checked=${this._config.show_color_temp_percent}
+                  .value="${'show_color_temp_percent'}"
                 ></ha-checkbox>
               </ha-formfield>
             </div>
