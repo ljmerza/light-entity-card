@@ -13,6 +13,7 @@ export default {
   white_value: true,
   warm_white_value: true,
   color_picker: true,
+  effects_list: true,
   speed: true,
   intensity: true,
 

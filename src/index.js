@@ -420,16 +420,18 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     // HA 2026.3+ uses kelvin-based attributes; fall back to mireds for older HA
     const usesKelvin = stateObj.attributes.min_color_temp_kelvin !== undefined;
+
+    // Slider always works in mireds (cool→warm, left→right matches CSS gradient).
+    // For kelvin entities, convert to mireds; note min/max invert.
     const currentTemp = usesKelvin
-      ? stateObj.attributes.color_temp_kelvin
+      ? Math.round(1000000 / stateObj.attributes.color_temp_kelvin)
       : stateObj.attributes.color_temp;
     const minTemp = usesKelvin
-      ? stateObj.attributes.min_color_temp_kelvin
+      ? Math.round(1000000 / stateObj.attributes.max_color_temp_kelvin)
       : stateObj.attributes.min_mireds;
     const maxTemp = usesKelvin
-      ? stateObj.attributes.max_color_temp_kelvin
+      ? Math.round(1000000 / stateObj.attributes.min_color_temp_kelvin)
       : stateObj.attributes.max_mireds;
-    const serviceAttr = usesKelvin ? 'color_temp_kelvin' : 'color_temp';
 
     const percent = this.showPercent(currentTemp, minTemp, maxTemp);
 
@@ -443,7 +445,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
           min="${minTemp}"
           max="${maxTemp}"
           .value=${currentTemp || (minTemp != null && maxTemp != null ? Math.round((minTemp + maxTemp) / 2) : 0)}
-          @change="${event => this._setValue(event, stateObj, serviceAttr)}"
+          @change="${event => this._setColorTemp(event, stateObj, usesKelvin)}"
         >
         </ha-slider>
         ${percent}
@@ -704,6 +706,26 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     if (isNaN(newValue) || parseInt(stateObj.attributes[valueName], 10) === newValue) return;
 
     this.callEntityService({ [valueName]: newValue }, stateObj);
+  }
+
+  /**
+   * handles color temperature slider changes, converting mireds↔kelvin as needed
+   * @param {CustomEvent} event
+   * @param {LightEntity} stateObj
+   * @param {boolean} usesKelvin
+   */
+  _setColorTemp(event, stateObj, usesKelvin) {
+    const miredValue = parseInt(event.target.value, 10);
+    if (isNaN(miredValue)) return;
+
+    if (usesKelvin) {
+      const kelvinValue = Math.round(1000000 / miredValue);
+      if (kelvinValue === parseInt(stateObj.attributes.color_temp_kelvin, 10)) return;
+      this.callEntityService({ color_temp_kelvin: kelvinValue }, stateObj);
+    } else {
+      if (miredValue === parseInt(stateObj.attributes.color_temp, 10)) return;
+      this.callEntityService({ color_temp: miredValue }, stateObj);
+    }
   }
 
   /**
