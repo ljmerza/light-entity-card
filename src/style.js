@@ -25,6 +25,8 @@ const style = css`
     justify-content: center;
     align-items: center;
     margin-left: 8px;
+    min-width: 40px;
+    text-align: right;
   }
 
   .light-entity-card__header {

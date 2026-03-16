@@ -574,14 +574,16 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
     if (this.config.color_picker === false) return html``;
     if (this.dontShowFeature('color', stateObj)) return html``;
 
-    const hsColor = stateObj.attributes.hs_color || [0, 0];
+    // ha-hs-color-picker uses saturation 0-1, HA uses 0-100
+    const haHs = stateObj.attributes.hs_color || [0, 0];
+    const pickerValue = this._colorPickerValue || [haHs[0], haHs[1] / 100];
 
     return html`
       <div class="light-entity-card__color-picker">
         <ha-hs-color-picker
-          .value=${hsColor}
-          @value-changed=${(e) => this.setColorPicker(e.detail.value, stateObj)}
-          @cursor-moved=${(e) => this.setColorPicker(e.detail.value, stateObj)}
+          .value=${pickerValue}
+          @cursor-moved=${(e) => { this._colorPickerValue = e.detail.value; }}
+          @value-changed=${(e) => this._onColorPickerChanged(e.detail.value, stateObj)}
         ></ha-hs-color-picker>
       </div>
     `;
@@ -659,9 +661,15 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @param {HSV} hsv
    * @param {LightEntity} stateObj
    */
+  _onColorPickerChanged(value, stateObj) {
+    this._colorPickerValue = null;
+    this.setColorPicker(value, stateObj);
+  }
+
   setColorPicker(value, stateObj) {
     if (!value) return;
-    this.callEntityService({ hs_color: [value[0], value[1]] }, stateObj);
+    // Convert saturation back from 0-1 to 0-100 for HA
+    this.callEntityService({ hs_color: [value[0], value[1] * 100] }, stateObj);
   }
 
   _setValue(event, stateObj, valueName) {
