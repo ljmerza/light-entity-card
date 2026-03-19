@@ -35,4 +35,18 @@ export default [
       "no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_", "caughtErrors": "none" }],
     },
   },
+  {
+    files: ["webpack/**/*.js", "babel.config.js", "rollup-plugins/**/*.js"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        module: "readonly",
+        require: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        exports: "writable",
+        process: "readonly",
+      },
+    },
+  },
 ];
