@@ -66,7 +66,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
             customElements.whenDefined('ha-hs-color-picker'),
             new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
           ]);
-        } catch (e) {
+        } catch {
           // Timed out — color picker element not available, continue gracefully
         } finally {
           // Always close the hidden dialog and remove the style
@@ -96,7 +96,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   }
 
   static async getConfigElement() {
-    // eslint-disable-next-line no-undef
+     
     return document.createElement(editorName);
   }
 
@@ -210,7 +210,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
 
     const templates = this._shownStateObjects.reduce(
       (htmlTemplate, stateObj) => html`${htmlTemplate}${this.createEntityTemplate(stateObj)}`,
-      // eslint-disable-next-line comma-dangle
+       
       ''
     );
 
@@ -757,7 +757,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    */
   _onColorPickerChanged(value, stateObj) {
     if (this._colorPickerValues) {
-      const { [stateObj.entity_id]: _, ...rest } = this._colorPickerValues;
+      const { [stateObj.entity_id]: _discarded, ...rest } = this._colorPickerValues;
       this._colorPickerValues = rest;
     }
     this.setColorPicker(value, stateObj);
