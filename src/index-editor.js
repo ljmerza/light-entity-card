@@ -69,8 +69,8 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
       }
     }
 
-    // eslint-disable-next-line arrow-body-style
-    // eslint-disable-next-line arrow-parens
+     
+     
     const options = this.entityOptions.map(entity => html`<mwc-list-item value="${entity}" ?selected=${entity === this._config.entity}>${entity}</mwc-list-item>`);
 
     return html`
