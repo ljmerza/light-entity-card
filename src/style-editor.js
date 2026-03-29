@@ -17,7 +17,7 @@ const style = css`
     display: flex;
   }
   
-  mwc-select {
+  ha-entity-picker {
     width: 100%;
   }
 

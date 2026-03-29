@@ -23,8 +23,7 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
       globalElementLoader('ha-checkbox'),
       globalElementLoader('ha-formfield'),
       globalElementLoader('ha-form-string'),
-      globalElementLoader('ha-select'),
-      globalElementLoader('mwc-list-item'),
+      globalElementLoader('ha-entity-picker'),
     ], LightEntityCardEditor);
   }
 
@@ -43,11 +42,8 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
     };
   }
 
-  get entityOptions() {
-    const allEntities = Object.keys(this.hass.states).filter(eid => ['switch', 'light', 'group'].includes(eid.substr(0, eid.indexOf('.'))));
-
-    allEntities.sort();
-    return allEntities;
+  get entityDomains() {
+    return ['switch', 'light', 'group'];
   }
 
   firstUpdated() {
@@ -69,10 +65,6 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
       }
     }
 
-    // eslint-disable-next-line arrow-body-style
-    // eslint-disable-next-line arrow-parens
-    const options = this.entityOptions.map(entity => html`<mwc-list-item value="${entity}" ?selected=${entity === this._config.entity}>${entity}</mwc-list-item>`);
-
     return html`
       <div class="card-config">
 
@@ -87,14 +79,14 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
         </div>
 
         <div class='entities'>
-          <ha-select
+          <ha-entity-picker
+            .hass=${this.hass}
+            .value=${this._config.entity}
+            .includeDomains=${this.entityDomains}
             label="Entity"
-            @selected="${this.configChanged}" 
-            @closed="${e => e.stopPropagation()}" 
-            .configValue="${'entity'}"
-          >
-            ${options}
-          </ha-select>
+            @value-changed=${this.entityChanged}
+            allow-custom-entity
+          ></ha-entity-picker>
           <ha-form-string
             .schema=${{ name: 'brightness_icon', type: 'string' }}
             label="Brightness Icon"
@@ -317,6 +309,14 @@ export default class LightEntityCardEditor extends ScopedRegistryHost(LitElement
           </div>
       </div>
     `;
+  }
+
+  entityChanged(ev) {
+    if (!this._config || !this.hass || !this._firstRendered) return;
+    const entity = ev.detail.value;
+    if (entity === this._config.entity) return;
+    this._config = { ...this._config, entity };
+    fireEvent(this, 'config-changed', { config: this._config });
   }
 
   configChanged(ev) {
