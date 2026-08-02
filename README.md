@@ -89,9 +89,9 @@ group: true
 
 ---
 
-Enjoy my card? Help me out for a couple of :beers: or a :coffee:!
+Enjoy my work? Help me out for a couple of :beers: or a :coffee:!
 
-[![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/JMISm06AD)
+<a href="https://www.buymeacoffee.com/JMISm06AD"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
 [commits-shield]: https://img.shields.io/github/commit-activity/y/ljmerza/light-entity-card.svg?style=for-the-badge
 [commits]: https://github.com/ljmerza/light-entity-card/commits/master
