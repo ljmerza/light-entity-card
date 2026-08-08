@@ -1,5 +1,18 @@
 # Light Entity Card
 
+<p align="center">
+<img src="https://img.shields.io/github/stars/ljmerza/light-entity-card?style=for-the-badge&label=Stars&color=orange" alt="Stars">
+<a href="https://github.com/ljmerza/light-entity-card/releases"><img src="https://img.shields.io/github/downloads/ljmerza/light-entity-card/total?style=for-the-badge&label=Downloads&color=blue" alt="Downloads"></a>
+<a href="https://github.com/ljmerza/light-entity-card/releases/latest"><img src="https://img.shields.io/github/v/release/ljmerza/light-entity-card?style=for-the-badge&color=purple" alt="Version"></a>
+<a href="https://github.com/ljmerza/light-entity-card/actions/workflows/deploy.yaml"><img src="https://img.shields.io/github/actions/workflow/status/ljmerza/light-entity-card/deploy.yaml?style=for-the-badge&label=Build" alt="Build"></a>
+<a href="https://github.com/ljmerza/light-entity-card/blob/master/LICENSE"><img src="https://img.shields.io/github/license/ljmerza/light-entity-card?style=for-the-badge&label=License&color=green" alt="License"></a>
+<a href="https://github.com/hacs/integration"><img src="https://img.shields.io/badge/HACS-Default-41BDF5?style=for-the-badge" alt="HACS Default"></a>
+</p>
+
+<p align="center">
+<a href="https://www.buymeacoffee.com/JMISm06AD"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"></a>
+</p>
+
 Control any light/switch entity through lovelace
 
 ## Support
@@ -7,11 +20,6 @@ Control any light/switch entity through lovelace
 For help, visit the light entity support thread [here](https://community.home-assistant.io/t/light-entity-card/96146)
 
 <img src='https://raw.githubusercontent.com/ljmerza/light-entity-card/master/card.png' />
-
-[![GitHub Release][releases-shield]][releases]
-[![License][license-shield]](LICENSE.md)
-![Project Maintenance][maintenance-shield]
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
 ## Features
 
@@ -86,16 +94,3 @@ group: true
 | intensity_icon       | string              | **Optional** | `transit-connection-horizontal` change the intensity slider icon            |
 | show_slider_percent  | boolean             | **Optional** | `false` show percent next to sliders                                        |
 | child_card           | boolean             | **Optional** | `false` remove padding/margin to make this card within another card         |
-
----
-
-Enjoy my work? Help me out for a couple of :beers: or a :coffee:!
-
-<a href="https://www.buymeacoffee.com/JMISm06AD"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
-
-[commits-shield]: https://img.shields.io/github/commit-activity/y/ljmerza/light-entity-card.svg?style=for-the-badge
-[commits]: https://github.com/ljmerza/light-entity-card/commits/master
-[license-shield]: https://img.shields.io/github/license/ljmerza/light-entity-card.svg?style=for-the-badge
-[maintenance-shield]: https://img.shields.io/badge/maintainer-Leonardo%20Merza%20%40ljmerza-blue.svg?style=for-the-badge
-[releases-shield]: https://img.shields.io/github/release/ljmerza/light-entity-card.svg?style=for-the-badge
-[releases]: https://github.com/ljmerza/light-entity-card/releases
