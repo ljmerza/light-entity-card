@@ -6,71 +6,34 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: '16'
+        node-version: '20'
+        cache: 'npm'
 
     - name: Install Dependencies
-      run: npm install
+      run: npm ci
 
     - name: Run Build
       run: npm run build
 
-    - name: Commit dist folder
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add dist/
-        git commit -m "Add dist folder"
-    
-    - name: Push changes
-      uses: ad-m/github-push-action@master
+    - name: Create Release and upload light-entity-card.js
+      uses: softprops/action-gh-release@v2
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        force: true
-        directory: dist
-
-    - name: Get current and previous tags
-      id: tags
-      run: |
-        current_tag=$(git describe --tags --abbrev=0)
-        previous_tag=$(git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 --max-count=1))
-        echo ::set-output name=current_tag::${current_tag}
-        echo ::set-output name=previous_tag::${previous_tag}
-
-    - name: Generate release notes
-      id: releasenotes
-      run: |
-        echo "Release Notes:" > release_notes.md
-        git log ${previous_tag}..${current_tag} --pretty=format:"%h - %s" >> release_notes.md
-        echo ::set-output name=notes::$(cat release_notes.md)
-
-    - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.tags.outputs.current_tag }}
-        release_name: Release ${{ steps.tags.outputs.current_tag }}
-        body: ${{ steps.releasenotes.outputs.notes }}
-        draft: false
-        prerelease: false
-
-    - name: Upload light-entity-card.js to Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/light-entity-card.js
-        asset_name: light-entity-card.js
-        asset_content_type: application/javascript
+        name: Release ${{ github.ref_name }}
+        generate_release_notes: true
+        files: dist/light-entity-card.js
