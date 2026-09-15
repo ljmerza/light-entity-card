@@ -8,6 +8,7 @@ import LightEntityCardEditor from './index-editor';
 import packageJson from '../package.json';
 import buildElementDefinitions from './buildElementDefinitions';
 import globalElementLoader from './globalElementLoader';
+import { computeEntityName } from './entity-name';
 
 const editorName = 'light-entity-card-editor';
 customElements.define(editorName, LightEntityCardEditor);
@@ -267,7 +268,7 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    */
   createHeader(stateObj) {
     if (this.config.hide_header) return html``;
-    const title = this.config.header || stateObj.attributes.friendly_name || stateObj.entity_id;
+    const title = computeEntityName(this.hass, stateObj, this.config.header) || stateObj.entity_id;
 
     return html`
       <div class="light-entity-card__header">
