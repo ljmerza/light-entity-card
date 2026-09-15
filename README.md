@@ -76,7 +76,7 @@ group: true
 | consolidate_entities | boolean             | **Optional** | `false` if entity is a group you can consolidate all entities into one      |
 | persist_features     | boolean             | **Optional** | `false` always show entity features                                         |
 | effects_list         | list/string/boolean | **Optional** | custom list of effects, an input_select entity, or set false to always hide |
-| header               | string              | **Optional** | custom header name                                                          |
+| header               | string / list       | **Optional** | custom header name. Accepts a [structured name](#structured-names) on Home Assistant 2026.4 and later |
 | hide_header          | boolean             | **Optional** | `false` hides the entity header of the card including toggle                |
 | show_header_icon     | boolean             | **Optional** | `false` shows the entity icon of the card including toggle                  |
 | brightness           | boolean             | **Optional** | `true` show brightness slider if available                                  |
@@ -94,3 +94,27 @@ group: true
 | intensity_icon       | string              | **Optional** | `transit-connection-horizontal` change the intensity slider icon            |
 | show_slider_percent  | boolean             | **Optional** | `false` show percent next to sliders                                        |
 | child_card           | boolean             | **Optional** | `false` remove padding/margin to make this card within another card         |
+
+## Structured names
+
+*Requires Home Assistant 2026.4 or later. On earlier versions a structured `header` falls back to the entity's friendly name.*
+
+Home Assistant composes an entity's display name out of its registry context
+(entity, device, area, floor) rather than one `friendly_name` string. From 2026.4
+the card header uses that composed name by default, and `header` can be a list of
+those parts instead of a plain string:
+
+```yaml
+type: custom:light-entity-card
+entity: light.kitchen_ceiling
+header:
+  - type: area
+  - type: entity
+```
+
+Available part types are `entity`, `device`, `parent_device`, `area`, `floor`, and
+`text` (a literal, written as `{type: text, text: Ceiling}`). Parts that resolve to
+nothing are dropped. A plain string `header` keeps working exactly as before.
+
+See the [Home Assistant developer documentation](https://developers.home-assistant.io/docs/frontend/data#hassformatentitynamestateobj-name-options) for details.
+
