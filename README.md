@@ -112,7 +112,7 @@ header:
   - type: entity
 ```
 
-Available part types are `entity`, `device`, `parent_device`, `area`, `floor`, and
+Available part types are `entity`, `device`, `area`, `floor`, and
 `text` (a literal, written as `{type: text, text: Ceiling}`). Parts that resolve to
 nothing are dropped. A plain string `header` keeps working exactly as before.
 
