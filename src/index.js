@@ -130,12 +130,12 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
    * @return {Number}
    */
   getCardSize() {
-    if (!this.config || !this.__hass || !this.__hass.states[this.config.entity]) {
+    if (!this.config || !this.hass || !this.hass.states[this.config.entity]) {
       return 1;
     }
 
     let cardLength = 0;
-    const entities = this.__hass.states[this.config.entity];
+    const entities = this.hass.states[this.config.entity];
 
     // if given a group entity then sum length of each entity by type
     // else just get the sible entity length
