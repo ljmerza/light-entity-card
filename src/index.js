@@ -15,6 +15,53 @@ customElements.define(editorName, LightEntityCardEditor);
 
 console.info(`light-entity-card v${packageJson.version}`);
 
+// Shared across all card instances so only one hidden more-info dialog is ever opened per page load.
+// Without this, a card recreated by a more-info interceptor (e.g. Browser Mod popup-card) fires
+// another more-info event, which recreates the card again — an infinite loop.
+let colorPickerLoader = null;
+
+// ha-hs-color-picker is lazy-loaded by HA (only when more-info dialog opens).
+// Force it to load by opening a more-info dialog hidden via CSS, then closing it.
+const loadColorPicker = (entityId) => {
+  if (colorPickerLoader) return colorPickerLoader;
+
+  const ha = document.querySelector('home-assistant');
+  if (!ha) return Promise.resolve();
+
+  colorPickerLoader = (async () => {
+    // Hide the dialog to prevent visible flash
+    const hideStyle = document.createElement('style');
+    hideStyle.textContent = 'ha-more-info-dialog { display: none !important; }';
+    ha.shadowRoot.appendChild(hideStyle);
+
+    // ignore_popup_card stops Browser Mod from replacing this internal event with a popup-card
+    const ev = new CustomEvent('hass-more-info', {
+      detail: { entityId, ignore_popup_card: true },
+      bubbles: true, composed: true,
+    });
+    ha.dispatchEvent(ev);
+
+    try {
+      await Promise.race([
+        customElements.whenDefined('ha-hs-color-picker'),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+      ]);
+    } catch (e) {
+      // Timed out — color picker element not available, continue gracefully
+    } finally {
+      // Always close the hidden dialog and remove the style
+      const closeEv = new CustomEvent('hass-more-info', {
+        detail: { entityId: '' },
+        bubbles: true, composed: true,
+      });
+      ha.dispatchEvent(closeEv);
+      hideStyle.remove();
+    }
+  })();
+
+  return colorPickerLoader;
+};
+
 class LightEntityCard extends ScopedRegistryHost(LitElement) {
   static get elementDefinitions() {
     return buildElementDefinitions(
@@ -44,41 +91,10 @@ class LightEntityCard extends ScopedRegistryHost(LitElement) {
   async firstUpdated() {
     this._firstUpdate = true;
 
-    // ha-hs-color-picker is lazy-loaded by HA (only when more-info dialog opens).
-    // Force it to load by opening a more-info dialog hidden via CSS, then closing it.
     const needsColorPicker = this.config.color_picker !== false
       && this.config.entity.startsWith('light.');
     if (needsColorPicker && !customElements.get('ha-hs-color-picker')) {
-      const ha = document.querySelector('home-assistant');
-      if (ha) {
-        // Hide the dialog to prevent visible flash
-        const hideStyle = document.createElement('style');
-        hideStyle.textContent = 'ha-more-info-dialog { display: none !important; }';
-        ha.shadowRoot.appendChild(hideStyle);
-
-        const ev = new CustomEvent('hass-more-info', {
-          detail: { entityId: this.config.entity },
-          bubbles: true, composed: true,
-        });
-        ha.dispatchEvent(ev);
-
-        try {
-          await Promise.race([
-            customElements.whenDefined('ha-hs-color-picker'),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
-          ]);
-        } catch (e) {
-          // Timed out — color picker element not available, continue gracefully
-        } finally {
-          // Always close the hidden dialog and remove the style
-          const closeEv = new CustomEvent('hass-more-info', {
-            detail: { entityId: '' },
-            bubbles: true, composed: true,
-          });
-          ha.dispatchEvent(closeEv);
-          hideStyle.remove();
-        }
-      }
+      await loadColorPicker(this.config.entity);
       this.requestUpdate();
     }
   }
