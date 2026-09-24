@@ -1,6 +1,6 @@
 {
   "name": "light-entity-card",
-  "version": "6.4.0",
+  "version": "6.4.1",
   "description": "A light-entity card for Home Assistant Lovelace UI",
   "keywords": [
     "home-assistant",
@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
-"@lit-labs/scoped-registry-mixin": "^1.0.0",
+    "@lit-labs/scoped-registry-mixin": "^1.0.0",
     "@material/mwc-icon": "^0.25.3",
     "@material/mwc-list": "^0.25.3",
     "@material/mwc-menu": "^0.25.3",
